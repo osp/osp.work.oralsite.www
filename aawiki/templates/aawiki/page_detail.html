@@ -1,0 +1,30 @@
+{% extends "aawiki/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/template" id="annotation-view-template">
+{% include "aawiki/partials/annotation-view.html" %}
+</script>
+<script type="text/template" id="annotation-edit-template">
+{% include "aawiki/partials/annotation-edit.html" %}
+</script>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/jquery-ui-git.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css">
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/jquery-ui-git.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/backbone-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/backbone-tastypie.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/marked.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}aawiki/js/page-detail.js"></script>
+{% endblock %}
