@@ -12,7 +12,9 @@
 
 {% block css %}
 <link rel="stylesheet" href="http://code.jquery.com/ui/jquery-ui-git.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/aa.jquery.contextual/aa.jquery.contextual.css">
 {% endblock %}
 
 {% block body %}
@@ -26,5 +28,6 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone-tastypie.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/marked.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lib/aa.jquery.contextual/aa.jquery.contextual.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}aawiki/js/page-detail.js"></script>
 {% endblock %}

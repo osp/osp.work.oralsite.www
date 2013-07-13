@@ -1,11 +1,19 @@
 $(function() {
     window.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",
+        defaults: {
+            body: "Nouvelle annotation",
+            top: 10,
+            left: 10,
+            width: 300,
+            height: 400,
+            page: "/pages/api/v1/page/1/",
+        }
     });
 
     window.AnnotationCollection = Backbone.Collection.extend({
         model: AnnotationModel,
-        url: "/pages/api/v1/annotation/",
+        urlRoot: "/pages/api/v1/annotation/",
     });
 
     window.AnnotationView = Backbone.View.extend({
@@ -19,6 +27,7 @@ $(function() {
           'dblclick' : 'toggle',
         },
         initialize: function() {
+            this.listenTo(this.model, 'destroy', this.remove);
             this.render();
         },
         render: function() {
@@ -52,6 +61,14 @@ $(function() {
                             'left': ui.offset.left,
                         }).save();
                     }
+                }).contextual({
+                    propertyName: 'a custom value'
+                }).contextual('registerClick', {
+                    class: 'icon icon2',
+                    title: 'hello, World!',
+                    onclick: function(event) {
+                        model.destroy();
+                    }
                 });
             };
 
@@ -73,6 +90,14 @@ $(function() {
         el: 'body',
         initialize: function() {
             this.render();
+            this.listenTo(this.collection, 'add', this.renderOne);
+        },
+        renderOne: function(model, collection) {
+            var $el = this.$el;
+            var annotationView = new AnnotationView({model: model});
+            $el.append(annotationView.el);
+
+            return this;
         },
         render: function() {
             var $el = this.$el;
@@ -91,5 +116,19 @@ $(function() {
         success: function(result) {
             window.annotationCollectionView = new AnnotationCollectionView({collection: annotationCollection});
         },
+    });
+
+
+
+    $('body').contextual({
+        propertyName: 'a custom value'
+    });
+
+    $('body').contextual('registerClick', {
+        class: 'icon icon4',
+        title: 'hello, World!',
+        onclick: function(event) {
+            annotationCollection.create({top: event.pageY, left: event.pageX});
+        }
     });
 });
