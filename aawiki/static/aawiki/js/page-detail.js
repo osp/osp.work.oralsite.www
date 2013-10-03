@@ -1,5 +1,10 @@
-$(function() {
-    window.AnnotationModel = Backbone.Model.extend({
+window.AA = window.AA || {};
+
+
+(function(undefined) {
+    'use strict';
+
+    AA.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
             body: "Nouvelle annotation",
@@ -11,12 +16,14 @@ $(function() {
         }
     });
 
-    window.AnnotationCollection = Backbone.Collection.extend({
-        model: AnnotationModel,
+
+    AA.AnnotationCollection = Backbone.Collection.extend({
+        model: AA.AnnotationModel,
         urlRoot: "/pages/api/v1/annotation/",
     });
 
-    window.AnnotationView = Backbone.View.extend({
+
+    AA.AnnotationView = Backbone.View.extend({
         tagName: 'section',
         templates: {
             view: _.template($('#annotation-view-template').html()),
@@ -28,6 +35,12 @@ $(function() {
         },
         initialize: function() {
             this.listenTo(this.model, 'destroy', this.remove);
+
+            marked.setOptions({
+                timecode: true,
+                semanticdata: 'aa',
+            });
+
             this.render();
         },
         render: function() {
@@ -61,19 +74,43 @@ $(function() {
                             'left': ui.offset.left,
                         }).save();
                     }
-                }).contextual({
-                    propertyName: 'a custom value'
-                }).contextual('registerClick', {
-                    class: 'icon icon2',
-                    title: 'hello, World!',
-                    onclick: function(event) {
-                        model.destroy();
-                    }
+                //})
+                //.contextual({
+                    //propertyName: 'a custom value'
+                //})
+                //.contextual('registerClick', {
+                    //class: 'icon icon1',
+                    //title: 'hello, World!',
+                    //onclick: function(event) {
+                        //model.destroy();
+                    //}
+                //})
+                //.contextual('registerClick', {
+                    //class: 'icon icon2',
+                    //title: 'hello, World!',
+                    //onclick: function(event) {
+                        //model.destroy();
+                    //}
+                //})
+                //.contextual('registerClick', {
+                    //class: 'icon icon3',
+                    //title: 'hello, World!',
+                    //onclick: function(event) {
+                        //model.destroy();
+                    //}
+                //})
+                //.contextual('registerClick', {
+                    //class: 'icon icon4',
+                    //title: 'hello, World!',
+                    //onclick: function(event) {
+                        //model.destroy();
+                    //}
                 });
             };
 
             return this;
         },
+
         toggle: function() {
             if (this.editing) {
                 this.model.set({
@@ -86,15 +123,54 @@ $(function() {
         }
     });
 
-    window.AnnotationCollectionView = Backbone.View.extend({
+
+    AA.AnnotationCollectionView = Backbone.View.extend({
+        collection: new AA.AnnotationCollection({page: "/pages/api/v1/page/1/"}),
         el: 'body',
         initialize: function() {
-            this.render();
+            var that = this;
+
+            this.$el.contextual({})
+            .contextual('registerClick', {
+                class: 'icon icon4',
+                title: 'hello, World!',
+                onclick: function(event) {
+                    that.collection.create({top: event.pageY, left: event.pageX});
+                }
+            })
+            .contextual('registerClick', {
+                class: 'icon icon3',
+                title: 'hello, World!',
+                onclick: function(event) {
+                    that.collection.create({top: event.pageY, left: event.pageX});
+                }
+            })
+            .contextual('registerClick', {
+                class: 'icon icon2',
+                title: 'hello, World!',
+                onclick: function(event) {
+                    that.collection.create({top: event.pageY, left: event.pageX});
+                }
+            })
+            .contextual('registerClick', {
+                class: 'icon icon1',
+                title: 'hello, World!',
+                onclick: function(event) {
+                    that.collection.create({top: event.pageY, left: event.pageX});
+                }
+            });
+
+            this.collection.fetch({
+                success: function(result) {
+                    that.render();
+                }
+            });
+
             this.listenTo(this.collection, 'add', this.renderOne);
         },
         renderOne: function(model, collection) {
             var $el = this.$el;
-            var annotationView = new AnnotationView({model: model});
+            var annotationView = new AA.AnnotationView({model: model});
             $el.append(annotationView.el);
 
             return this;
@@ -103,32 +179,16 @@ $(function() {
             var $el = this.$el;
             $el.empty();
             this.collection.each(function(annotation) {
-                var annotationView = new AnnotationView({model: annotation});
+                var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);
             });
 
             return this;
         }
     });
-
-    window.annotationCollection = new AnnotationCollection({page: "/pages/api/v1/page/1/"});
-    annotationCollection.fetch({
-        success: function(result) {
-            window.annotationCollectionView = new AnnotationCollectionView({collection: annotationCollection});
-        },
-    });
+})();
 
 
-
-    $('body').contextual({
-        propertyName: 'a custom value'
-    });
-
-    $('body').contextual('registerClick', {
-        class: 'icon icon4',
-        title: 'hello, World!',
-        onclick: function(event) {
-            annotationCollection.create({top: event.pageY, left: event.pageX});
-        }
-    });
+$(function() {
+    AA.annotationCollectionView = new AA.AnnotationCollectionView();
 });
