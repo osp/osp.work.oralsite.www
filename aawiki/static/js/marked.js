@@ -1,1 +1,0 @@
-../../../../../marked/lib/marked.js

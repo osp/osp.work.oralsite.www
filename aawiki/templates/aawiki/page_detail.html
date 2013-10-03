@@ -12,10 +12,10 @@
 
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="http://code.jquery.com/ui/jquery-ui-git.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}lib/aa.jquery.contextual/aa.jquery.contextual.css">
 {% endblock %}
 
 {% block body %}
@@ -23,12 +23,13 @@
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/ui/jquery-ui-git.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/underscore-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/backbone-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/backbone-tastypie.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/marked.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}lib/aa.jquery.contextual/aa.jquery.contextual.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}aawiki/js/page-detail.js"></script>
+<script src="{{ STATIC_URL }}components/jquery/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+<script src="{{ STATIC_URL }}components/underscore/underscore-min.js"></script>
+<script src="{{ STATIC_URL }}components/backbone/backbone-min.js"></script>
+<script src="{{ STATIC_URL }}components/backbone-tastypie/backbone_tastypie/static/js/backbone-tastypie.js"></script>
+<script src="{{ STATIC_URL }}components/marked/lib/marked.js"></script>
+<script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/page-detail.js"></script>
 {% endblock %}
