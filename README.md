@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- python &gt;= 2.5
+- python &gt;= 2.6
 - pip
 - virtualenv
 
@@ -22,30 +22,14 @@ source bin/activate
 ### Clone the code
 
 ```bash
-git clone <URL_TO_GIT_REPOSITORY> oralsite
+git clone git@git.constantvzw.org:/osp.work.oralsite.www.git oralsite
 ```
 
 ### Install the requirements
 
 ```bash
 cd oralsite
-pip install -r requirements/common.txt
-```
-
-Depending on the your profile (development or production), install the extra
-requirements.
-
-In a development environment, run:
-
-```bash
-cd oralsite
-pip install -r requirements/dev.txt
-```
-In a production environment, run:
-
-```bash
-cd oralsite
-pip install -r requirements/prod.txt
+pip install -r requirements.txt
 ```
 
 ### Configure the project
@@ -67,4 +51,6 @@ python manage.py syncdb
 python manage.py runserver
 ```
 
-Open you browser at <http://localhost:8000>.
+Navigate to <http://localhost:8000/admin/>. Create a first page with slug `Index` manually at <http://localhost:8000/admin/aawiki/page/add/>.
+
+Open your browser at <http://localhost:8000>.
