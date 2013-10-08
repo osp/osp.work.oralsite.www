@@ -74,37 +74,6 @@ window.AA = window.AA || {};
                             'left': ui.offset.left,
                         }).save();
                     }
-                //})
-                //.contextual({
-                    //propertyName: 'a custom value'
-                //})
-                //.contextual('registerClick', {
-                    //class: 'icon icon1',
-                    //title: 'hello, World!',
-                    //onclick: function(event) {
-                        //model.destroy();
-                    //}
-                //})
-                //.contextual('registerClick', {
-                    //class: 'icon icon2',
-                    //title: 'hello, World!',
-                    //onclick: function(event) {
-                        //model.destroy();
-                    //}
-                //})
-                //.contextual('registerClick', {
-                    //class: 'icon icon3',
-                    //title: 'hello, World!',
-                    //onclick: function(event) {
-                        //model.destroy();
-                    //}
-                //})
-                //.contextual('registerClick', {
-                    //class: 'icon icon4',
-                    //title: 'hello, World!',
-                    //onclick: function(event) {
-                        //model.destroy();
-                    //}
                 });
             };
 
@@ -129,36 +98,6 @@ window.AA = window.AA || {};
         el: 'body',
         initialize: function() {
             var that = this;
-
-            this.$el.contextual({})
-            .contextual('registerClick', {
-                class: 'icon icon4',
-                title: 'hello, World!',
-                onclick: function(event) {
-                    that.collection.create({top: event.pageY, left: event.pageX});
-                }
-            })
-            .contextual('registerClick', {
-                class: 'icon icon3',
-                title: 'hello, World!',
-                onclick: function(event) {
-                    that.collection.create({top: event.pageY, left: event.pageX});
-                }
-            })
-            .contextual('registerClick', {
-                class: 'icon icon2',
-                title: 'hello, World!',
-                onclick: function(event) {
-                    that.collection.create({top: event.pageY, left: event.pageX});
-                }
-            })
-            .contextual('registerClick', {
-                class: 'icon icon1',
-                title: 'hello, World!',
-                onclick: function(event) {
-                    that.collection.create({top: event.pageY, left: event.pageX});
-                }
-            });
 
             this.collection.fetch({
                 success: function(result) {
