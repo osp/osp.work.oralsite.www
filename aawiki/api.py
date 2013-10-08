@@ -4,6 +4,7 @@ from tastypie import fields
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource
 from aawiki.models import Annotation, Page
+from aawiki.authorization import PerPageAuthorization, PerAnnotationAuthorization
 
 
 class AnnotationResource(ModelResource):
@@ -15,7 +16,7 @@ class AnnotationResource(ModelResource):
         filtering = {
             "page": ('exact',)
         }
-        authorization = Authorization()
+        authorization = PerAnnotationAuthorization()
 
 
 class PageResource(ModelResource):
@@ -24,4 +25,9 @@ class PageResource(ModelResource):
     class Meta:
         queryset = Page.objects.all()
         resource_name = 'page'
-        authorization = Authorization()
+        authorization = PerPageAuthorization()
+    
+    def dehydrate(self, bundle):
+        if hasattr(bundle.request, 'user') and not isinstance(bundle.request.user, AnonymousUser):
+            bundle.data['user'] = {'name' : bundle.request.user.username }
+        return bundle
