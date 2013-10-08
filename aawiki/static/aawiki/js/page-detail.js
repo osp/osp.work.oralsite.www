@@ -4,6 +4,16 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+    /* Error Handling */
+    AA.AlertView = Backbone.View.extend({
+        set: function(typeOfError, traceback) {
+            var error = $('.error');
+            error
+                .html('<h1>' + typeOfError + '</h1>' + '<pre>' + traceback + '</pre>') // TODO: create template
+                .fadeIn()
+        }
+    });
+
     AA.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
@@ -109,7 +119,12 @@ window.AA = window.AA || {};
                     that.render();
                 },
                 error: function(model, response, options) {
-                    console.log(model, response, options);
+                    // The response-text for the error is in JSON (probably a TastyPie specific format)
+                    // We parse it.
+                    var error = JSON.parse(response.responseText);
+                    var errorMessage = error.error_message
+                    var traceback = error.traceback
+                    AA.alertView.set(errorMessage, traceback);
                 }
             });
 
@@ -139,6 +154,7 @@ window.AA = window.AA || {};
 
 
 $(function() {
+    AA.alertView = new AA.AlertView();
     // TODO: AA.pageView = new AA.PageView();
     // TODO: AA.userView = new AA.UserView();
     AA.annotationCollectionView = new AA.AnnotationCollectionView();
