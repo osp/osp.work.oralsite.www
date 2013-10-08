@@ -12,7 +12,7 @@ window.AA = window.AA || {};
             left: 10,
             width: 300,
             height: 400,
-            page: "/pages/api/v1/page/1/",
+            page: "/pages/api/v1/page/1/", /* TODO: needs to be a function that returns the link to the current page */
         }
     });
 
@@ -100,8 +100,16 @@ window.AA = window.AA || {};
             var that = this;
 
             this.collection.fetch({
+                data : {
+                    // filters the annotation list for the current Page at
+                    // the API level
+                    "page" : 1
+                },
                 success: function(result) {
                     that.render();
+                },
+                error: function(model, response, options) {
+                    console.log(model, response, options);
                 }
             });
 
@@ -125,9 +133,13 @@ window.AA = window.AA || {};
             return this;
         }
     });
+
+// end of the namespace:
 })();
 
 
 $(function() {
+    // TODO: AA.pageView = new AA.PageView();
+    // TODO: AA.userView = new AA.UserView();
     AA.annotationCollectionView = new AA.AnnotationCollectionView();
 });

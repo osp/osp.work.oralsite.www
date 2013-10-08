@@ -1,3 +1,5 @@
+from django.contrib.auth.models import AnonymousUser
+
 from tastypie import fields
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource
@@ -10,7 +12,10 @@ class AnnotationResource(ModelResource):
     class Meta:
         queryset = Annotation.objects.all()
         resource_name = 'annotation'
-        authorization= Authorization()
+        filtering = {
+            "page": ('exact',)
+        }
+        authorization = Authorization()
 
 
 class PageResource(ModelResource):
@@ -19,4 +24,4 @@ class PageResource(ModelResource):
     class Meta:
         queryset = Page.objects.all()
         resource_name = 'page'
-        authorization= Authorization()
+        authorization = Authorization()
