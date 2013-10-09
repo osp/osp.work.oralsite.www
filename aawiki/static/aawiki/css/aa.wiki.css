@@ -20,3 +20,21 @@ body {
     width: 100%;
     height: 100%;
 }
+
+nav#sidebar {
+    width: 207px;
+    padding: 13px 0 13px 13px;
+}
+nav#sidebar hgroup h1 {
+    font-size: 32px;
+    line-height: 36px;
+}
+
+nav#sidebar hgroup {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    margin: -2px 0;
+    position: relative;
+    top: 5px;
+    padding-bottom: 18px;
+}

@@ -14,6 +14,30 @@ window.AA = window.AA || {};
         }
     });
 
+    AA.PageModel = Backbone.Model.extend({
+        urlRoot: "/pages/api/v1/page/",
+        initialize: function() {
+            this.fetch();
+        },
+    });
+
+    AA.PageView = Backbone.View.extend({
+        el: '#page-meta',
+        templates: {
+            view: _.template($('#page-view-template').html()),
+        },
+        render: function() {
+            this.$el.html( this.templates.view( this.model.toJSON() ) );
+            return this;
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            // if we want to already render the template, without the values fetched: this.render();
+        },
+    });
+
+
+
     AA.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
@@ -105,7 +129,7 @@ window.AA = window.AA || {};
 
     AA.AnnotationCollectionView = Backbone.View.extend({
         collection: new AA.AnnotationCollection({page: "/pages/api/v1/page/1/"}),
-        el: 'body',
+        el: 'article#canvas',
         initialize: function() {
             var that = this;
 
@@ -155,7 +179,7 @@ window.AA = window.AA || {};
 
 $(function() {
     AA.alertView = new AA.AlertView();
-    // TODO: AA.pageView = new AA.PageView();
+    AA.pageView = new AA.PageView({ model: new AA.PageModel, id : 1 }); // TODO: don’t hardcode, but get from the router instead
     // TODO: AA.userView = new AA.UserView();
     AA.annotationCollectionView = new AA.AnnotationCollectionView();
 });

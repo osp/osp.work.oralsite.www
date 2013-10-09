@@ -2,6 +2,12 @@
 
 {% block extrahead %}
 {{ block.super }}
+<script type="text/template" id="page-view-template">
+{% include "aawiki/partials/page-view.html" %}
+</script>
+<script type="text/template" id="user-view-template">
+{% include "aawiki/partials/user-view.html" %}
+</script>
 <script type="text/template" id="annotation-view-template">
 {% include "aawiki/partials/annotation-view.html" %}
 </script>
@@ -20,6 +26,20 @@
 {% endblock %}
 
 {% block body %}
+<nav id="sidebar">
+    <!-- TODO: implement Site View in Backbone for these kind of infos:
+        <div id="site-name"><a title="Back to main page" href="/oralsite/">Oralsite</a>
+(<a title="About Oral Site" href="/oralsite/pages/Oral_Site/">about</a>)</div> -->
+    <div id="user-meta">
+
+    </div>
+    <div id="page-meta">
+        
+    </div>
+</nav>
+<article id="canvas">
+    
+</article>
 <div class="error">
     Generic Error Message
 </div>
