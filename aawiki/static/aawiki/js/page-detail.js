@@ -1,3 +1,11 @@
+/*
+ * TODO: There are no 404’s, an inexisting page will create an empty page to experiment with.
+ *       However, there is no way yet to save that page to the server.
+ * TODO: Add functionality to create new annotations
+ * TODO: When creating a new annotation, and on an unsaved new page, first try to create new page
+ * 
+ * */
+
 window.AA = window.AA || {};
 
 
@@ -19,7 +27,13 @@ window.AA = window.AA || {};
     AA.PageModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/page/",
         initialize: function() {
-            this.fetch();
+            this.fetch({
+                error: function(model, response, options) {
+                    if (response.status === 404) {
+                        AA.alertView.set('Creating a new page', '');
+                    }
+                }
+            });
         },
     });
 
@@ -48,7 +62,7 @@ window.AA = window.AA || {};
             left: 10,
             width: 300,
             height: 400,
-            page: "/pages/api/v1/page/1/", /* TODO: needs to be a function that returns the link to the current page */
+            page: "/pages/api/v1/page/1/", /* TODO: REMOVE, see next TODO */
         }
     });
 
@@ -56,6 +70,9 @@ window.AA = window.AA || {};
     AA.AnnotationCollection = Backbone.Collection.extend({
         model: AA.AnnotationModel,
         urlRoot: "/pages/api/v1/annotation/",
+        /* TODO we will need a function to create a new annotation
+         * To make reference tot theh current page, we can use AA.router.pageView.model.get('resource_uri')
+         */
     });
 
 
@@ -130,7 +147,7 @@ window.AA = window.AA || {};
 
 
     AA.AnnotationCollectionView = Backbone.View.extend({
-        collection: new AA.AnnotationCollection({page: "/pages/api/v1/page/1/"}),
+        collection: new AA.AnnotationCollection(), 
         el: 'article#canvas',
         initialize: function() {
             var that = this;
@@ -139,7 +156,7 @@ window.AA = window.AA || {};
                 data : {
                     // filters the annotation list for the current Page at
                     // the API level
-                    "page" : 1
+                    "page__slug" : this.id
                 },
                 success: function(result) {
                     that.render();
@@ -175,15 +192,34 @@ window.AA = window.AA || {};
         }
     });
 
+    AA.Router = Backbone.Router.extend({
+
+      routes: {
+        ":slug/": "page",
+      },
+
+      page: function(slug) {
+        console.log(slug);
+        // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
+        this.pageView && this.pageView.remove();
+        this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
+        
+        this.annotationCollectionView && this.annotationCollectionView.remove();
+        this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
+      },
+
+    });
+
 // end of the namespace:
 })();
 
 
 $(function() {
+    var id = 'Index';
+    AA.router = new AA.Router();
     AA.alertView = new AA.AlertView();
-    AA.pageView = new AA.PageView({ model: new AA.PageModel, id : 1 }); // TODO: don’t hardcode, but get from the router instead
+    Backbone.history.start({pushState: true, root: "/pages/"});
     // TODO: AA.userView = new AA.UserView();
-    AA.annotationCollectionView = new AA.AnnotationCollectionView();
 });
 
 $(document).ajaxError(function (e, xhr, options) {
