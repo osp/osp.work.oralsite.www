@@ -25,12 +25,22 @@ nav#sidebar {
     width: 207px;
     padding: 13px 0 13px 13px;
 }
-nav#sidebar hgroup h1 {
+
+.error {
+    width: 207px;
+    border: 1px solid black;
+    position: fixed;
+    top: 13px;
+    right: 13px;
+    padding: 13px;
+}
+
+h1 {
     font-size: 32px;
     line-height: 36px;
 }
 
-nav#sidebar hgroup {
+hgroup {
     border-top: 2px solid black;
     border-bottom: 2px solid black;
     margin: -2px 0;
@@ -38,3 +48,4 @@ nav#sidebar hgroup {
     top: 5px;
     padding-bottom: 18px;
 }
+

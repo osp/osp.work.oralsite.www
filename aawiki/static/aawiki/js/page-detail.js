@@ -6,11 +6,13 @@ window.AA = window.AA || {};
 
     /* Error Handling */
     AA.AlertView = Backbone.View.extend({
-        set: function(typeOfError, traceback) {
+        set: function(typeOfError, instructions, traceback) {
             var error = $('.error');
             error
-                .html('<h1>' + typeOfError + '</h1>' + '<pre>' + traceback + '</pre>') // TODO: create template
+                .html('<h1>' + typeOfError + '</h1>' + '<p>' + instructions + '</p>') // TODO: create template
                 .fadeIn()
+                .delay(5000)
+                .fadeOut();
         }
     });
 
@@ -69,7 +71,7 @@ window.AA = window.AA || {};
         },
         initialize: function() {
             this.listenTo(this.model, 'destroy', this.remove);
-
+            
             marked.setOptions({
                 timecode: true,
                 semanticdata: 'aa',
@@ -182,4 +184,13 @@ $(function() {
     AA.pageView = new AA.PageView({ model: new AA.PageModel, id : 1 }); // TODO: don’t hardcode, but get from the router instead
     // TODO: AA.userView = new AA.UserView();
     AA.annotationCollectionView = new AA.AnnotationCollectionView();
+});
+
+$(document).ajaxError(function (e, xhr, options) {
+    /* This displays an error message.
+     * The error is not actually *caught*,
+     * so it keeps showing up in the console */
+    if (xhr.status === 401 || xhr.status === 403) {
+     AA.alertView.set('Insufficient permissions to save', 'Remember, your changes will not actually be saved when you leave the page');
+    }
 });
