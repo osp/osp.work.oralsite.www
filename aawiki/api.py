@@ -1,11 +1,23 @@
-from django.contrib.auth.models import AnonymousUser
+# -*- coding: utf-8 -*-
+
+from django.contrib.auth.models import AnonymousUser, User
 from django.conf.urls import url
+from django.core.urlresolvers import reverse
 
 from tastypie import fields
+from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
+
 from aawiki.models import Annotation, Page
 from aawiki.authorization import PerPageAuthorization, PerAnnotationAuthorization
+
+class UserResource(ModelResource):
+    class Meta:
+        resource_name = 'user'
+        queryset = User.objects.all()
+        excludes = ['email', 'password', 'is_active', 'is_staff', 'is_superuser']
+        authentication = SessionAuthentication()
 
 class AnnotationResource(ModelResource):
     page = fields.ForeignKey('aawiki.api.PageResource', 'page')
@@ -17,7 +29,6 @@ class AnnotationResource(ModelResource):
             "page": ALL_WITH_RELATIONS
         }
         authorization = PerAnnotationAuthorization()
-
 
 class PageResource(ModelResource):
     annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True, full=True)
@@ -37,6 +48,9 @@ class PageResource(ModelResource):
         ]
     
     def dehydrate(self, bundle):
+        """
+        Add a link to the currently logged in user
+        """
         if hasattr(bundle.request, 'user') and not isinstance(bundle.request.user, AnonymousUser):
-            bundle.data['user'] = {'name' : bundle.request.user.username }
+            bundle.data['user'] =  bundle.request.user.id # reverse('api_dispatch_detail', kwargs={'resource_name': 'user', 'api_name':'v1', 'pk': bundle.request.user.id })
         return bundle

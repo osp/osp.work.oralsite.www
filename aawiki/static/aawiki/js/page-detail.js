@@ -24,6 +24,28 @@ window.AA = window.AA || {};
         }
     });
 
+    AA.UserModel = Backbone.Model.extend({
+        urlRoot: "/pages/api/v1/user/",
+        initialize: function() {
+            this.fetch()
+        },
+    });
+
+    AA.UserView = Backbone.View.extend({
+        el: '#user-meta',
+        templates: {
+            view: _.template($('#user-view-template').html()),
+        },
+        render: function() {
+            this.$el.html( this.templates.view( this.model.toJSON() ) );
+            return this;
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+        },
+    });
+
+
     AA.PageModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/page/",
         initialize: function() {
@@ -31,8 +53,9 @@ window.AA = window.AA || {};
                 error: function(model, response, options) {
                     if (response.status === 404) {
                         AA.alertView.set('Creating a new page', '');
+                        // TODO: set default model attributes based on slug
                     }
-                }
+                },
             });
         },
     });
@@ -44,6 +67,16 @@ window.AA = window.AA || {};
         },
         render: function() {
             this.$el.html( this.templates.view( this.model.toJSON() ) );
+            /* Because the render function will only fire once the data is fetched,
+             * We initialise dependant views here.
+             * 
+             * The userview is is dependant because we need to know the userId.
+             * This view in turn will only render once the needed data is fetched.
+             * */
+            if (!AA.userView) {
+                AA.userModel = new AA.UserModel({id : AA.router.pageView.model.attributes.user });
+                AA.userView = new AA.UserView({ model : AA.userModel });
+            }
             return this;
         },
         initialize: function() {
@@ -51,8 +84,6 @@ window.AA = window.AA || {};
             // if we want to already render the template, without the values fetched: this.render();
         },
     });
-
-
 
     AA.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",

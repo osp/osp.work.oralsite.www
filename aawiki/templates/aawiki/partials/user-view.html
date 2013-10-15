@@ -1,3 +1,7 @@
-    <p>
+<p>
+    <% if (typeof id === "undefined" | id === -1) { %>
         <a title="Login" id="login-link">Login</a>
-    </p>
+    <% } else {%> 
+        Welcome, <%= username %>
+    <% } %>
+</p>
