@@ -31,14 +31,14 @@ class PerPageAuthorization(Authorization):
         raise NotImplementedError()
     
     def create_detail(self, object_list, bundle):
-        get_user(bundle).has_perm('add_page', bundle.obj)
+        return get_user(bundle).has_perm('add_page', bundle.obj)
     
     def update_list(self, object_list, bundle):
         pages = get_objects_for_user(get_user(bundle), 'aawiki.change_page')
         return pages
     
     def update_detail(self, object_list, bundle):
-        get_user(bundle).has_perm('change_page', bundle.obj)
+        return get_user(bundle).has_perm('change_page', bundle.obj)
     
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
@@ -62,14 +62,14 @@ class PerAnnotationAuthorization(Authorization):
         raise NotImplementedError()
     
     def create_detail(self, object_list, bundle):
-        get_user(bundle).has_perm('add_page', bundle.obj.page)
+        return get_user(bundle).has_perm('add_page', bundle.obj.page)
     
     def update_list(self, object_list, bundle):
         permitted_pages = [i.id for i in get_objects_for_user(get_user(bundle), 'aawiki.change_page')]
         return object_list.filter(page__id__in=permitted_pages)
     
     def update_detail(self, object_list, bundle):
-        get_user(bundle).has_perm('change_page', bundle.obj.page)
+        return get_user(bundle).has_perm('change_page', bundle.obj.page)
     
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
