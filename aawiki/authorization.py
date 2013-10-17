@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.contrib.auth.models import User, AnonymousUser
 
 from tastypie.authorization import Authorization
@@ -17,8 +19,59 @@ def get_user(bundle):
     else:
         return bundle.request.user
 
+class PerUserAuthorization(Authorization):
+    """
+    By default, users can only request info on themselves.
+    If not logged in, the AnymousUser object will be returned.
+    """
+    def read_list(self, object_list, bundle):
+        """
+        Only superusers can read the list of users
+        (TODO: should be all users in the ‘editors’ group)
+        """
+        if get_user(bundle).is_superuser:
+            return object_list
+        else:
+            raise Unauthorized("Sorry, you can not see the other users")
+    
+    def read_detail(self, object_list, bundle):
+        """
+        A user can request info on herself
+        """
+        if get_user(bundle).id == bundle.obj.id:
+            return True
+        else:
+            return False
+    
+    def create_list(self, object_list, bundle):
+        # Currently not used in Tastypie
+        raise NotImplementedError()
+    
+    def create_detail(self, object_list, bundle):
+        # TODO
+        raise NotImplementedError()
+    
+    def update_list(self, object_list, bundle):
+        raise NotImplementedError()
+    
+    def update_detail(self, object_list, bundle):
+        # TODO
+        raise NotImplementedError()
+    
+    def delete_list(self, object_list, bundle):
+        raise Unauthorized("Sorry, no deletes.")
+    
+    def delete_detail(self, object_list, bundle):
+        raise Unauthorized("Sorry, no deletes.")
+
 
 class PerPageAuthorization(Authorization):
+    """
+    This maps the permissions, as assigned by Django Guardian,
+    to a Tastypie Authorization class. It checks if the logged in
+    user (or else, the AnonymousUser) has the appropriate
+    permissions to view, add or create a Page.
+    """
     def read_list(self, object_list, bundle):
         pages = get_objects_for_user(get_user(bundle), 'aawiki.view_page')
         return pages
@@ -47,6 +100,10 @@ class PerPageAuthorization(Authorization):
         raise Unauthorized("Sorry, no deletes.")
     
 class PerAnnotationAuthorization(Authorization):
+    """
+    To see if a user can see, edit and create annotations, we depend
+    on the permissions the user has for the parent page.
+    """
     def read_list(self, object_list, bundle):
         permitted_pages = get_objects_for_user(get_user(bundle), 'aawiki.view_page')
         permitted_ids = []
@@ -62,7 +119,7 @@ class PerAnnotationAuthorization(Authorization):
         raise NotImplementedError()
     
     def create_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('add_page', bundle.obj.page)
+        return get_user(bundle).has_perm('change_page', bundle.obj.page) # change page, not add page, because adding an annotation means changing a page
     
     def update_list(self, object_list, bundle):
         permitted_pages = [i.id for i in get_objects_for_user(get_user(bundle), 'aawiki.change_page')]
