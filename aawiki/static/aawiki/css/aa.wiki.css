@@ -43,9 +43,12 @@ h1 {
 hgroup {
     border-top: 2px solid black;
     border-bottom: 2px solid black;
-    margin: -2px 0;
+    margin: 0;
     position: relative;
     top: 5px;
     padding-bottom: 18px;
 }
 
+div#accordion {
+    margin-top: 13px;
+}

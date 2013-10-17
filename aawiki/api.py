@@ -12,7 +12,7 @@ from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 
 from aawiki.models import Annotation, Page
-from aawiki.authorization import get_user, PerUserAuthorization, PerPageAuthorization, PerAnnotationAuthorization
+from aawiki.authorization import get_user, get_serialized_perms, PerUserAuthorization, PerPageAuthorization, PerAnnotationAuthorization
 
 class UserResource(ModelResource):
     class Meta:
@@ -44,7 +44,7 @@ class AnnotationResource(ModelResource):
         authorization = PerAnnotationAuthorization()
     
 class PageResource(ModelResource):
-    annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True, full=True)
+    annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True )
 
     class Meta:
         queryset = Page.objects.all()
@@ -65,4 +65,5 @@ class PageResource(ModelResource):
         Add a link to the currently logged in user
         """
         bundle.data['user'] =  get_user(bundle).id # reverse('api_dispatch_detail', kwargs={'resource_name': 'user', 'api_name':'v1', 'pk': get_user(bundle).id })
+        bundle.data['permissions'] = get_serialized_perms(bundle.obj)
         return bundle

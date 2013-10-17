@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.models import User, AnonymousUser
+from django.core.urlresolvers import reverse
 
 from tastypie.authorization import Authorization
 from tastypie.exceptions import Unauthorized
 
-from guardian.shortcuts import get_objects_for_user
+from guardian.shortcuts import get_objects_for_user, get_users_with_perms
 
 def get_user(bundle):
     """
@@ -18,6 +19,20 @@ def get_user(bundle):
         return User.objects.get(pk=-1)
     else:
         return bundle.request.user
+
+def get_serialized_perms(object, perms_to_serialize=[u'view_page', u'change_page']):
+    permissions = {}
+    for perm in perms_to_serialize:
+        permissions[perm] = []
+    for user, perms in get_users_with_perms(object, attach_perms=True).iteritems():
+        perms_found = set(perms_to_serialize) & set(perms)
+        for perm in perms_found:
+            permissions[perm].append({  'type' : 'user',
+                                        'id'   : user.id,
+                                        'name' : user.first_name or user.username,
+                                        'uri'  : reverse('api_dispatch_detail', kwargs={'resource_name': 'user', 'api_name':'v1', 'pk': user.id }) }
+            )
+    return permissions
 
 class PerUserAuthorization(Authorization):
     """
