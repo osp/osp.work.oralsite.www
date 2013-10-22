@@ -15,7 +15,8 @@ class Page(models.Model):
     
     class Meta:
         permissions = (
-            ('view_page', 'View page'),
+            ('view_page', 'Can view page'),
+            ('administer_page', 'Can administer page')
         )
 
 
