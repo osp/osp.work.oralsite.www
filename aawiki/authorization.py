@@ -132,4 +132,4 @@ class PerAnnotationAuthorization(Authorization):
         raise Unauthorized("Sorry, no deletes.")
     
     def delete_detail(self, object_list, bundle):
-        raise Unauthorized("Sorry, no deletes.")
+        return get_user(bundle).has_perm('change_page', bundle.obj.page)
