@@ -210,10 +210,6 @@ section.section1 .menu {
     display: none;
 }
 
-section.section1:hover .menu {
-    display: block;
-}
-
 body {
    -moz-user-select     : none;
    -khtml-user-select   : none;

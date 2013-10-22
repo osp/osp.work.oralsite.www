@@ -12,6 +12,30 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+
+    /**
+     * Button factory for contextual menus
+     * TODO: move in a more appropriate place
+     */
+    var CreateBtn = function(options) {
+        var defaults = {
+            title: 'undefined',
+            class: ''
+        };
+
+        var options = $.extend({}, defaults, options);
+
+        var btn = $('<div>')
+        .attr({
+            title: options.title,
+            draggable: false,
+            class: 'icon ' + options.class
+        });
+
+        return btn;
+    };
+
+
     /* Error Handling */
     AA.AlertView = Backbone.View.extend({
         set: function(typeOfError, instructions, traceback) {
@@ -24,12 +48,14 @@ window.AA = window.AA || {};
         }
     });
 
+
     AA.UserModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/user/",
         initialize: function() {
             this.fetch()
         },
     });
+
 
     AA.UserView = Backbone.View.extend({
         el: '#user-meta',
@@ -60,6 +86,7 @@ window.AA = window.AA || {};
         },
     });
 
+
     AA.PageView = Backbone.View.extend({
         el: '#page-meta',
         templates: {
@@ -84,6 +111,7 @@ window.AA = window.AA || {};
             // if we want to already render the template, without the values fetched: this.render();
         },
     });
+
 
     AA.AnnotationModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/annotation/",
@@ -114,12 +142,62 @@ window.AA = window.AA || {};
             edit: _.template($('#annotation-edit-template').html()),
         },
         editing: false,
-        events : {
-          'dblclick' : 'toggle',
+        onPositionChange: function(model, value, options) {
+            var defaults = {
+                animate: false
+            };
+            var options = $.extend({}, defaults, options);
+
+            if (options.animate === true) {
+                this.$el.animate({
+                    left: model.changed.left,
+                    top: model.changed.top
+                }, 2000, 'easeOutExpo');
+            };
+        },
+        deleteAnnotation: function(event) {
+            if (window.confirm('This will permanently delete this annotation. Proceed?')) {
+                this.$el.contextual('hide');
+                this.model.destroy();
+            };
+            return false;
+        },
+        exportAnnotationToAudacityMarkers: function(event) {
+            window.open(this.model.id + '?format=audacity');
+
+            return false;
+        },
+        importAnnotationFromAudacityMarkers: function(event) {
+            window.open('/annotations/' + this.model.get('id') + '/update/', '', "status=yes, height=500; width=500; resizeable=0");
+                
+            return false;
         },
         initialize: function() {
             this.listenTo(this.model, 'destroy', this.remove);
-            
+            this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
+
+            this.$el.contextual({iconSize: 40, iconSpacing: 5});
+
+            // Edit Annotation Button
+            var btn = CreateBtn({title: 'edit annotation', class: 'icon7'})
+                .on('click', this.toggle.bind(this));
+            this.$el.contextual('register', 'click', 'left', btn);
+
+            // Delete Annotation Button
+            var btn = CreateBtn({title: 'delete annotation', class: 'icon6'})
+                .on('click', this.deleteAnnotation.bind(this));
+            this.$el.contextual('register', 'click', 'left', btn);
+
+            // Export to Audacity Button
+            var btn = CreateBtn({title: 'export annotation to audacity markers', class: 'icon8'})
+                .on('click', this.exportAnnotationToAudacityMarkers.bind(this));
+            this.$el.contextual('register', 'click', 'left', btn);
+
+            // Import from Audacity Button
+            var btn = CreateBtn({title: 'import annotation from audacity markers', class: 'icon8'})
+                .on('click', this.importAnnotationFromAudacityMarkers.bind(this));
+            this.$el.contextual('register', 'click', 'left', btn);
+
             marked.setOptions({
                 timecode: true,
                 semanticdata: 'aa',
@@ -180,8 +258,51 @@ window.AA = window.AA || {};
     AA.AnnotationCollectionView = Backbone.View.extend({
         collection: new AA.AnnotationCollection(), 
         el: 'article#canvas',
+        addAnnotation: function(event) {
+            console.log(this);
+            var offsetBtn = $(event.currentTarget).position();
+            var offsetCanvas = this.$el.position();
+            var top = offsetBtn.top - offsetCanvas.top;
+            var left = offsetBtn.left - offsetCanvas.left;
+            this.collection.create({top: top, left: left});
+            this.$el.contextual('hide');
+
+            return false;
+        },
+        organizeAnnotations: function (event) {
+            this.collection.each(function(model, index) {
+                model.set({
+                    'left': 20 + (index * 20),
+                    'top': 20 + (index * 20),
+                }, {animate: true}).save();
+            });
+
+            return false;
+        },
         initialize: function() {
             var that = this;
+
+            this.$el.contextual({iconSize: 40, iconSpacing: 5});
+
+            // Create Annotation Button
+            var btn = CreateBtn({title: 'new annotation', class: 'icon5'})
+                .on('click', this.addAnnotation.bind(this));
+            this.$el.contextual('register', 'click', 'cursor', btn);
+
+            // Create Toggle grid Button (doing nothing at the moment)
+            var btn = CreateBtn({title: 'toggle grid', class: 'icon2'})
+                .on('click', function(event) { return false; });
+            this.$el.contextual('register', 'click', 'cursor', btn);
+                
+            // Create Change grid Button (doing nothing at the moment)
+            var btn = CreateBtn({title: 'change grid', class: 'icon3'})
+                .on('click', function(event) { return false; });
+            this.$el.contextual('register', 'click', 'cursor', btn);
+
+            // Create Organize annotations Button
+            var btn = CreateBtn({title: 'organize annotations', class: 'icon1'})
+                .on('click', this.organizeAnnotations.bind(this));
+            this.$el.contextual('register', 'click', 'cursor', btn);
 
             this.collection.fetch({
                 data : {
@@ -224,25 +345,20 @@ window.AA = window.AA || {};
     });
 
     AA.Router = Backbone.Router.extend({
-
-      routes: {
-        ":slug/": "page",
-      },
-
-      page: function(slug) {
-        console.log(slug);
-        // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
-        this.pageView && this.pageView.remove();
-        this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
-        
-        this.annotationCollectionView && this.annotationCollectionView.remove();
-        this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
-      },
-
+        routes: {
+            ":slug/": "page",
+        },
+        page: function(slug) {
+            console.log(slug);
+            // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
+            this.pageView && this.pageView.remove();
+            this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
+            
+            this.annotationCollectionView && this.annotationCollectionView.remove();
+            this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
+        }
     });
-
-// end of the namespace:
-})();
+})();  // end of the namespace AA
 
 
 $(function() {
