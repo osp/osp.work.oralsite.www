@@ -20,7 +20,7 @@ def get_user(bundle):
     else:
         return bundle.request.user
 
-def get_serialized_perms(object, perms_to_serialize=[u'view_page', u'change_page']):
+def get_serialized_perms(object, perms_to_serialize=[u'view_page', u'change_page', u'administer_page']):
     permissions = {}
     for perm in perms_to_serialize:
         permissions[perm] = []
