@@ -75,11 +75,12 @@ window.AA = window.AA || {};
     AA.PageModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/page/",
         initialize: function() {
+            var that = this;
             this.fetch({
                 error: function(model, response, options) {
                     if (response.status === 404) {
                         AA.alertView.set('Creating a new page', '');
-                        // TODO: set default model attributes based on slug
+                        that.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) })
                     }
                 },
             });
@@ -335,11 +336,13 @@ window.AA = window.AA || {};
     });
 
     AA.Router = Backbone.Router.extend({
+        currentSlug: '',
         routes: {
             ":slug/": "page",
         },
         page: function(slug) {
-            console.log(slug);
+            this.currentSlug = slug;
+            console.log(slug, document.location.pathname);
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
             this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });

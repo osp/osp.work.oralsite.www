@@ -74,7 +74,7 @@ class PageResource(ModelResource):
     
     def prepend_urls(self):
         return [
-            url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
+            url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d%%'_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
     
     def dehydrate(self, bundle):
