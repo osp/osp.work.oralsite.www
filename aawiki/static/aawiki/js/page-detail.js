@@ -94,16 +94,6 @@ window.AA = window.AA || {};
         },
         render: function() {
             this.$el.html( this.templates.view( this.model.toJSON() ) );
-            /* Because the render function will only fire once the data is fetched,
-             * We initialise dependant views here.
-             * 
-             * The userview is is dependant because we need to know the userId.
-             * This view in turn will only render once the needed data is fetched.
-             * */
-            if (!AA.userView) {
-                AA.userModel = new AA.UserModel({id : AA.router.pageView.model.attributes.user });
-                AA.userView = new AA.UserView({ model : AA.userModel });
-            }
             return this;
         },
         initialize: function() {
@@ -362,11 +352,14 @@ window.AA = window.AA || {};
 
 
 $(function() {
-    var id = 'Index';
     AA.router = new AA.Router();
+
+    AA.userModel = new AA.UserModel({id : 'me' });
+    AA.userView = new AA.UserView({ model : AA.userModel });
+
     AA.alertView = new AA.AlertView();
+
     Backbone.history.start({pushState: true, root: "/pages/"});
-    // TODO: AA.userView = new AA.UserView();
 });
 
 $(document).ajaxError(function (e, xhr, options) {

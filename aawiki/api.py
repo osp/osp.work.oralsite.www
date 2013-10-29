@@ -34,6 +34,21 @@ class UserResource(ModelResource):
                 url(r"^(?P<resource_name>%s)/(?P<pk>-?\w[\w/-]*)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
+def me(request):
+    """
+    Shortcut that displays the information for the currently logged in user
+    
+    This can be set up at a known url so that the client-side application can
+    easily access it.
+    """
+    if not hasattr(request, 'user') or isinstance(request.user, AnonymousUser):
+        user = User.objects.get(pk=-1)
+    else:
+        user = request.user
+    user_resource = UserResource()
+    user_view = user_resource.wrap_view('dispatch_detail')
+    return user_view(request, pk=user.id)
+
 class AnnotationResource(ModelResource):
     page = fields.ForeignKey('aawiki.api.PageResource', 'page')
 
