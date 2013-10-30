@@ -1,7 +1,6 @@
 /*
  * TODO: There are no 404’s, an inexisting page will create an empty page to experiment with.
  *       However, there is no way yet to save that page to the server.
- * TODO: Add functionality to create new annotations
  * TODO: When creating a new annotation, and on an unsaved new page, first try to create new page
  * 
  * */
@@ -112,17 +111,18 @@ window.AA = window.AA || {};
             left: 10,
             width: 300,
             height: 400,
-            page: "/pages/api/v1/page/1/", /* TODO: REMOVE, see next TODO */
-        }
+        },
+        initialize: function() {
+            if (!this.get('page')) {
+                this.set('page', AA.router.pageView.model.url());
+            }
+        },
     });
 
 
     AA.AnnotationCollection = Backbone.Collection.extend({
         model: AA.AnnotationModel,
         urlRoot: "/pages/api/v1/annotation/",
-        /* TODO we will need a function to create a new annotation
-         * To make reference tot theh current page, we can use AA.router.pageView.model.get('resource_uri')
-         */
     });
 
 

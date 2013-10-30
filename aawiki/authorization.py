@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 
 from tastypie.authorization import Authorization
 from tastypie.exceptions import Unauthorized
 
 from guardian.shortcuts import get_objects_for_user, get_users_with_perms
+
+from aawiki.models import Page
 
 def get_user(bundle):
     """
@@ -134,7 +136,14 @@ class PerAnnotationAuthorization(Authorization):
         raise NotImplementedError()
     
     def create_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('change_page', bundle.obj.page) # change page, not add page, because adding an annotation means changing a page
+        """
+        Here we can not rely on bundle.obj, because the object has not been
+        created yet. We will have to find it based on the submitted data.
+        """
+        page_url = bundle.data['page']
+        url_match = resolve(page_url)
+        page = Page.objects.get(slug = url_match.kwargs['slug'])
+        return get_user(bundle).has_perm('change_page', page) # change page, not add page, because adding an annotation means changing a page
     
     def update_list(self, object_list, bundle):
         permitted_pages = [i.id for i in get_objects_for_user(get_user(bundle), 'aawiki.change_page')]
