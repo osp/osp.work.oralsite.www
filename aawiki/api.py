@@ -79,10 +79,8 @@ class PageResource(ModelResource):
     
     def dehydrate(self, bundle):
         """
-        Add a link to the currently logged in user
         Add all permissions for current page
         """
-        bundle.data['user'] =  get_user(bundle).id # reverse('api_dispatch_detail', kwargs={'resource_name': 'user', 'api_name':'v1', 'pk': get_user(bundle).id })
         if get_user(bundle).id != -1:
             bundle.data['permissions'] = get_serialized_perms(bundle.obj)
         return bundle
