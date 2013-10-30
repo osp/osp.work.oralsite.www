@@ -64,6 +64,8 @@ class PageResource(ModelResource):
     annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True )
 
     class Meta:
+        always_return_data = True           # Mainly important when creating a new Page, as the necessary permissions will
+                                            # be calculated server-side and returned in the 201 created response.
         queryset = Page.objects.all()
         resource_name = 'page'
         authorization = PerPageAuthorization()

@@ -79,7 +79,23 @@ window.AA = window.AA || {};
                 error: function(model, response, options) {
                     if (response.status === 404) {
                         AA.alertView.set('Creating a new page', '');
-                        that.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) })
+                        /* Unset the id so that Backbone will not try to post to
+                         * the post url, but instead to the API endpoint.
+                         * 
+                         * Pass silent to not trigger a redraw */
+                        model.unset('id', { silent: true })
+                        /* We set the model’s name and slug based on the page’s uri
+                         * */
+                        model.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) })
+                        /* We save. The API returns the newly created object,
+                         * which also contains the appropriate permissions,
+                         * created on the server-side.
+                         * 
+                         * Backbone automagically synchronises.
+                         * 
+                         * TODO: defer page creation to moment the first annotation is created (not easy)
+                         */
+                        model.save(); 
                     }
                 },
             });
