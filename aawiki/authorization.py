@@ -10,6 +10,8 @@ from guardian.shortcuts import get_objects_for_user, get_users_with_perms
 
 from aawiki.models import Page
 
+anonymous_user = User.objects.get(pk=-1)
+
 def get_user(bundle):
     """
     By convention, Gaurdian stores an AnonymousUser under ID -1
@@ -18,7 +20,7 @@ def get_user(bundle):
     AnonymousUser, so that they get the necessary permissions.
     """
     if not hasattr(bundle.request, 'user') or isinstance(bundle.request.user, AnonymousUser):
-        return User.objects.get(pk=-1)
+        return anonymous_user
     else:
         return bundle.request.user
 
@@ -94,7 +96,7 @@ class PerPageAuthorization(Authorization):
         return pages
     
     def read_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('view_page', bundle.obj)
+        return get_user(bundle).has_perm('view_page', bundle.obj) or anonymous_user.has_perm('view_page', bundle.obj)
     
     def create_list(self, object_list, bundle):
         # Currently not used in Tastypie
@@ -122,14 +124,15 @@ class PerAnnotationAuthorization(Authorization):
     on the permissions the user has for the parent page.
     """
     def read_list(self, object_list, bundle):
-        permitted_pages = get_objects_for_user(get_user(bundle), 'aawiki.view_page')
+        permitted_pages = list(get_objects_for_user(get_user(bundle), 'aawiki.view_page')) + list(get_objects_for_user(anonymous_user, 'aawiki.view_page'))
         permitted_ids = []
         for p in permitted_pages:
             permitted_ids.append(p.id)
+        permitted_ids = list(set(permitted_ids))
         return object_list.filter(page__id__in=permitted_ids)
     
     def read_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('view_page', bundle.obj.page)
+        return get_user(bundle).has_perm('view_page', bundle.obj.page) or anonymous_user.has_perm('view_page', bundle.obj.page)
     
     def create_list(self, object_list, bundle):
         # Currently not used in Tastypie
