@@ -103,7 +103,7 @@ class PerPageAuthorization(Authorization):
         raise NotImplementedError()
     
     def create_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('add_page', bundle.obj)
+        return get_user(bundle).has_perm('aawiki.add_page')
     
     def update_list(self, object_list, bundle):
         pages = get_objects_for_user(get_user(bundle), 'aawiki.change_page')
