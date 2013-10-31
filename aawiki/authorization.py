@@ -24,7 +24,13 @@ def get_user(bundle):
     else:
         return bundle.request.user
 
-def get_serialized_perms(object, perms_to_serialize=[u'view_page', u'change_page', u'administer_page']):
+def get_serialized_perms(object, current_user_id=None, perms_to_serialize=[u'view_page', u'change_page', u'administer_page']):
+    """
+    Get the specified user-permission pairs for the given object.
+    
+    If passed a current_user_id, an extra field ‘current’ is added to each user-permission pair,
+    that designates whether the user with the permission corresponds to the current user.
+    """
     permissions = {}
     for perm in perms_to_serialize:
         permissions[perm] = []
@@ -36,6 +42,8 @@ def get_serialized_perms(object, perms_to_serialize=[u'view_page', u'change_page
                                         'name' : user.first_name or user.username,
                                         'uri'  : reverse('api_dispatch_detail', kwargs={'resource_name': 'user', 'api_name':'v1', 'pk': user.id }) }
             )
+            if current_user_id:
+                permissions[perm][-1]['current'] = current_user_id == user.id
     return permissions
 
 class PerUserAuthorization(Authorization):

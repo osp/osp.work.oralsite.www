@@ -83,8 +83,9 @@ class PageResource(ModelResource):
         """
         Add all permissions for current page
         """
-        if get_user(bundle).id != -1:
-            bundle.data['permissions'] = get_serialized_perms(bundle.obj)
+        current_user_id = get_user(bundle).id
+        if current_user_id != -1:
+            bundle.data['permissions'] = get_serialized_perms(bundle.obj, current_user_id)
         return bundle
 
     def obj_create(self, bundle, **kwargs):
