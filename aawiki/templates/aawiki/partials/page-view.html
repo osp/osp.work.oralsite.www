@@ -14,42 +14,47 @@
         // is the new list shorter?
         // then AnonymousUser was part of the list, and the page can be considered public
         var public = permissions.view_page.length < viewers;
+        
+        var admin = false;
+        if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
+            var admin = true;
+        }
         %>
 
         <div id="tab-permissions">
             <fieldset>
                 <legend>Visible by</legend>
                 <label>
-                    <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% } %>>
+                    <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% }; if (!admin) { %> disabled<% }%>>
                     The public
                 </label>
                 <label>
-                    <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% } %>>
+                    <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
                     Selected:
                 </label>
                 <ul class="tags">
                     <% _.each(permissions.view_page, function(permitted) { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %> <span class="del">×</span></li>
+                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
                     <% }); %>
-                    <li class="add">Add <span>+</span></li>
+                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
                 </ul>
             </fieldset>
             <fieldset>
                 <legend>Editable by</legend> 
                 <ul class="tags">
                     <% _.each(permissions.change_page, function(permitted) { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %> <span class="del">×</span></li>
+                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
                     <% }); %>
-                    <li class="add">Add <span>+</span></li>
+                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
                 </ul>
             </fieldset>
             <fieldset>
                 <legend>Administrated by</legend>
                 <ul class="tags">
                     <% _.each(permissions.administer_page, function(permitted) { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %> <span class="del">×</span></li>
+                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
                     <% }); %>
-                    <li class="add">Add <span>+</span></li>
+                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
                 </ul>
             </fieldset>
         </div>
