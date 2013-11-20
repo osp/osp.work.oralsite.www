@@ -14,7 +14,7 @@ from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 
 from aawiki.models import Annotation, Page
-from aawiki.authorization import get_user, get_serialized_perms, PerUserAuthorization, PerPageAuthorization, PerAnnotationAuthorization
+from aawiki.authorization import *
 
 class UserResource(ModelResource):
     class Meta:
@@ -88,6 +88,17 @@ class PageResource(ModelResource):
             bundle.data['permissions'] = get_serialized_perms(bundle.obj, current_user_id)
         return bundle
 
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        bundle = super(PageResource, self).obj_update(bundle, **kwargs)
+        
+        new = set(extract_perms_for_comparison(bundle.data['permissions']))
+        old = set(extract_perms_for_comparison(get_serialized_perms(bundle.obj)))
+        
+        print "old:", old
+        print "new:", new
+        print "to remove:", old - new, "to add:", new - old
+        return bundle
+    
     def obj_create(self, bundle, **kwargs):
         """
         If a new page object is created, create the necessary permissions

@@ -46,6 +46,15 @@ def get_serialized_perms(object, current_user_id=None, perms_to_serialize=[u'vie
                 permissions[perm][-1]['current'] = current_user_id == user.id
     return permissions
 
+def extract_perms_for_comparison(object):
+    """
+    Takes a serialised object as produced by get_serialized_perms and transforms it into a list
+    for easy comparison
+    """
+    for perm, users in object.iteritems():
+        for user in users:
+            yield user['id'], perm
+
 class PerUserAuthorization(Authorization):
     """
     By default, users can only request info on themselves.

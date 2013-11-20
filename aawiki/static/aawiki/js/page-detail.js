@@ -1,6 +1,4 @@
 /*
- * TODO: There are no 404’s, an inexisting page will create an empty page to experiment with.
- *       However, there is no way yet to save that page to the server.
  * TODO: When creating a new annotation, and on an unsaved new page, first try to create new page
  * 
  * */
