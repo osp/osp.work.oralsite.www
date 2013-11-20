@@ -203,11 +203,6 @@ window.AA = window.AA || {};
                 .on('click', this.importAnnotationFromAudacityMarkers.bind(this));
             this.$el.contextual('register', 'click', 'left', btn);
 
-            marked.setOptions({
-                timecode: true,
-                semanticdata: 'aa',
-            });
-
             this.render();
         },
         render: function() {
@@ -216,7 +211,7 @@ window.AA = window.AA || {};
                 .html(this.templates.edit({body: this.model.get("body")}));
             } else {
                 var model = this.model;
-                var body = marked(this.model.get("body"));
+                var body = markdown.toHTML(this.model.get("body"), "Aa");
 
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
