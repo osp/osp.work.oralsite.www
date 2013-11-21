@@ -3,8 +3,32 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+
+    AA.widgets = AA.widgets || {};
+    /**
+    * Button factory for contextual menus
+    */
+    AA.widgets.CreateBtn = function(options) {
+        var defaults = {
+            title: 'undefined',
+            class: ''
+        };
+
+        var options = $.extend({}, defaults, options);
+
+        var btn = $('<div>')
+        .attr({
+            title: options.title,
+            draggable: false,
+            class: 'icon ' + options.class
+        });
+
+        return btn;
+    };
+    
+    
     AA.utils = AA.utils || {};
-     
+    
     AA.utils.dewikify = function(name) {
         /*
         Turns URL name/slug into a proper name (reverse of wikify).
@@ -40,63 +64,4 @@ window.AA = window.AA || {};
        
        return name.replace(/_/g, ' ');
     };
-})();  // end of the namespace AAS
-
-/*
-CREATE PAGE
-
-var data = JSON.stringify({
-    "top"   : 158,
-    "left"  : 867,
-    "body"  : "Nouvelle annotation",
-    "width" : 310,
-    "height": 347,
-    "page"  : "/pages/api/v1/page/test-page/"
-});
-
-$.ajax({
-    url: 'http://localhost:8000/pages/api/v1/annotation/',
-    type: 'POST',
-    contentType: 'application/json',
-    data: data,
-    dataType: 'json',
-    processData: false,
-    succes: function(data) { console.log(data); },
-    error: function(error) { console.log(error); }
-});*/
-    
-
-/*
-LOGOUT:
-
-$.ajax({
-    url: 'http://localhost:8000/pages/api/v1/user/logout',
-    type: 'GET',
-    contentType: 'application/json',
-    processData: false,
-    succes: function(data) { console.log(data); },
-    error: function(error) { console.log(error); }
-});
-*/
-
-/*
-
-LOGIN:
-
-var data = JSON.stringify({
-    "username"   : "username",
-    "password"  : "password"
-});
-
-$.ajax({
-    url: 'http://localhost:8000/pages/api/v1/user/login/',
-    type: 'POST',
-    contentType: 'application/json',
-    data: data,
-    dataType: 'json',
-    processData: false,
-    succes: function(data) { console.log(data); },
-    error: function(error) { console.log(error); }
-});
-
-*/
+})();  // end of the namespace AA

@@ -1,37 +1,7 @@
-/*
- * TODO: When creating a new annotation, and on an unsaved new page, first try to create new page
- * 
- * */
-
 window.AA = window.AA || {};
-
 
 (function(undefined) {
     'use strict';
-
-
-    /**
-     * Button factory for contextual menus
-     * TODO: move in a more appropriate place
-     */
-    var CreateBtn = function(options) {
-        var defaults = {
-            title: 'undefined',
-            class: ''
-        };
-
-        var options = $.extend({}, defaults, options);
-
-        var btn = $('<div>')
-        .attr({
-            title: options.title,
-            draggable: false,
-            class: 'icon ' + options.class
-        });
-
-        return btn;
-    };
-
 
     /* Error Handling */
     AA.AlertView = Backbone.View.extend({
@@ -44,15 +14,6 @@ window.AA = window.AA || {};
                 .fadeOut();
         }
     });
-
-
-    AA.UserModel = Backbone.Model.extend({
-        urlRoot: "/pages/api/v1/user/",
-        initialize: function() {
-            this.fetch();
-        },
-    });
-
 
     AA.UserView = Backbone.View.extend({
         id: 'user-meta', // <div id="user-meta"></div>
@@ -115,39 +76,6 @@ window.AA = window.AA || {};
         }
     });
 
-
-    AA.PageModel = Backbone.Model.extend({
-        urlRoot: "/pages/api/v1/page/",
-        initialize: function() {
-            var that = this;
-            this.fetch({
-                error: function(model, response, options) {
-                    if (response.status === 404) {
-                        AA.alertView.set('Creating a new page', '');
-                        /* Unset the id so that Backbone will not try to post to
-                         * the post url, but instead to the API endpoint.
-                         * 
-                         * Pass silent to not trigger a redraw */
-                        model.unset('id', { silent: true });
-                        /* We set the model’s name and slug based on the page’s uri
-                         * */
-                        model.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) });
-                        /* We save. The API returns the newly created object,
-                         * which also contains the appropriate permissions,
-                         * created on the server-side.
-                         * 
-                         * Backbone automagically synchronises.
-                         * 
-                         * TODO: defer page creation to moment the first annotation is created (not easy)
-                         */
-                        model.save(); 
-                    }
-                },
-            });
-        },
-    });
-
-
     AA.PageView = Backbone.View.extend({
         el: '#page-meta',
         templates: {
@@ -162,30 +90,6 @@ window.AA = window.AA || {};
             // if we want to already render the template, without the values fetched: this.render();
         },
     });
-
-
-    AA.AnnotationModel = Backbone.Model.extend({
-        urlRoot: "/pages/api/v1/annotation/",
-        defaults: {
-            body: "Nouvelle annotation",
-            top: 10,
-            left: 10,
-            width: 300,
-            height: 400,
-        },
-        initialize: function() {
-            if (!this.get('page')) {
-                this.set('page', AA.router.pageView.model.url());
-            }
-        },
-    });
-
-
-    AA.AnnotationCollection = Backbone.Collection.extend({
-        model: AA.AnnotationModel,
-        urlRoot: "/pages/api/v1/annotation/",
-    });
-
 
     AA.AnnotationView = Backbone.View.extend({
         tagName: 'section',
@@ -225,6 +129,8 @@ window.AA = window.AA || {};
             return false;
         },
         initialize: function() {
+            var CreateBtn = AA.widgets.CreateBtn;
+            
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
 
@@ -328,6 +234,7 @@ window.AA = window.AA || {};
         },
         initialize: function() {
             var that = this;
+            var CreateBtn = AA.widgets.CreateBtn;
 
             this.$el.contextual({iconSize: 40, iconSpacing: 5});
 
@@ -382,68 +289,5 @@ window.AA = window.AA || {};
             return this;
         }
     });
-
-    // the globalEvents object allows to setup some events
-    // that are common to all Backbone views / models
-    // cf: http://lostechies.com/derickbailey/2012/04/03/revisiting-the-backbone-event-aggregator-lessons-learned/
     
-    AA.globalEvents = _.extend({}, Backbone.Events);
-    
-    AA.globalEvents.on('aa:changeUser', function() {
-        /*
-         * On login and logout we recreate the userview.
-         * 
-         * We also need to adapt the Page permissions
-         * 
-         * TODO: annotations might also have to change
-         */
-        AA.userView && AA.userView.remove();
-        AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
-        AA.router.pageView.model.unset('permissions');
-        AA.router.pageView.model.fetch();
-    });
-
-    AA.Router = Backbone.Router.extend({
-        currentSlug: '',
-        routes: {
-            ":slug/": "page",
-        },
-        page: function(slug) {
-            this.currentSlug = slug;
-            console.log(slug, document.location.pathname);
-            // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
-            this.pageView && this.pageView.remove();
-            this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
-            
-            this.annotationCollectionView && this.annotationCollectionView.remove();
-            this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
-        }
-    });
 })();  // end of the namespace AA
-
-
-$(function() {
-    AA.router = new AA.Router();
-
-    AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
-
-    AA.alertView = new AA.AlertView();
-
-    Backbone.history.start({pushState: true, root: "/pages/"});
-});
-
-$(document).ajaxError(function (e, xhr, options) {
-    /* This displays an error message.
-     * The error is not actually *caught*,
-     * so it keeps showing up in the console */
-    if (xhr.status === 401 || xhr.status === 403) {
-        AA.alertView.set('Insufficient permissions to save', 'Remember, your changes will not actually be saved when you leave the page');
-    } else if (xhr.status === 500) {
-        /* The response-text for the error is in JSON (probably a TastyPie specific format)
-           We parse it. */
-        var error = JSON.parse(xhr.responseText);
-        var errorMessage = error.error_message;
-        var traceback = error.traceback;
-        AA.alertView.set(errorMessage, traceback);
-    }
-});
