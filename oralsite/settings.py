@@ -136,6 +136,7 @@ LOGGING = {
     }
 }
 
+APPEND_SLASH=False
 
 try:
     LOCAL_SETTINGS

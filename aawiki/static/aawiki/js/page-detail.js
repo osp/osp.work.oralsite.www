@@ -49,23 +49,70 @@ window.AA = window.AA || {};
     AA.UserModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/user/",
         initialize: function() {
-            this.fetch()
+            this.fetch();
         },
     });
 
 
     AA.UserView = Backbone.View.extend({
-        el: '#user-meta',
+        id: 'user-meta', // <div id="user-meta"></div>
         templates: {
             view: _.template($('#user-view-template').html()),
         },
+        events: {
+            "click #login-link"         : "login",
+            "submit"                    : "login",
+            "keypress input"            : "loginOnEnter",
+            "click #logout-link"        : "logout",
+        },
+        loginOnEnter: function(e) {
+        // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            console.log(e.which, e.keyCode);
+            if ( e.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.login(e);
+            }
+        },
         render: function() {
             this.$el.html( this.templates.view( this.model.toJSON() ) );
+            // If the element is not yet part of the DOM:
+            if ($('#user-meta').length === 0 ) {
+                $('#sidebar').prepend(this.el);
+            }
             return this;
         },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
         },
+        login: function(e) {
+            e.preventDefault();
+            var data = JSON.stringify({
+                username: $("input[name=username]").val(),
+                password: $("input[name=password]").val()
+            });
+            $.ajax({
+                url: 'http://localhost:8000/pages/api/v1/user/login/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: data,
+                dataType: 'json',
+                processData: false,
+                success: function(data) { 
+                    AA.globalEvents.trigger('aa:changeUser');
+                },
+            });
+        },
+        logout: function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'http://localhost:8000/pages/api/v1/user/logout/',
+                type: 'GET',
+                contentType: 'application/json',
+                processData: false,
+                success: function(data) { 
+                    AA.globalEvents.trigger('aa:changeUser');
+                },
+            });
+        }
     });
 
 
@@ -81,10 +128,10 @@ window.AA = window.AA || {};
                          * the post url, but instead to the API endpoint.
                          * 
                          * Pass silent to not trigger a redraw */
-                        model.unset('id', { silent: true })
+                        model.unset('id', { silent: true });
                         /* We set the model’s name and slug based on the page’s uri
                          * */
-                        model.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) })
+                        model.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug) });
                         /* We save. The API returns the newly created object,
                          * which also contains the appropriate permissions,
                          * created on the server-side.
@@ -336,6 +383,26 @@ window.AA = window.AA || {};
         }
     });
 
+    // the globalEvents object allows to setup some events
+    // that are common to all Backbone views / models
+    // cf: http://lostechies.com/derickbailey/2012/04/03/revisiting-the-backbone-event-aggregator-lessons-learned/
+    
+    AA.globalEvents = _.extend({}, Backbone.Events);
+    
+    AA.globalEvents.on('aa:changeUser', function() {
+        /*
+         * On login and logout we recreate the userview.
+         * 
+         * We also need to adapt the Page permissions
+         * 
+         * TODO: annotations might also have to change
+         */
+        AA.userView && AA.userView.remove();
+        AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
+        AA.router.pageView.model.unset('permissions');
+        AA.router.pageView.model.fetch();
+    });
+
     AA.Router = Backbone.Router.extend({
         currentSlug: '',
         routes: {
@@ -358,8 +425,7 @@ window.AA = window.AA || {};
 $(function() {
     AA.router = new AA.Router();
 
-    AA.userModel = new AA.UserModel({id : 'me' });
-    AA.userView = new AA.UserView({ model : AA.userModel });
+    AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
 
     AA.alertView = new AA.AlertView();
 

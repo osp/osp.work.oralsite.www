@@ -37,4 +37,8 @@ ul.tags li.add {
 
 ul.tags li.add:hover, ul.tags li span.del:hover {
     cursor: pointer;
-} 
+}
+
+#login-link, #logout-link {
+    cursor: pointer;
+}
