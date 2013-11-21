@@ -97,7 +97,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'tastypie',
     'guardian',
-    'aawiki'
+    'celery',
+    'djcelery',
+    'aawiki',
+    'aafilters',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -135,6 +138,11 @@ LOGGING = {
         },
     }
 }
+
+
+# Django Celery setup
+import djcelery
+djcelery.setup_loader()
 
 
 try:

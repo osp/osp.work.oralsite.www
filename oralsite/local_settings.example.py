@@ -27,8 +27,13 @@ DATABASES = {
     }
 }
 
+
+# Django Celery with Rabbitmq
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'mzy-))70=q&qm$$_em$_hq21e4gkz76ale7t_o5nl^(+&b+rjh'
+SECRET_KEY = ''
 
 if DEBUG:
     # Show emails in the console during developement.
