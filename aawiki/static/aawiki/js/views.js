@@ -3,18 +3,6 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
-    /* Error Handling */
-    AA.AlertView = Backbone.View.extend({
-        set: function(typeOfError, instructions, traceback) {
-            var error = $('.error');
-            error
-                .html('<h1>' + typeOfError + '</h1>' + '<p>' + instructions + '</p>') // TODO: create template
-                .fadeIn()
-                .delay(5000)
-                .fadeOut();
-        }
-    });
-
     AA.UserView = Backbone.View.extend({
         id: 'user-meta', // <div id="user-meta"></div>
         templates: {
@@ -165,7 +153,8 @@ window.AA = window.AA || {};
             } else {
                 var model = this.model;
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
-
+                // DEBUG aa:embed while we don’t have the Markdown:
+                // body += '<a href="http://someurl.com/resource.ogv" data-filter="filter1:args|filter2|filter3:args" rel="aa:embed">TheLink</a>';
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
                 .css({
@@ -189,7 +178,8 @@ window.AA = window.AA || {};
                             'left': ui.offset.left,
                         }).save();
                     }
-                });
+                }).
+                renderResources();
             };
 
             return this;
@@ -289,5 +279,6 @@ window.AA = window.AA || {};
             return this;
         }
     });
+    
     
 })();  // end of the namespace AA
