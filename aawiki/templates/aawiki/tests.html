@@ -1,0 +1,96 @@
+{% extends "aawiki/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/template" id="page-view-template">
+{% include "aawiki/partials/page-view.html" %}
+</script>
+<script type="text/template" id="user-view-template">
+{% include "aawiki/partials/user-view.html" %}
+</script>
+<script type="text/template" id="annotation-view-template">
+{% include "aawiki/partials/annotation-view.html" %}
+</script>
+<script type="text/template" id="annotation-edit-template">
+{% include "aawiki/partials/annotation-edit.html" %}
+</script>
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.css">
+{% endblock %}
+
+
+{% block body %}
+<nav id="sidebar">
+    <div id="page-meta">
+        
+    </div>
+</nav>
+<article id="canvas">
+    
+</article>
+<div class="error">
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.js"></script>
+<script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+
+<script src="{{ STATIC_URL }}components/jquery/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+<script src="{{ STATIC_URL }}components/underscore/underscore-min.js"></script>
+<script src="{{ STATIC_URL }}components/backbone/backbone-min.js"></script>
+<script src="{{ STATIC_URL }}components/backbone-tastypie/backbone_tastypie/static/js/backbone-tastypie.js"></script>
+<script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/utils.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/plugins/aa.jquery.renderResources.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/markup/markdown.min.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/models.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/collections.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/views.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/global-events.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/router.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/error-handling.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/tests/utils.js"></script>
+
+
+<script type="text/javascript">
+    (function () {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var htmlReporter = new jasmine.HtmlReporter();
+
+        jasmineEnv.addReporter(htmlReporter);
+
+        jasmineEnv.specFilter = function (spec) {
+            return htmlReporter.specFilter(spec);
+        };
+
+        var currentWindowOnload = window.onload;
+
+        window.onload = function () {
+            if (currentWindowOnload) {
+                currentWindowOnload();
+            }
+            execJasmine();
+        };
+
+        function execJasmine() {
+            jasmineEnv.execute();
+        }
+
+    })();
+</script>
+
+{% endblock %}
