@@ -21,134 +21,10 @@ section.section1 > div.wrapper {
     padding: 5px;
 }
 
-section.section1 h1 {
-    font-family: 'News Cycle';
-    letter-spacing: 1px;
-    font-size: 13px;
-    line-height: 13px;
-    margin: 0;
-    top: 0;
-    text-transform: uppercase;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    padding: 5px;
-    cursor: move;
-}
-section.section1 h1:hover {
-    background-color: whitesmoke;
-}
-section.section1 span.about {
-    display: none;
-}
-section.section1[about] span.about {
-    display: inline;
-}
-
-section.section1 h2 {
-    font-size: 13px;
-    line-height: 16px;
-    text-align: right;
-    /*font-weight: bold;*/
-    /*font-family: 'News Cycle'; */
-    /*letter-spacing: 1px;*/
-}
-
-section.section1 h2, 
-section.section1 p {
-    margin-bottom: 16px;
-}
-section.section1 h2:last-child, 
-section.section1 p:last-child {
-    margin-bottom: 0;
-}
-/* SECTION 2 ---------- */
-section.section2 {
+section[typeof="aa:annotation"] {
     border-top: 1px solid whitesmoke;
     margin-top: -1px;
     padding-bottom: 16px;
-}
-/* }}} */
-
-
-/* section editing {{{*/
-section.editing div.wrapper { 
-    display: none; 
-}
-section.editing textarea {
-    width: 100%;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    border: 1px solid black;
-    outline: 0px none transparent;
-    padding: 5px;
-    resize: none;
-    font-size: 11px;
-    line-height: 16px;
-}
-/* }}} */
-
-
-/* BUTTONS --------- {{{ */
-section span.edit,
-section span.save,
-section span.cancel {
-    display: none;
-    cursor: pointer;
-    color: gray;
-    float: right;
-    position: relative;
-    font-size: 13px;
-}
-section:hover span.edit {
-    display: block;
-}
-body.locked section:hover span.edit {
-    display: none;  /* hides the section edit link if user isn't logged in */
-}
-section span.edit:hover,
-section span.save:hover,
-section span.cancel:hover {
-    color: blue;
-}
-section.editing span.edit {
-    display: none;
-}
-section.editing span.save,
-section.editing span.cancel {
-    display: block;
-}
-/* }}} */
-
-
-/* collapsing {{{ */
-section.collapsed {
-    height: auto !important;
-    padding-bottom: 0;
-}
-section.section2.collapsed {
-    border: none;
-    border-top: 1px solid darkgray;
-}
-section.collapsed > div.wrapper {
-    display: none;
-}
-section.section1 h2 {
-    cursor: n-resize;
-}
-section.collapsed h2 {
-    color: lightgray;
-    cursor: s-resize;
-}
-section.collapsed h1:before,
-section.collapsed h2:before {
-    content: "\25B8";
-    margin-right: 0.25em;
-}
-section.collapsed span.edit {
-    display: none;
 }
 /* }}} */
 
@@ -164,20 +40,20 @@ section.collapsed span.edit {
 
 
 /* timecodes {{{ */
-span[property="aa:start"],
+span[property="aa:begin"],
 span[property="aa:end"] {
     color: gray;
     font-size: smaller;
 }
-span[property="aa:start"]:hover,
+span[property="aa:begin"]:hover,
 span[property="aa:end"]:hover {
     cursor: pointer;
     color: blue;
 }
-span[property="aa:start"]:after {
+span[property="aa:begin"]:after {
     content: "\00A0\2192\00A0";
 }
-span[property="aa:start"]:last-child:after {
+span[property="aa:begin"]:last-child:after {
     content: "\00A0\2192\00A0 ?";
 }
 span[property="aa:end"].deduced:after {
