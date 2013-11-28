@@ -97,7 +97,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'tastypie',
     'guardian',
-    'celery',
     'djcelery',
     'aawiki',
     'aafilters',
