@@ -4,16 +4,12 @@
 <div class="ui-layout-content">
     <div id="accordion">
         <% if (typeof permissions !== 'undefined') {
-
-        // how many allowed viewers does the page have?
-        var viewers = permissions.view_page.length;
         
-        // try to throw the AnonymousUser (who’s id is -1) out of the list of allowed viewers:
-        permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
-        
-        // is the new list shorter?
-        // then AnonymousUser was part of the list, and the page can be considered public
-        var public = permissions.view_page.length < viewers;
+        // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
+        var public = false;
+        if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
+            public = true;
+        }
         
         var admin = false;
         if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
@@ -33,9 +29,11 @@
                     Selected:
                 </label>
                 <ul class="tags">
-                    <% _.each(permissions.view_page, function(permitted) { %>
+                    <% _.each(permissions.view_page, function(permitted) {
+                        if (permitted.id !== -1)  { %>
                     <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
-                    <% }); %>
+                    <%  } 
+                    }); %>
                     <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
                 </ul>
             </fieldset>

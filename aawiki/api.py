@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser, User
+
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
@@ -9,12 +11,13 @@ from guardian.shortcuts import assign_perm
 from tastypie import fields
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
+from tastypie.http import HttpUnauthorized, HttpForbidden
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from tastypie.utils import trailing_slash
 
 from aawiki.models import Annotation, Page
-from aawiki.authorization import get_user, get_serialized_perms, PerUserAuthorization, PerPageAuthorization, PerAnnotationAuthorization
+from aawiki.authorization import *
 
 class UserResource(ModelResource):
     class Meta:
@@ -25,14 +28,62 @@ class UserResource(ModelResource):
 
     def prepend_urls(self):
         """
+        1) + 2)
+        Allow login and logout via the API
+        
+        cf. http://stackoverflow.com/questions/11770501/how-can-i-login-to-django-using-tastypie
+        
+        3)
         Allow negative primary key when requesting individual user
         (Django Guardian has the convention that there exists an AnonymousUser with id=-1)
         
         cf https://github.com/toastdriven/django-tastypie/pull/395/files
+        
         """
         return [
-                url(r"^(?P<resource_name>%s)/(?P<pk>-?\w[\w/-]*)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
+            url(r"^(?P<resource_name>%s)/login%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('login'), name="api_login"),
+            url(r'^(?P<resource_name>%s)/logout%s$' %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('logout'), name='api_logout'),
+            url(r"^(?P<resource_name>%s)/(?P<pk>-?\w[\w/-]*)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_detail'), name="api_dispatch_detail")
         ]
+        
+    def login(self, request, **kwargs):
+        self.method_check(request, allowed=['post'])
+
+        data = self.deserialize(request, request.raw_post_data, format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+        username = data.get('username', '')
+        password = data.get('password', '')
+
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+                return self.create_response(request, {
+                    'success': True
+                })
+            else:
+                return self.create_response(request, {
+                    'success': False,
+                    'reason': 'disabled',
+                    }, HttpForbidden )
+        else:
+            return self.create_response(request, {
+                'success': False,
+                'reason': 'incorrect',
+                }, HttpUnauthorized )
+    
+    def logout(self, request, **kwargs):
+        self.method_check(request, allowed=['get', 'post'])
+        if request.user and request.user.is_authenticated():
+            logout(request)
+            return self.create_response(request, { 'success': True })
+
 
 def me(request):
     """
@@ -88,6 +139,17 @@ class PageResource(ModelResource):
             bundle.data['permissions'] = get_serialized_perms(bundle.obj, current_user_id)
         return bundle
 
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        bundle = super(PageResource, self).obj_update(bundle, **kwargs)
+        
+        new = set(extract_perms_for_comparison(bundle.data['permissions']))
+        old = set(extract_perms_for_comparison(get_serialized_perms(bundle.obj)))
+        
+        print "old:", old
+        print "new:", new
+        print "to remove:", old - new, "to add:", new - old
+        return bundle
+    
     def obj_create(self, bundle, **kwargs):
         """
         If a new page object is created, create the necessary permissions

@@ -30,9 +30,10 @@
     <!-- TODO: implement Site View in Backbone for these kind of infos:
         <div id="site-name"><a title="Back to main page" href="/oralsite/">Oralsite</a>
 (<a title="About Oral Site" href="/oralsite/pages/Oral_Site/">about</a>)</div> -->
-    <div id="user-meta">
-
-    </div>
+    <!-- Backbone inserts here:
+        <div id="user-meta">(…)</div>
+        ( $('#sidebar').prepend(this.el); )
+    -->
     <div id="page-meta">
         
     </div>
@@ -55,6 +56,16 @@
 <script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/utils.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/markdown.min.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/page-detail.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/plugins/aa.jquery.renderResources.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/markup/markdown.min.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/models.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/collections.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/views.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/global-events.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/router.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/error-handling.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/app.js"></script>
+
 {% endblock %}

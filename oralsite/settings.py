@@ -138,6 +138,7 @@ LOGGING = {
     }
 }
 
+APPEND_SLASH=False
 
 # Django Celery setup
 import djcelery
