@@ -177,7 +177,8 @@ window.AA = window.AA || {};
                             'top': ui.offset.top,
                             'left': ui.offset.left,
                         }).save();
-                    }
+                    },
+                    distance: 10
                 }).
                 renderResources();
             };
