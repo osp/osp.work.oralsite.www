@@ -97,7 +97,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'tastypie',
     'guardian',
-    'aawiki'
+    'djcelery',
+    'aawiki',
+    'aafilters',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -137,6 +139,11 @@ LOGGING = {
 }
 
 APPEND_SLASH=False
+
+# Django Celery setup
+import djcelery
+djcelery.setup_loader()
+
 
 try:
     LOCAL_SETTINGS

@@ -39,7 +39,7 @@ window.AA = window.AA || {};
                 password: $("input[name=password]").val()
             });
             $.ajax({
-                url: 'http://localhost:8000/pages/api/v1/user/login/',
+                url: '/pages/api/v1/user/login/',
                 type: 'POST',
                 contentType: 'application/json',
                 data: data,
@@ -53,7 +53,7 @@ window.AA = window.AA || {};
         logout: function(e) {
             e.preventDefault();
             $.ajax({
-                url: 'http://localhost:8000/pages/api/v1/user/logout/',
+                url: '/pages/api/v1/user/logout/',
                 type: 'GET',
                 contentType: 'application/json',
                 processData: false,
