@@ -6,7 +6,7 @@
         </form>
         <a title="Login" id="login-link">Login</a>
     <% } else {%> 
-        Welcome, <span class="user self"><%= username %></span>.
+        Welcome, <span class="user self"><%= first_name ? first_name : username %></span>.
         <a title="Logout" id="logout-link">Logout</a>
     <% } %>
 </p>
