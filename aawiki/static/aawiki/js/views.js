@@ -25,7 +25,7 @@ window.AA = window.AA || {};
             this.$el.html( this.templates.view( this.model.toJSON() ) );
             // If the element is not yet part of the DOM:
             if ($('#user-meta').length === 0 ) {
-                $('#sidebar').prepend(this.el);
+                $('#user-meta-container').prepend(this.el);
             }
             return this;
         },
@@ -65,12 +65,16 @@ window.AA = window.AA || {};
     });
 
     AA.PageView = Backbone.View.extend({
-        el: '#page-meta',
+        id: 'page-meta', // <div id="page-meta"></div>
         templates: {
             view: _.template($('#page-view-template').html()),
         },
         render: function() {
             this.$el.html( this.templates.view( this.model.toJSON() ) );
+            // If the element is not yet part of the DOM:
+            if ($('#page-meta').length === 0 ) {
+                $('#page-meta-container').prepend(this.el);
+            }
             return this;
         },
         initialize: function() {

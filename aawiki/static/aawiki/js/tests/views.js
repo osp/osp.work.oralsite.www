@@ -1,4 +1,6 @@
 describe("The views", function() {
+    
+    AA.router = {}; // To fake the fact that some views are normally bound to the router
 
     describe("The User view", function(){
         
@@ -44,13 +46,77 @@ describe("The views", function() {
 
     });
 
-    /*
     describe("The Page view", function(){
-        it("knows to find a mime-type for a filename", function(){
-            expect(AA.utils.path2mime("poster.jpg")).toBe("image/jpeg");
+        
+        var mockPageHash = {
+                    id: 'test_page'
+                }
+        var mockPageModel = new Backbone.Model(mockPageHash);
+        AA.router.pageView = new AA.PageView({ model : mockPageModel });
+        
+        it("can be initialised", function(){
+            expect(AA.router.pageView).toBeDefined();
         });
-    });
 
+        it("won’t render if not provided with info", function(){
+            expect($("#page-meta")).not.toExist();
+        });
+        
+
+        it("will be visible once more info is retrieved", function(){
+            AA.router.pageView.model.set({
+                                    "annotations": [
+                                        "/pages/api/v1/annotation/2/",
+                                        "/pages/api/v1/annotation/9/",
+                                        "/pages/api/v1/annotation/24/"
+                                    ],
+                                    "id": 1,
+                                    "name": "Test Page!",
+                                    "permissions": {
+                                        "administer_page": [
+                                            {
+                                                "current": true,
+                                                "id": 1,
+                                                "name": "osp",
+                                                "type": "user",
+                                                "uri": "/pages/api/v1/user/1/"
+                                            }
+                                        ],
+                                        "change_page": [
+                                            {
+                                                "current": true,
+                                                "id": 1,
+                                                "name": "osp",
+                                                "type": "user",
+                                                "uri": "/pages/api/v1/user/1/"
+                                            }
+                                        ],
+                                        "view_page": [
+                                            {
+                                                "current": true,
+                                                "id": 1,
+                                                "name": "osp",
+                                                "type": "user",
+                                                "uri": "/pages/api/v1/user/1/"
+                                            },
+                                            {
+                                                "current": false,
+                                                "id": -1,
+                                                "name": "AnonymousUser",
+                                                "type": "user",
+                                                "uri": "/pages/api/v1/user/-1/"
+                                            }
+                                        ]
+                                    },
+                                    "resource_uri": "/pages/api/v1/page/test-page/",
+                                    "slug": "test-page"
+                                });
+            expect($("#page-meta")).toExist();
+        });
+        
+    });
+    
+    /*
     describe("The Annotation view", function(){
         it("knows to find a mime-type for a filename", function(){
             expect(AA.utils.path2mime("poster.jpg")).toBe("image/jpeg");
