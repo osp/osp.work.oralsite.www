@@ -6,7 +6,7 @@ describe("The views", function() {
         
         var mockUserHash = {
                     id: 'me'
-                }
+            };
         var mockUserModel = new Backbone.Model(mockUserHash);
         AA.userView = new AA.UserView({ model : mockUserModel });
         
@@ -50,7 +50,7 @@ describe("The views", function() {
         
         var mockPageHash = {
                     id: 'test_page'
-                }
+            };
         var mockPageModel = new Backbone.Model(mockPageHash);
         AA.router.pageView = new AA.PageView({ model : mockPageModel });
         
@@ -128,7 +128,7 @@ describe("The views", function() {
                                     },
                                     "objects": [
                                         {
-                                            "body": "# Foo!\n## Bar!\n\nThis is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\n01:44,738 -->\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n02:13,867 -->\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
+                                            "body": "# Foo!\n## Bar!\n\nThis is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\n01:44,738 --> 02:13,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n02:13,867 --> 02:16,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
                                             "height": 400,
                                             "id": 2,
                                             "left": 290,
@@ -158,7 +158,7 @@ describe("The views", function() {
                                             "width": 300
                                         }
                                     ]
-                                }
+                            };
         
         spyOn($, 'ajax').andCallFake(function(options) {
             options.success(mockAnnotationsHash);
