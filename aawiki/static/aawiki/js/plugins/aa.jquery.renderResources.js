@@ -60,7 +60,7 @@
             };
         
             var isLocal = function (uri) {
-                if (uri.indexOf("http") === -1 || href.indexOf(document.location.host) !== -1 || uri.indexOf("localhost") !== -1 || uri.indexOf("127.0.0.1") !== -1) {
+                if (uri.indexOf("http") === -1 || uri.indexOf(document.location.host) !== -1 || uri.indexOf("localhost") !== -1 || uri.indexOf("127.0.0.1") !== -1) {
                     return true;
                 }
                 return false;
