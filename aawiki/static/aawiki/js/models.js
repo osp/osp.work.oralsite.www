@@ -53,6 +53,7 @@ window.AA = window.AA || {};
             height: 400,
         },
         initialize: function() {
+            // the annotation belongs to the current page
             if (!this.get('page')) {
                 this.set('page', AA.router.pageView.model.url());
             }

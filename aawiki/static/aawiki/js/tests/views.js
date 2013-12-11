@@ -128,6 +128,7 @@ describe("The views", function() {
                                     },
                                     "objects": [
                                         {
+                                            "about": document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
                                             "body": "# Foo!\n## Bar!\n\nThis is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\n01:44,738 --> 02:13,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n02:13,867 --> 02:16,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
                                             "height": 400,
                                             "id": 2,
@@ -138,7 +139,7 @@ describe("The views", function() {
                                             "width": 301
                                         },
                                         {
-                                            "body": "Nouvelle annotation\n\n\n[[ embed::http://someurl.com/resource.ext||filter1:args|filter2|filter3:args ]]\n\n",
+                                            "body": "Nouvelle annotation\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
                                             "height": 400,
                                             "id": 9,
                                             "left": 714,
@@ -173,7 +174,47 @@ describe("The views", function() {
         it("loads the right number of annotations", function(){
             expect(AA.router.annotationCollectionView.collection.length).toBe(3);
         });
+        
+        it("has turned a semantic link to a video into an actual <video> tag", function(){
+            expect($("video")).toExist();
+        });
+        
+        it("has about attributes for all annotations", function() {
+            expect($("article > section").map(function(i, el) {
+                return $(el).attr('about');
+                }).get().length
+            ).toBe(3);
+        });
+        
+        it("the about attributes are absolute hyperlinks", function() {
+            expect($("article > section").map(function(i, el) {
+                return $(el).attr('about').match(/http:\/\/[^/]+\//) !== null;
+                }).get()
+            ).toEqual([true, true, true]);
+        });
+        
+        it("the about attributes are correct", function() {
+            expect($("article > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
+            expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
+            expect($("article > section:nth-child(3)")).toHaveAttr("about", document.location.origin + document.location.pathname);
+        });
     });
-  
-  
+
+/*  
+    describe("The Multiplex view", function() {
+        
+        AA.router.multiplexView = new AA.MultiplexView();
+        
+        it("can be initialised", function(){
+            expect(AA.router.multiplexView).toBeDefined();
+        });
+        
+        it("finds the right amount of clocks", function(){
+            // 1 clock for the page,
+            // 3 clocks for the annotations,
+            // 1 clock for the video element
+            expect(_.keys(AA.router.multiplexView.clocks).length).toBe(5);
+        });
+        
+    });*/
 });

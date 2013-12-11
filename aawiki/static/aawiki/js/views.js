@@ -121,6 +121,13 @@ window.AA = window.AA || {};
             return false;
         },
         initialize: function() {
+            // the annotation can be about any element on the page,
+            // however is this is not specified, it is about the current page
+            if (!this.model.get('about')) {
+                // this will give us the uri sans the #hash
+                this.model.set('about', document.location.origin + document.location.pathname);
+            }
+            
             var CreateBtn = AA.widgets.CreateBtn;
             
             this.listenTo(this.model, 'destroy', this.remove);
@@ -161,6 +168,7 @@ window.AA = window.AA || {};
                 // body += '<a href="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv" rel="aa:embed">TheLink</a>';
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
+                .attr('about', this.model.attributes.about)
                 .css({
                     width: this.model.get("width"),
                     height: this.model.get("height"),
