@@ -157,8 +157,8 @@ window.AA = window.AA || {};
             } else {
                 var model = this.model;
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
-                // DEBUG aa:embed while we don’t have the Markdown:
-                // body += '<a href="http://someurl.com/resource.ogv" data-filter="filter1:args|filter2|filter3:args" rel="aa:embed">TheLink</a>';
+                // DEBUG aa:embed if we don’t have the Markdown:
+                // body += '<a href="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv" rel="aa:embed">TheLink</a>';
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
                 .css({
