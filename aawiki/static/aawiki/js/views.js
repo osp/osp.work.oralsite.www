@@ -138,22 +138,22 @@ window.AA = window.AA || {};
             // Edit Annotation Button
             var btn = CreateBtn({title: 'edit annotation', class: 'icon7'})
                 .on('click', this.toggle.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Delete Annotation Button
             var btn = CreateBtn({title: 'delete annotation', class: 'icon6'})
                 .on('click', this.deleteAnnotation.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Export to Audacity Button
             var btn = CreateBtn({title: 'export annotation to audacity markers', class: 'icon8'})
                 .on('click', this.exportAnnotationToAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Import from Audacity Button
             var btn = CreateBtn({title: 'import annotation from audacity markers', class: 'icon8'})
                 .on('click', this.importAnnotationFromAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             this.render();
         },
@@ -244,22 +244,22 @@ window.AA = window.AA || {};
             // Create Annotation Button
             var btn = CreateBtn({title: 'new annotation', class: 'icon5'})
                 .on('click', this.addAnnotation.bind(this));
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             // Create Toggle grid Button (doing nothing at the moment)
             var btn = CreateBtn({title: 'toggle grid', class: 'icon2'})
                 .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
                 
             // Create Change grid Button (doing nothing at the moment)
             var btn = CreateBtn({title: 'change grid', class: 'icon3'})
                 .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             // Create Organize annotations Button
             var btn = CreateBtn({title: 'organize annotations', class: 'icon1'})
                 .on('click', this.organizeAnnotations.bind(this));
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             this.collection.fetch({
                 data : {
