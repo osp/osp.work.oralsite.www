@@ -22,5 +22,27 @@ window.AA = window.AA || {};
         AA.router.pageView.model.unset('permissions');
         AA.router.pageView.model.fetch();
     });
+    
+    AA.listeningAnnotations = function() {
+        /*
+         * In plugins/aa.popcorn.js it is defined that a passed element gets triggered
+         * with `start` and `end` events.
+         * 
+         * In views.js, AnnotationView, updateAnnotationEvents, it is defined that
+         * the annotation body looks for annotation elements, and registers them with
+         * the associated driver (by default, the page), using the data-begin and data-end
+         * properties.
+         * 
+         * The drivers themselves have been declared in AnnotationView, registerDriver.
+         * 
+         * Here then, we determine what needs to happen when these start and end events
+         * fire.
+         */
+        $("article#canvas").on("start", "[typeof='aa:annotation']", function(e) {
+           $(this).addClass("active");
+        }).on("end", "[typeof='aa:annotation']", function(e) {
+            $(this).removeClass("active");
+        });
+    };
 
 })();  // end of the namespace AA

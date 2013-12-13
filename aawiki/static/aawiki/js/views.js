@@ -83,6 +83,29 @@ window.AA = window.AA || {};
         },
     });
 
+    AA.MultiplexView = Backbone.View.extend({
+        initialize: function() {
+            this.drivers = {};
+        },
+        registerDriver : function(uri) {
+            if (typeof(this.drivers[uri]) === 'undefined') {
+                // If the about is the current page, attach to the baseplayer
+                if (uri === document.location.origin + document.location.pathname) {
+                    this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
+                    // console.log("set " + uri + " as driver of type baseplayer");
+                    return this.drivers[uri];
+                }
+                // otherwise it only works for audio, video
+                this.drivers[uri] = Popcorn($('[src="' + uri + '"]')[0]);
+                // console.log("set" + uri + " as driver");
+                return this.drivers[uri];
+            } else {
+                // console.log("this clock already exists, no need to set a dirver");
+                return this.drivers[uri];
+            }
+        }
+    });
+
     AA.AnnotationView = Backbone.View.extend({
         tagName: 'section',
         templates: {
@@ -156,6 +179,25 @@ window.AA = window.AA || {};
             this.$el.contextual('register', 'dblclick', 'left', btn);
 
             this.render();
+            
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
+        },
+        registerDriver : function() {
+            this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
+            this.updateAnnotationEvents();
+        },
+        updateAnnotationEvents: function() {
+            var that = this;
+            this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
+                 var $annotation = $(el);
+                 var begin = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
+                 var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
+                 that.driver.aa({
+                     start: begin,
+                     end: end,
+                     $el: $annotation
+                 });
+             });
         },
         render: function() {
             if (this.editing) {
@@ -164,8 +206,7 @@ window.AA = window.AA || {};
             } else {
                 var model = this.model;
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
-                // DEBUG aa:embed if we don’t have the Markdown:
-                // body += '<a href="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv" rel="aa:embed">TheLink</a>';
+
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
                 .attr('about', this.model.attributes.about)
@@ -193,6 +234,7 @@ window.AA = window.AA || {};
                     distance: 10
                 }).
                 renderResources();
+                
             };
 
             return this;
@@ -289,6 +331,7 @@ window.AA = window.AA || {};
                 $el.append(annotationView.el);
             });
 
+            AA.globalEvents.trigger('aa:newDrivers');
             return this;
         }
     });
