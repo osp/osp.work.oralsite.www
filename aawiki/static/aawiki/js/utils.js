@@ -29,6 +29,13 @@ window.AA = window.AA || {};
     
     AA.utils = AA.utils || {};
     
+    AA.utils.zeropad = function (n, toplaces) {
+        var ret = "" + n;
+        var foo = toplaces - ret.length;
+        for (var i = 0; i < foo; i++) { ret = "0" + ret; }
+        return ret;
+    };
+    
     AA.utils._timecodeToSecsPat = /^(?:(\d\d):)?(\d\d):(\d\d)(,(\d{1,3}))?$/;
     
     /**

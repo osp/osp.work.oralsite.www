@@ -154,6 +154,7 @@ describe("The views", function() {
                                             "width": 300
                                         },
                                         {
+                                            "about": document.location.origin + '/pages/tests/#annotation-0024',
                                             "body": "MOCKsuper\n\n## API\n-  Modeling ☑\n-  Versieeoning\n\n## Annotations\n-  manipulation / edition ☑\n-  markdown syntax to javascript ☑\n-  the metadate 'is part of' -> some pages are part of several 'collections'.\n\n## Tags, Indexation\n-  adapting the indexing code to the new architecture\n-  stabilizing filters and tags\n-  contextual tagging within a publication\n\n## User permissions\n-  authentication system ☑\n-  viewing/editing permissions ☑\n-  reverting/indexing permissions\n\n## Interface and layout tools\n-  hotglue like interface ☑\n-  Miniature navigation map\n-  grid and snapping helpers\n-  CSS/templates setup ☑\n-  CSS/templates modifiable\n-  annotation distribution actions: spring layout, cascade layout...\n\n## Media support\n-  flash fallback for unsupported formats\n-  youtube and vimeo support + synchronizing with annotations\n-  setting in and out points for media (enabling basic sound and video editing)\n-  once an annotation becomes active, play the video/sound contained inside\n-  make it possible to link to (a specific time in) another video/sound\n-  make slideshow in non-convoluted way\n-  Adjust appearance of sound player\n\n## Miscellaneous\n-  migrating the old website\n-  deployement\n-  wrap up\n-  better encoding and serving of media files\n-  documentation\n",
                                             "height": 400,
                                             "id": 24,
@@ -201,7 +202,7 @@ describe("The views", function() {
         it("the about attributes are correct", function() {
             expect($("article > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
             expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
-            expect($("article > section:nth-child(3)")).toHaveAttr("about", document.location.origin + document.location.pathname);
+            expect($("article > section:nth-child(3)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
     });
 
@@ -220,11 +221,9 @@ describe("The views", function() {
         
         it("finds the right amount of drivers", function(){
             // 1 driver for the video,
-            // 1 for the page (2 elements that make reference to it),
-
-            // about’s should also be able to be about annotation boxes
-            // test that later
-            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(2);
+            // 1 for the page
+            // 1 for an annotation box
+            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(3);
         });
         
         it("the video has 2 registered events", function(){

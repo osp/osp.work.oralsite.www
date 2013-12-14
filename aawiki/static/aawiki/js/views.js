@@ -89,18 +89,26 @@ window.AA = window.AA || {};
         },
         registerDriver : function(uri) {
             if (typeof(this.drivers[uri]) === 'undefined') {
-                // If the about is the current page, attach to the baseplayer
+                
                 if (uri === document.location.origin + document.location.pathname) {
+                    // If the about is the current page, attach to the baseplayer
                     this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
-                    // console.log("set " + uri + " as driver of type baseplayer");
-                    return this.drivers[uri];
+                } 
+                // uri: http://localhost:8000/pages/tests/#annotation-0024
+                else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
+                    var hash = '#' + uri.split('#').slice(-1);
+                    if ($(hash).length === 0) {
+                        return null;
+                    }
+                    this.drivers[uri] = Popcorn.baseplayer( hash );
+
+                } else {
+                    // otherwise it only works for audio, video
+                    this.drivers[uri] = Popcorn($('[src="' + uri + '"]')[0]);
                 }
-                // otherwise it only works for audio, video
-                this.drivers[uri] = Popcorn($('[src="' + uri + '"]')[0]);
-                // console.log("set" + uri + " as driver");
                 return this.drivers[uri];
             } else {
-                // console.log("this clock already exists, no need to set a dirver");
+                // already registered, just return it
                 return this.drivers[uri];
             }
         }
@@ -209,6 +217,7 @@ window.AA = window.AA || {};
 
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
+                .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
                 .attr('about', this.model.attributes.about)
                 .css({
                     width: this.model.get("width"),
