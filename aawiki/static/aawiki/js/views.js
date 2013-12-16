@@ -201,7 +201,7 @@ window.AA = window.AA || {};
 
     AA.AnnotationCollectionView = Backbone.View.extend({
         collection: new AA.AnnotationCollection(), 
-        el: 'article#canvas',
+        el: 'article#canvas .wrapper',
         addAnnotation: function(event) {
             console.log(this);
             var offsetBtn = $(event.currentTarget).position();

@@ -1,0 +1,317 @@
+/* Fonts {{{ */
+@font-face {
+    font-family: 'Charis';
+    src: url('/static/lib/fonts/charissilcompact-b-webfont.eot');
+    src: url('/static/lib/fonts/charissilcompact-b-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/charissilcompact-b-webfont.woff') format('woff'),
+         url('/static/lib/fonts/charissilcompact-b-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/charissilcompact-b-webfont.svg#charis_sil_compactbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Charis';
+    src: url('/static/lib/fonts/charissilcompact-bi-webfont.eot');
+    src: url('/static/lib/fonts/charissilcompact-bi-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/charissilcompact-bi-webfont.woff') format('woff'),
+         url('/static/lib/fonts/charissilcompact-bi-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/charissilcompact-bi-webfont.svg#charis_sil_compactbold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Charis';
+    src: url('/static/lib/fonts/charissilcompact-i-webfont.eot');
+    src: url('/static/lib/fonts/charissilcompact-i-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/charissilcompact-i-webfont.woff') format('woff'),
+         url('/static/lib/fonts/charissilcompact-i-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/charissilcompact-i-webfont.svg#charis_sil_compactitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Charis';
+    src: url('/static/lib/fonts/charissilcompact-r-webfont.eot');
+    src: url('/static/lib/fonts/charissilcompact-r-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/charissilcompact-r-webfont.woff') format('woff'),
+         url('/static/lib/fonts/charissilcompact-r-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/charissilcompact-r-webfont.svg#charis_sil_compactregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'News Cycle';
+    src: url('/static/lib/fonts/NewsCycle-Regular-webfont.eot');
+    src: url('/static/lib/fonts/NewsCycle-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.woff') format('woff'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.svg#NewsCycleRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+/* }}} */
+
+
+/* Layout {{{ */
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+#sidebar,
+#canvas {
+    box-sizing: border-box;
+}
+
+#sidebar {
+    position: fixed;
+    width: 250px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    padding: 13px;
+}
+
+#canvas {
+    position: fixed;
+    left: 250px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
+    > .wrapper {
+        width: 100%;
+        height: 100%;
+        
+    }
+}
+/* }}} */
+
+
+/* Styles {{{ */
+
+body {
+    font-family: 'Charis', sans;
+    font-size: 13px;
+    line-height: 19px;
+}
+
+em {
+    font-style: italic;
+}
+
+p + p {
+    margin-top: 19px;
+
+}
+
+h1 { 
+    font-size: 2.25em; 
+}
+
+h2 { 
+    font-size: 1.5em;
+}
+
+h3 { 
+    font-size: 1.125em;
+}
+
+blockquote {
+    margin-left: 38px;
+}
+
+#sidebar {
+    font-family: 'News Cycle', sans;
+    font-size: 13px;
+    line-height: 18px;
+
+    hgroup {
+        border-top: 2px solid black;
+        border-bottom: 2px solid black;
+        margin: 0;
+        position: relative;
+        top: 5px;
+        padding-bottom: 19px;
+
+        h1 {
+            font-size: 32px;
+            line-height: 36px;
+        }
+    }
+
+    p + p {
+        margin-top: 0;
+        text-indent: 26px;
+    }
+
+    fieldset {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    label {
+        display: block;
+    }
+
+    ul.tags {
+        margin: 2px 0 0 13px;
+        overflow: hidden;
+        margin-bottom:15px;
+
+        li {
+            float: left;
+            border: 1px solid #ccc;
+            margin: 2px 2px;
+            padding: 0px 2px 2px 4px;
+            border-radius: 7px;
+
+            &.add {
+                background-color: #ccc;
+                color: white;
+            }
+
+            &.add:hover, 
+            span.del:hover {
+                cursor: pointer;
+            }
+
+            span {
+                font-size: 16px;
+                font-family: "Nimbus Sans L", "Free Sans", "Helvetica", "Arial";
+            }
+        }
+    }
+
+    #login-link, 
+    #logout-link {
+        cursor: pointer;
+    }
+}
+
+
+.error {
+    width: 207px;
+    border: 1px solid black;
+    position: fixed;
+    top: 13px;
+    right: 13px;
+    padding: 13px;
+    display: none;
+}
+
+section.section1 {
+    background-color: white;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 400px;
+    cursor: auto;
+    outline: 1px solid grey;
+
+    .grid {
+        background-size: 20px 20px, 20px 20px;
+        background-position: 0 0,0 0;
+        background-image: -webkit-linear-gradient(top, transparent, transparent 19px, cyan 20px), -webkit-linear-gradient(left, transparent, transparent 19px, cyan 20px); 
+    }
+
+    span[property="aa:begin"],
+    span[property="aa:end"] {
+        color: gray;
+        font-size: smaller;
+
+        &:hover {
+            cursor: pointer;
+            color: blue;
+        }
+
+        &:after {
+            content: "\00A0\2192\00A0";
+        }
+    }
+
+    span[property="aa:begin"]:last-child:after {
+        content: "\00A0\2192\00A0 ?";
+    }
+
+    span[property="aa:end"] {
+        &.deduced {
+            &:after {
+                content: ")";
+            }
+        }
+    }
+
+    span[property="aa:end"].deduced:before {
+        content: "(";
+    }
+
+    textarea {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .menu {
+        position: absolute;
+        height: 18px;
+        top: -19px;
+        left: 0;
+        width: 100%;
+        z-index: 99999999;
+        outline: 1px solid grey;
+        background-color: grey;
+        color: white;
+        display: none;
+    }
+
+    > div.wrapper {
+        overflow-x: hidden;
+        height: 100%;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        padding: 5px;
+    }
+
+    section[typeof="aa:annotation"] {
+        border-top: 1px solid whitesmoke;
+        margin-top: -1px;
+        padding-bottom: 16px;
+    }
+
+    .active {
+        background-color: paleGreen;
+    }
+}
+
+body {
+   -moz-user-select     : none;
+   -khtml-user-select   : none;
+   -webkit-user-select  : none;
+   -o-user-select       : none;
+   user-select          : none;
+} 
+
+section {
+   -moz-user-select     : text;
+   -khtml-user-select   : text;
+   -webkit-user-select  : text;
+   -o-user-select       : text;
+   user-select          : text;
+} 
+
+/* UI */
+
+/* }}} */
+
+
+/* vim: set foldmethod=indent */

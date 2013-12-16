@@ -5,3 +5,4 @@ django-guardian==1.1.1
 django-celery==3.1.1
 requests==2.0.1
 Pillow==2.2.1
+django-compressor==1.3
