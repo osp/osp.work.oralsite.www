@@ -15,5 +15,10 @@
 <body>
 {% block body %}{% endblock %}
 {% block js %}{% endblock %}
+
+<!-- Piwik statistics -->
+{% if not debug %}
+{% include "aawiki/partials/piwik.html" %}
+{% endif %}
 </body>
 </html>
