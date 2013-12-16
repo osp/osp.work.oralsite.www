@@ -86,7 +86,7 @@
                     clicks = 0;             //after action performed, reset counter
                 }
 
-                return false
+                //return false;
             })
             .on("dblclick", function(event) {
                 event.preventDefault();  //cancel system double-click event
@@ -124,7 +124,7 @@
                 this._is_visible = true;
 
                 if ($.isFunction(this.options.onShow)) {
-                    this.options.onShow.call(this)
+                    this.options.onShow.call(this);
                 };
             };
         },

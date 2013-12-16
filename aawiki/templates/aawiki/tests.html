@@ -19,15 +19,45 @@
 {% block css %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.ui.css">
+<style>
+body {
+    width: inherit;
+    height: inherit;
+}
+article#canvas {
+    box-sizing: border-box;
+    padding-right: 420px;
+}
+#HTMLReporter {
+    box-sizing: border-box;
+    width: 420px;
+    min-height: 100%;
+    padding: 10px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: #eeeeee;
+}
+</style>
 {% endblock %}
 
 
 {% block body %}
 <nav id="sidebar">
-    <div id="page-meta">
-        
+    
+    <div id="user-meta-container">
     </div>
+    <div id="page-meta-container">
+    </div>
+
 </nav>
+<div id="baseplayer">
+</div>
 <article id="canvas">
     
 </article>
@@ -43,16 +73,23 @@
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 
 <script src="{{ STATIC_URL }}components/jquery/jquery.min.js"></script>
+
+<script src="{{ STATIC_URL }}components/jasmine-jquery/lib/jasmine-jquery.js"></script>
+
 <script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
 <script src="{{ STATIC_URL }}components/underscore/underscore-min.js"></script>
 <script src="{{ STATIC_URL }}components/backbone/backbone-min.js"></script>
 <script src="{{ STATIC_URL }}components/backbone-tastypie/backbone_tastypie/static/js/backbone-tastypie.js"></script>
+
+<script src="{{ STATIC_URL }}components/popcorn-js/popcorn-complete.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/plugins/aa.popcorn.js"></script>
+
 <script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/utils.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.jquery.renderResources.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/markup/markdown.min.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/markup/markdown.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/models.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/collections.js"></script>
@@ -62,6 +99,7 @@
 <script src="{{ STATIC_URL }}aawiki/js/error-handling.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/tests/utils.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/tests/views.js"></script>
 
 
 <script type="text/javascript">

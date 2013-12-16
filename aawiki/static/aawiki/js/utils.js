@@ -29,6 +29,46 @@ window.AA = window.AA || {};
     
     AA.utils = AA.utils || {};
     
+    AA.utils.zeropad = function (n, toplaces) {
+        var ret = "" + n;
+        var foo = toplaces - ret.length;
+        for (var i = 0; i < foo; i++) { ret = "0" + ret; }
+        return ret;
+    };
+    
+    AA.utils._timecodeToSecsPat = /^(?:(\d\d):)?(\d\d):(\d\d)(,(\d{1,3}))?$/;
+    
+    /**
+     * Converts a timecode to seconds (float).  Seeks and returns first timecode pattern
+     * and returns it in secs nb:.  Timecode can appear anywhere in string, will
+     * only convert first match.  
+     * @private
+     * @param {String} tcstr A string containing a timecode pattern.
+     * @returns A timecode in secs nb.
+     */
+    AA.utils.timecodeToSeconds = function (tcstr) {
+        var r = tcstr.match(AA.utils._timecodeToSecsPat);
+        if (r) {
+            var seconds = 0;
+            if (r[1]) {
+                // hours
+                // Note that the parseInt(f, 10):avoids "09" being seen as octal (and throws an error)
+                seconds += 3600 * parseInt(r[1], 10);
+            }
+            // minutes
+            seconds += 60 * parseInt(r[2], 10);
+            // seconds
+            seconds += parseInt(r[3], 10);
+            // fraction of second
+            if (r[5]) {
+                seconds = parseFloat(seconds + "." + r[5]);
+            }
+            return seconds;
+        } else {
+            return null;
+        }
+    };
+    
     AA.utils.dewikify = function(name) {
         /*
         Turns URL name/slug into a proper name (reverse of wikify).

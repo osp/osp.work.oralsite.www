@@ -2,7 +2,13 @@ describe("The AA utils", function() {
 
     it("can be found", function() {
         expect(AA.utils).toBeDefined();
-    }); 
+    });
+    
+    describe("The utility timecodeToSeconds", function() {
+        it("knows how to handle timecode in the form of '01:44,738'", function() {
+            expect(AA.utils.timecodeToSeconds('01:44,738')).toBe(104.738);
+        });
+    });
 
     describe("The utility path2mime", function(){
         it("knows to find a mime-type for a filename", function(){

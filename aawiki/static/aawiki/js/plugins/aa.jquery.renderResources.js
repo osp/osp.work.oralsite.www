@@ -5,7 +5,7 @@
     
         var templates = {
             img:        _.template('<img src="<%= uri %>" />'),
-            html5video: _.template('<video class="player" controls src="<%= uri %>" />'),
+            html5video: _.template('<video class="player" controls preload src="<%= uri %>" />'),
             html5audio: _.template('<audio class="player" controls src="<%= uri %>" />'),
             iframe:     _.template('<iframe src="<%= uri %>"></iframe>'),
             fallback:   _.template('<a href="<%= uri %>"><%= uri %></a>')
@@ -60,14 +60,14 @@
             };
         
             var isLocal = function (uri) {
-                if (uri.indexOf("http") === -1 || href.indexOf(document.location.host) !== -1 || uri.indexOf("localhost") !== -1 || uri.indexOf("127.0.0.1") !== -1) {
+                if (uri.indexOf("http") === -1 || uri.indexOf(document.location.host) !== -1 || uri.indexOf("localhost") !== -1 || uri.indexOf("127.0.0.1") !== -1) {
                     return true;
                 }
                 return false;
             };
         
             // If the image is already local, and needs no filtering we can serve it as is:
-            if (!filter && uri.isLocal) {
+            if (!filter && isLocal(uri)) {
                 renderUri = uri;
             } else {
                 renderUri = uriForCachedResource(uri, filter);

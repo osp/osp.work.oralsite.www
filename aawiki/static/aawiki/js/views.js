@@ -25,7 +25,7 @@ window.AA = window.AA || {};
             this.$el.html( this.templates.view( this.model.toJSON() ) );
             // If the element is not yet part of the DOM:
             if ($('#user-meta').length === 0 ) {
-                $('#sidebar').prepend(this.el);
+                $('#user-meta-container').prepend(this.el);
             }
             return this;
         },
@@ -65,7 +65,7 @@ window.AA = window.AA || {};
     });
 
     AA.PageView = Backbone.View.extend({
-        el: '#page-meta',
+        id: 'page-meta', // <div id="page-meta"></div>
         templates: {
             view: _.template($('#page-view-template').html()),
         },
@@ -73,12 +73,49 @@ window.AA = window.AA || {};
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             this.$el.html( this.templates.view( context ) );
+
+            // If the element is not yet part of the DOM:
+            if ($('#page-meta').length === 0 ) {
+                $('#page-meta-container').prepend(this.el);
+            }
+
             return this;
         },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
             // if we want to already render the template, without the values fetched: this.render();
         },
+    });
+
+    AA.MultiplexView = Backbone.View.extend({
+        initialize: function() {
+            this.drivers = {};
+        },
+        registerDriver : function(uri) {
+            if (typeof(this.drivers[uri]) === 'undefined') {
+                
+                if (uri === document.location.origin + document.location.pathname) {
+                    // If the about is the current page, attach to the baseplayer
+                    this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
+                } 
+                // uri: http://localhost:8000/pages/tests/#annotation-0024
+                else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
+                    var hash = '#' + uri.split('#').slice(-1);
+                    if ($(hash).length === 0) {
+                        return null;
+                    }
+                    this.drivers[uri] = Popcorn.baseplayer( hash );
+
+                } else {
+                    // otherwise it only works for audio, video
+                    this.drivers[uri] = Popcorn($('[src="' + uri + '"]')[0]);
+                }
+                return this.drivers[uri];
+            } else {
+                // already registered, just return it
+                return this.drivers[uri];
+            }
+        }
     });
 
     AA.AnnotationView = Backbone.View.extend({
@@ -119,6 +156,13 @@ window.AA = window.AA || {};
             return false;
         },
         initialize: function() {
+            // the annotation can be about any element on the page,
+            // however is this is not specified, it is about the current page
+            if (!this.model.get('about')) {
+                // this will give us the uri sans the #hash
+                this.model.set('about', document.location.origin + document.location.pathname);
+            }
+            
             var CreateBtn = AA.widgets.CreateBtn;
             
             this.listenTo(this.model, 'destroy', this.remove);
@@ -129,24 +173,43 @@ window.AA = window.AA || {};
             // Edit Annotation Button
             var btn = CreateBtn({title: 'edit annotation', class: 'icon7'})
                 .on('click', this.toggle.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Delete Annotation Button
             var btn = CreateBtn({title: 'delete annotation', class: 'icon6'})
                 .on('click', this.deleteAnnotation.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Export to Audacity Button
             var btn = CreateBtn({title: 'export annotation to audacity markers', class: 'icon8'})
                 .on('click', this.exportAnnotationToAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             // Import from Audacity Button
             var btn = CreateBtn({title: 'import annotation from audacity markers', class: 'icon8'})
                 .on('click', this.importAnnotationFromAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'click', 'left', btn);
+            this.$el.contextual('register', 'dblclick', 'left', btn);
 
             this.render();
+            
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
+        },
+        registerDriver : function() {
+            this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
+            this.updateAnnotationEvents();
+        },
+        updateAnnotationEvents: function() {
+            var that = this;
+            this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
+                 var $annotation = $(el);
+                 var begin = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
+                 var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
+                 that.driver.aa({
+                     start: begin,
+                     end: end,
+                     $el: $annotation
+                 });
+             });
         },
         render: function() {
             if (this.editing) {
@@ -155,10 +218,11 @@ window.AA = window.AA || {};
             } else {
                 var model = this.model;
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
-                // DEBUG aa:embed while we don’t have the Markdown:
-                // body += '<a href="http://someurl.com/resource.ogv" data-filter="filter1:args|filter2|filter3:args" rel="aa:embed">TheLink</a>';
+
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
+                .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
+                .attr('about', this.model.attributes.about)
                 .css({
                     width: this.model.get("width"),
                     height: this.model.get("height"),
@@ -183,6 +247,7 @@ window.AA = window.AA || {};
                     distance: 10
                 }).
                 renderResources();
+                
             };
 
             return this;
@@ -234,22 +299,22 @@ window.AA = window.AA || {};
             // Create Annotation Button
             var btn = CreateBtn({title: 'new annotation', class: 'icon5'})
                 .on('click', this.addAnnotation.bind(this));
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             // Create Toggle grid Button (doing nothing at the moment)
             var btn = CreateBtn({title: 'toggle grid', class: 'icon2'})
                 .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
                 
             // Create Change grid Button (doing nothing at the moment)
             var btn = CreateBtn({title: 'change grid', class: 'icon3'})
                 .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             // Create Organize annotations Button
             var btn = CreateBtn({title: 'organize annotations', class: 'icon1'})
                 .on('click', this.organizeAnnotations.bind(this));
-            this.$el.contextual('register', 'click', 'cursor', btn);
+            this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
             this.collection.fetch({
                 data : {
@@ -279,6 +344,7 @@ window.AA = window.AA || {};
                 $el.append(annotationView.el);
             });
 
+            AA.globalEvents.trigger('aa:newDrivers');
             return this;
         }
     });
