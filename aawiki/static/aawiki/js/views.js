@@ -70,7 +70,9 @@ window.AA = window.AA || {};
             view: _.template($('#page-view-template').html()),
         },
         render: function() {
-            this.$el.html( this.templates.view( this.model.toJSON() ) );
+            var context = this.model.toJSON();
+            context.introduction = markdown.toHTML(context.introduction, "Aa");
+            this.$el.html( this.templates.view( context ) );
             return this;
         },
         initialize: function() {

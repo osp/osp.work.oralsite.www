@@ -5,6 +5,7 @@ class Page(models.Model):
     """Represents a wiki page"""
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
+    introduction = models.TextField(blank=True)
     
     def __unicode__(self):
         return self.name
