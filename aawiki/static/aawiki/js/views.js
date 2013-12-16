@@ -16,7 +16,6 @@ window.AA = window.AA || {};
         },
         loginOnEnter: function(e) {
         // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            console.log(e.which, e.keyCode);
             if ( e.keyCode === 13 ) { // 13 is the code for ENTER KEY
                 this.login(e);
             }
@@ -159,6 +158,8 @@ window.AA = window.AA || {};
                 this.model.set('about', document.location.origin + document.location.pathname);
             }
             
+            this.driverEventIDs = [];
+            
             var CreateBtn = AA.widgets.CreateBtn;
             
             this.listenTo(this.model, 'destroy', this.remove);
@@ -194,17 +195,26 @@ window.AA = window.AA || {};
             this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
             this.updateAnnotationEvents();
         },
+        deleteAnnotationEvents: function() {
+            for (var i=0; i<this.driverEventIDs.length; i++) {
+                var eventID = this.driverEventIDs[i];
+                this.driver.removeTrackEvent( eventID );
+            }
+            this.driverEventIDs = [];
+        },
         updateAnnotationEvents: function() {
             var that = this;
+            this.deleteAnnotationEvents();
             this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
                  var $annotation = $(el);
                  var begin = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
                  var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
-                 that.driver.aa({
+                 var p = that.driver.aa({
                      start: begin,
                      end: end,
                      $el: $annotation
                  });
+                 that.driverEventIDs.push(p.getLastTrackEventId());
              });
         },
         render: function() {
@@ -244,6 +254,9 @@ window.AA = window.AA || {};
                 }).
                 renderResources();
                 
+                if(this.driver) {
+                    this.updateAnnotationEvents();
+                }
             };
 
             return this;
@@ -266,7 +279,6 @@ window.AA = window.AA || {};
         collection: new AA.AnnotationCollection(), 
         el: 'article#canvas',
         addAnnotation: function(event) {
-            console.log(this);
             var offsetBtn = $(event.currentTarget).position();
             var offsetCanvas = this.$el.position();
             var top = offsetBtn.top - offsetCanvas.top;
