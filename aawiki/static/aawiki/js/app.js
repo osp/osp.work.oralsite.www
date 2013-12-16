@@ -2,7 +2,7 @@ $(function() {
     // load the void player, so that later it can be initialised to turn the page
     // and annotation boxes into drivers.
     Popcorn.player( "baseplayer" );
-    
+
     // loads the views that change from page to page
     AA.router = new AA.Router();
     
