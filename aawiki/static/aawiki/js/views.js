@@ -217,7 +217,7 @@ window.AA = window.AA || {};
                 .html(this.templates.edit({body: this.model.get("body")}));
             } else {
                 var model = this.model;
-                var body = markdown.toHTML(this.model.get("body"), "Aa");
+                var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
                 this.$el
                 .html(this.templates.view({body: body})).addClass('section1')
@@ -348,6 +348,6 @@ window.AA = window.AA || {};
             return this;
         }
     });
-    
-    
 })();  // end of the namespace AA
+
+// vim: set foldmethod=indent:
