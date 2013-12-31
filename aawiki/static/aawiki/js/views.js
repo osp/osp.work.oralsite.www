@@ -114,10 +114,28 @@ window.AA = window.AA || {};
     });
 
     AA.AnnotationView = Backbone.View.extend({
+        /**
+         * For the Popcorn player API,
+         * see: https://gist.github.com/boazsender/729213
+         * */
         tagName: 'section',
         templates: {
             view: _.template($('#annotation-view-template').html()),
             edit: _.template($('#annotation-edit-template').html()),
+        },
+        events: {
+            "click .play"               : "play",
+        },
+        play: function(e) {
+            /**
+             * Sends a ‘play’ event to the annotation’s driver.
+             * 
+             * We should implement a full HTML5 player interface.
+             * 
+             * (The Popcorn instance wraps the HTML5 audio/video player,
+             *  so it shares the same base methods)
+             *  */
+            AA.router.multiplexView.drivers[this.model.get('about')].play();
         },
         editing: false,
         onPositionChange: function(model, value, options) {
@@ -192,10 +210,22 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
         },
         registerDriver : function() {
+            /**
+             * This annotation has an `about` value. It represents what is annotated,
+             * also called the ‘driver’ because this time based resource can trigger
+             * time-based behaviour in the annotations.
+             * 
+             * With this time-based resource we initialise the driver,
+             * if it has not yet been initialised, and we call the function to register
+             * the annotations as events.
+             */
             this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
             this.updateAnnotationEvents();
         },
         deleteAnnotationEvents: function() {
+            /**
+             * Delete all references to annotations at this annotation’s driver. 
+             */
             for (var i=0; i<this.driverEventIDs.length; i++) {
                 var eventID = this.driverEventIDs[i];
                 this.driver.removeTrackEvent( eventID );
@@ -203,6 +233,13 @@ window.AA = window.AA || {};
             this.driverEventIDs = [];
         },
         updateAnnotationEvents: function() {
+            /**
+             * Scan the contents of the annotation view: parse out all annotations,
+             * and register them with the driver.
+             * 
+             * This is rerun every time the content changes (with the old events
+             * emptied out beforehand) 
+             */
             var that = this;
             this.deleteAnnotationEvents();
             this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
@@ -217,6 +254,16 @@ window.AA = window.AA || {};
                  that.driverEventIDs.push(p.getLastTrackEventId());
              });
         },
+        hasPlay : function() {
+            /** 
+             * Should this annotation feature player controls?
+             * 
+             * In most cases, yes, but not if the driver of the annotation is
+             * the page itself. In this case, there will be general player controls
+             * located elsewhere.
+             * */
+            return this.model.get('about') !== document.location.origin + document.location.pathname;
+        },
         render: function() {
             if (this.editing) {
                 this.$el
@@ -226,7 +273,12 @@ window.AA = window.AA || {};
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
 
                 this.$el
-                .html(this.templates.view({body: body})).addClass('section1')
+                .html(this.templates.view({
+                    body:    body,
+                    hasPlay: this.hasPlay(),
+                    about:   this.model.get('about')
+                }))
+                .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
                 .attr('about', this.model.attributes.about)
                 .css({

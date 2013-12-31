@@ -204,6 +204,17 @@ describe("The views", function() {
             expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
             expect($("article > section:nth-child(3)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
+
+        it("features play buttons for two of the annotations", function() {
+            expect($("article > section:nth-child(1) .play")).toExist();
+            expect($("article > section:nth-child(3) .play")).toExist();
+        });
+
+        it("except when the annotation is about the page itself", function() {
+            expect($("article > section:nth-child(2) .play")).not.toExist();
+        });
+
+
     });
 
 
