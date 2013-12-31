@@ -69,11 +69,15 @@ window.AA = window.AA || {};
             view: _.template($('#page-view-template').html()),
         },
         render: function() {
-            this.$el.html( this.templates.view( this.model.toJSON() ) );
+            var context = this.model.toJSON();
+            context.introduction = markdown.toHTML(context.introduction, "Aa");
+            this.$el.html( this.templates.view( context ) );
+
             // If the element is not yet part of the DOM:
             if ($('#page-meta').length === 0 ) {
                 $('#page-meta-container').prepend(this.el);
             }
+
             return this;
         },
         initialize: function() {
@@ -270,7 +274,7 @@ window.AA = window.AA || {};
                 .html(this.templates.edit({body: this.model.get("body")}));
             } else {
                 var model = this.model;
-                var body = markdown.toHTML(this.model.get("body"), "Aa");
+                var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
                 this.$el
                 .html(this.templates.view({
@@ -329,7 +333,7 @@ window.AA = window.AA || {};
 
     AA.AnnotationCollectionView = Backbone.View.extend({
         collection: new AA.AnnotationCollection(), 
-        el: 'article#canvas',
+        el: 'article#canvas .wrapper',
         addAnnotation: function(event) {
             var offsetBtn = $(event.currentTarget).position();
             var offsetCanvas = this.$el.position();
@@ -408,6 +412,6 @@ window.AA = window.AA || {};
             return this;
         }
     });
-    
-    
 })();  // end of the namespace AA
+
+// vim: set foldmethod=indent:

@@ -58,6 +58,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -98,6 +99,7 @@ INSTALLED_APPS = (
     'tastypie',
     'guardian',
     'djcelery',
+    'compressor',
     'aawiki',
     'aafilters',
 )
@@ -143,6 +145,13 @@ APPEND_SLASH=False
 # Django Celery setup
 import djcelery
 djcelery.setup_loader()
+
+
+# Django Compressor setup
+COMPRESS_PRECOMPILERS = (
+   ('text/less', 'lessc {infile} {outfile}'),
+)
+INTERNAL_IPS = ('127.0.0.1',)
 
 
 try:

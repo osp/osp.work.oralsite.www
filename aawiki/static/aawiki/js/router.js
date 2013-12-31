@@ -14,6 +14,9 @@ window.AA = window.AA || {};
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
             this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
+
+            this.multiplexView && this.multiplexView.remove();
+            this.multiplexView = new AA.MultiplexView();
             
             this.annotationCollectionView && this.annotationCollectionView.remove();
             this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
