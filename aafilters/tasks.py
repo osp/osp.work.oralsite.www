@@ -1,12 +1,19 @@
+from __future__ import absolute_import
+# ^^^ The above is required if you want to import from the celery
+# library.  If you don't have this then `from celery.schedules import`
+# becomes `proj.celery.schedules` in Python 2.x since it allows
+# for relative imports by default.
+
+
 import os
 import requests
 
-from celery import task
-from PIL import Image 
+from celery import shared_task
+from PIL import Image
 from StringIO import StringIO
 from urlparse import urlsplit
 from django.conf import settings
-from settings import CACHE_PATH
+from .settings import CACHE_PATH
 
 
 # NOTE: Should filters accept and return mimetypes?
@@ -27,7 +34,7 @@ def url2path(url):
     return ret
 
 
-@task
+@shared_task
 def cache(bundle):
     full_path = os.path.join(CACHE_PATH, url2path(bundle['url']))
 
@@ -46,7 +53,7 @@ def cache(bundle):
     return bundle
 
 
-@task
+@shared_task
 def bw(bundle):
     image_file = Image.open(bundle['path'])
     image_file = image_file.convert('1')

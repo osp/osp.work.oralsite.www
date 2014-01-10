@@ -30,6 +30,7 @@ DATABASES = {
 
 # Django Celery with Rabbitmq
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 
 # Make this unique, and don't share it with anybody.
