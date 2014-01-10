@@ -310,6 +310,7 @@ window.AA = window.AA || {};
                 }).
                 renderResources();
                 
+                
                 if(this.driver) {
                     this.updateAnnotationEvents();
                 }
@@ -406,6 +407,7 @@ window.AA = window.AA || {};
             this.collection.each(function(annotation) {
                 var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);
+                
             });
 
             AA.globalEvents.trigger('aa:newDrivers');
