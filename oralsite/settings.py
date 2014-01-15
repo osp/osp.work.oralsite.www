@@ -142,10 +142,6 @@ LOGGING = {
 
 APPEND_SLASH=False
 
-# Django Celery setup
-import djcelery
-djcelery.setup_loader()
-
 
 # Django Compressor setup
 COMPRESS_PRECOMPILERS = (
