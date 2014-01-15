@@ -89,16 +89,19 @@ window.AA = window.AA || {};
     AA.MultiplexView = Backbone.View.extend({
         initialize: function() {
             this.drivers = {};
+            this.mE = {}; // mediaElementObjects, there to help out with video compatibility.
         },
         registerDriver : function(uri) {
             if (typeof(this.drivers[uri]) === 'undefined') {
                 
                 if (uri === document.location.origin + document.location.pathname) {
-                    // If the about is the current page, attach to the baseplayer
+                    // If the about is the current page, attach to the general timeline
                     this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
                 } 
-                // uri: http://localhost:8000/pages/tests/#annotation-0024
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
+                    // example uri: http://localhost:8000/pages/tests/#annotation-0024
+                    // If the about refers to a part of the page, we try to create
+                    // a separate abstract player for that part
                     var hash = '#' + uri.split('#').slice(-1);
                     if ($(hash).length === 0) {
                         return null;
@@ -106,8 +109,19 @@ window.AA = window.AA || {};
                     this.drivers[uri] = Popcorn.baseplayer( hash );
 
                 } else {
-                    // otherwise it only works for audio, video
-                    this.drivers[uri] = Popcorn($('[src="' + uri + '"]')[0]);
+                    // we assume that the driver is a media element we can manipulate
+                    // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
+                    var driverMediaEl = document.querySelector('[src="' + uri + '"]');
+                    if (driverMediaEl &&
+                           ( driverMediaEl.tagName.toLowerCase() === "video" ||
+                             driverMediaEl.tagName.toLowerCase() === "audio" )
+                           ) {
+                        this.drivers[uri] = Popcorn(driverMediaEl);
+                        this.mE[uri] = new MediaElement(driverMediaEl);
+                    } else {
+                        // And else we don’t know what to do
+                        return null;
+                    }
                 }
                 return this.drivers[uri];
             } else {
@@ -244,6 +258,9 @@ window.AA = window.AA || {};
              * This is rerun every time the content changes (with the old events
              * emptied out beforehand) 
              */
+            if (!this.driver) {
+                return false;
+            }
             var that = this;
             this.deleteAnnotationEvents();
             this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
