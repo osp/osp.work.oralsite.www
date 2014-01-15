@@ -6,22 +6,12 @@ from __future__ import absolute_import
 
 
 from django.shortcuts import redirect
-from django.http import HttpResponse
-from celery import chain
-from .tasks import cache, bw
-
-
-cmd = {
-    'bw': bw,
-}
+from .tasks import process_pipeline
 
 
 def process(request):
+    url = request.GET.get('url')
     pipeline = request.GET.get('pipeline')
-    url, filters = pipeline.split("|", 1)
-    filters = filters.split("|")
-
-    args = [cache.subtask(({'url': url},))] + [cmd[f].subtask() for f in filters]
-    task = chain(*args).apply_async()
-
-    return redirect('celery-task_status', task_id=task.id)
+    pipeline = pipeline.split('|')
+    task_id = process_pipeline(url=url, pipeline=pipeline)
+    return redirect('celery-task_status', task_id=task_id)

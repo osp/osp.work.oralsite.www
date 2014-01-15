@@ -31,10 +31,24 @@ DATABASES = {
 # Django Celery with Rabbitmq
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERY_ALWAYS_EAGER = False
 
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
+
+
+# This is used for aafilters task, to store locks
+# Don't use the simple MemLocCache it will not be able to retrieve values
+# between threads!
+# TODO: use memcached or redis (as suggested on #celery@freenode)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/django_cache',
+    }
+}
+
 
 if DEBUG:
     # Show emails in the console during developement.
