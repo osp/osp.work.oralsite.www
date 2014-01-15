@@ -1,4 +1,5 @@
 {% extends "aawiki/base.html" %}
+{% load compress %}
 
 {% block extrahead %}
 {{ block.super }}
@@ -21,9 +22,18 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.ui.css">
+
+
+{% if debug %}
+<!-- This is the client-side way to compile less and an ok choice for local dev -->
+<link rel="stylesheet/less" type="text/css" media="all" href="{{ STATIC_URL }}aawiki/css/aa.wiki.less" />
+{% else %}
+{% compress css %}
+<!-- This is the nifty django-compressor way to compile your less files in css -->
+<link rel="stylesheet/less" type="text/css" media="all" href="{{ STATIC_URL }}aawiki/css/aa.wiki.less" />
+{% endcompress %}
+{% endif %}
+
 <style>
 body {
     width: inherit;
@@ -59,7 +69,7 @@ article#canvas {
 <div id="baseplayer">
 </div>
 <article id="canvas">
-    
+    <div class="wrapper"></div>
 </article>
 <div class="error">
 </div>
@@ -69,6 +79,13 @@ article#canvas {
 
 {% block js %}
 {{ block.super }}
+{% if debug %}
+<!-- This is the client-side way to compile less and an ok choice for local dev -->
+<script src="{{ STATIC_URL }}components/less/dist/less-1.5.1.min.js"></script>
+{% endif %}
+
+<script src="{{ STATIC_URL }}components/typogr.js/typogr.min.js"></script>
+
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.js"></script>
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 
