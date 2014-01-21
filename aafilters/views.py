@@ -24,7 +24,8 @@ def process(request, pipeline_string):
     parts = pipeline_string.split('..')
     url = parts[0]
     pipeline = []
-    if parts > 1:
+    extension=None
+    if len(parts) > 1:
         pipeline = parts[1:]
         pipeline[-1], extension = os.path.splitext(pipeline[-1])
     print url, pipeline_string, extension

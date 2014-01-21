@@ -74,19 +74,23 @@ class Bundle(object):
         lock_id = get_lock_id(url=self.url, pipeline=self.consumed)
         fn = md5(lock_id).hexdigest() # no longer used
         local_path = self.url
-        if len(self.consumed) > 0: #and len(self.to_go) > 0:
+        if len(self.consumed) > 0:
             local_path += u"..%s" % '..'.join(self.consumed)
         # For the final filename, we want the requested extension,
         # so that it gets saved on a predictable location
         if len(self.to_go) == 0:
-            ext = self.target_ext
-            # Yet we do check if the mimetype of the produced result fits with the
-            # requested extension:
-            if ext.lower() not in mimetypes.guess_all_extensions(self.mime, strict=False):
-                raise TypeError
+            if len(self.consumed) == 0:
+                pass
+            elif self.target_ext:
+                ext = self.target_ext
+                # Yet we do check if the mimetype of the produced result fits with the
+                # requested extension:
+                if ext.lower() not in mimetypes.guess_all_extensions(self.mime, strict=False):
+                    raise TypeError
+                local_path += ext
         else:
             ext = mimetypes.guess_extension(self.mime, strict=False)
-        local_path += ext
+            local_path += ext
         print "%d steps to go in pipeline" % len(self.to_go)
         local_folder, local_filename = os.path.split(local_path)
         if not os.path.exists(os.path.join(CACHE_PATH,local_folder)):
