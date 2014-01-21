@@ -19,6 +19,22 @@ from tastypie.utils import trailing_slash
 from aawiki.models import Annotation, Page
 from aawiki.authorization import *
 
+
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+from tastypie.serializers import Serializer
+
+
+class PrettyJSONSerializer(Serializer):
+    json_indent = 2
+
+    def to_json(self, data, options=None):
+        options = options or {}
+        data = self.to_simple(data, options)
+        return json.dumps(data, cls=DjangoJSONEncoder,
+                sort_keys=True, ensure_ascii=False, indent=self.json_indent)
+
+
 class UserResource(ModelResource):
     class Meta:
         resource_name = 'user'
@@ -30,15 +46,15 @@ class UserResource(ModelResource):
         """
         1) + 2)
         Allow login and logout via the API
-        
+
         cf. http://stackoverflow.com/questions/11770501/how-can-i-login-to-django-using-tastypie
-        
+
         3)
         Allow negative primary key when requesting individual user
         (Django Guardian has the convention that there exists an AnonymousUser with id=-1)
-        
+
         cf https://github.com/toastdriven/django-tastypie/pull/395/files
-        
+
         """
         return [
             url(r"^(?P<resource_name>%s)/login%s$" %
@@ -51,7 +67,7 @@ class UserResource(ModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('dispatch_detail'), name="api_dispatch_detail")
         ]
-        
+
     def login(self, request, **kwargs):
         self.method_check(request, allowed=['post'])
 
@@ -77,7 +93,7 @@ class UserResource(ModelResource):
                 'success': False,
                 'reason': 'incorrect',
                 }, HttpUnauthorized )
-    
+
     def logout(self, request, **kwargs):
         self.method_check(request, allowed=['get', 'post'])
         if request.user and request.user.is_authenticated():
@@ -88,7 +104,7 @@ class UserResource(ModelResource):
 def me(request):
     """
     Shortcut that displays the information for the currently logged in user
-    
+
     This can be set up at a known url so that the client-side application can
     easily access it.
     """
@@ -110,7 +126,7 @@ class AnnotationResource(ModelResource):
             "page": ALL_WITH_RELATIONS
         }
         authorization = PerAnnotationAuthorization()
-    
+
 class PageResource(ModelResource):
     annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True )
 
@@ -121,15 +137,17 @@ class PageResource(ModelResource):
         resource_name = 'page'
         authorization = PerPageAuthorization()
         detail_uri_name = 'slug'
+        excludes = ['json']
+        serializer = PrettyJSONSerializer()
         filtering = {
             "slug": ALL
         }
-    
+
     def prepend_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d%%'_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
-    
+
     def dehydrate(self, bundle):
         """
         Add all permissions for current page
@@ -141,31 +159,31 @@ class PageResource(ModelResource):
 
     def obj_update(self, bundle, skip_errors=False, **kwargs):
         bundle = super(PageResource, self).obj_update(bundle, **kwargs)
-        
+
         new = set(extract_perms_for_comparison(bundle.data['permissions']))
         old = set(extract_perms_for_comparison(get_serialized_perms(bundle.obj)))
-        
+
         print "old:", old
         print "new:", new
         print "to remove:", old - new, "to add:", new - old
         return bundle
-    
+
     def obj_create(self, bundle, **kwargs):
         """
         If a new page object is created, create the necessary permissions
-        
-        cf http://stackoverflow.com/questions/10070173/tastypie-obj-create-how-to-use-newly-created-object 
+
+        cf http://stackoverflow.com/questions/10070173/tastypie-obj-create-how-to-use-newly-created-object
         """
         bundle = super(PageResource, self).obj_create(bundle, **kwargs)
         user = get_user(bundle)
-        
+
         anonymous_user = User.objects.get(pk=-1)
-        
+
         assign_perm('aawiki.view_page', user, bundle.obj)
         if user.id != -1:
             # if the current user is not the anonymous user
             assign_perm('aawiki.view_page', anonymous_user, bundle.obj)
         assign_perm('aawiki.change_page', user, bundle.obj)
         assign_perm('aawiki.administer_page', user, bundle.obj)
-        
+
         return bundle

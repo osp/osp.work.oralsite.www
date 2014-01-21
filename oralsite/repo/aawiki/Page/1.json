@@ -1,1 +1,1 @@
-"{\"annotations\": [], \"id\": 1, \"introduction\": \"test\", \"name\": \"test\", \"resource_uri\": \"/pages/api/v1/page/test/\", \"slug\": \"test\"}"
+"{\n  \"annotations\": [], \n  \"id\": 1, \n  \"introduction\": \"test\", \n  \"name\": \"test\", \n  \"resource_uri\": \"/pages/api/v1/page/test/\", \n  \"slug\": \"test\"\n}"
