@@ -77,6 +77,8 @@
             // uriC = uriForCachedResource('http://media.boingboing.net/wp-content/themes/2012/sundries/logo_bounce2012.gif', 'size:160|bw');
             // console.log(uriC, uriC === location.protocol + '//' + location.host + '/filters/cache/media.boingboing.net/wp-content/themes/2012/sundries/logo_bounce2012.gif..size:160..bw.gif');
             
+            
+            // http://sarma.be/filters/example.com/truc.png..size:50x50.png
             var templateName = mimeMap(mimeType);
             return templates[templateName]({
                 uri: renderUri,
@@ -92,6 +94,11 @@
                         var uri = $el.attr('href');
                         var filter = $el.attr('data-filter');
                         var mimeType = AA.utils.path2mime(uri);
+                        // TODO: in ADMIN mode:
+                        // A replace with spinner
+                        // B launch HEAD request that tests if URL exists,
+                        // and only replace with the template
+                        // on succesful callback
                         $el.replaceWith($(renderResource(uri, mimeType, filter)));
                     });
             

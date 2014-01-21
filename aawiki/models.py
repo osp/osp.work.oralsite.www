@@ -24,6 +24,7 @@ class Page(models.Model):
 class Annotation(models.Model):
     """Represent an annotation"""
     page = models.ForeignKey(Page)
+    about = models.URLField(blank=True)
     top = models.IntegerField(default=10)
     left = models.IntegerField(default=10)
     width = models.IntegerField(default=300)

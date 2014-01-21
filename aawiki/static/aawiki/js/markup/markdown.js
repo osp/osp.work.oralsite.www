@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2013-12-06T08:55Z
+ * Date: 2014-01-10T16:35Z
  */
 
 (function(expose) {
@@ -1761,7 +1761,6 @@
 /**
  * TODO: document
  * TODO: simplify the timecode regex
- * TODO: fill missing ends on timecode sections
  */
 
   var Aa = DialectHelpers.subclassDialect( Maruku ),
@@ -1774,13 +1773,33 @@
    * Adds supports for srt-like timed sections.
    */
   Aa.block['timecode'] =  function timecode( block, next ) {
+    // matches expressions like "00:00:00 --> 00:00:10"
     var re = /^\s{0,3}(((\d{1,2})(:))?(\d\d):(\d\d)([,\.](\d{1,3}))?)\s*-->(\s*(((\d{1,2})(:))?(\d\d):(\d\d)([,\.](\d{1,3}))?))?\s*(?:\n|$)/,
       m = block.match( re );
 
+    // stops here if there is no match
     if ( !m )
       return undefined;
 
+    // references the begin and end groups
+    var begin = m[1],
+      end = m[10];
+
+    // if not specified, sets the end of the previous timed section with the
+    // current value for begin
+    var previous = this.tree[this.tree.length - 1],
+      previousAttrs = previous[1];
+
+    if (previousAttrs['data-begin'] && !previousAttrs['data-end']) {
+      previousAttrs['data-end'] = begin;
+      previous.splice(3, 0, [ "span", {"property": "aa:end", "class": "deduced"}, begin ]);
+    }
+
+    // collects the content of the timed section; that is the following blocks
+    // until an other timed section is found, or the end of the source text is
+    // reached.
     var inner = [];
+
     while (next.length) {
       var found = next[0].match(re);
 
@@ -1789,10 +1808,21 @@
       inner.push(next.shift());
     }
 
-    var begin = [ "span", {"property": "aa:begin"}, m[1] ];
-    var end = [ "span", {"property": "aa:end"}, m[10] ];
+    // constructs the JSONML to push to the tree
+    var attrs = {"typeof": "aa:annotation", "data-begin": begin};
+    var section = [ "section", attrs ];
+    
+    section.push([ "span", {"property": "aa:begin"}, begin ]);
 
-    return [ [ "section", {"typeof": "aa:annotation", "data-begin": m[1], "data-end": m[10]}, begin, " \u2192 ", end, this.toTree(inner, [ "div", {"property": "aa:content"} ]) ] ];
+    // sets the end only if the group was matched
+    if (end) {
+      attrs["data-end"] = end;
+      section.push([ "span", {"property": "aa:end"}, end ]);
+    }
+
+    section.push(this.toTree(inner, [ "div", {"property": "aa:content"} ]));
+
+    return [ section ];
   };
 
   /**
@@ -1807,12 +1837,31 @@
    *
    * is rendered as:
    *
-   *    <a href="/SherryTurkle" rel="aa:Speaker"></a>
+   *    <a href="Sherry_Turkle" rel="aa:Speaker">Second Self</a>
    */
   Aa.inline[ "[[" ] = function semanticwikilink( text ) {
     var m = text.match( /^\[\[\s*(?:((\w+):)?([^\]#]+?)\s*::)?\s*(.+?)\s*(?:\|\s*(.+?)\s*)?\]\](?!\])/ );
 
     var wikify = function(target) {
+      // Links like 'sherry Turkle' will get wikified.
+      // Links like 'sherry.jpeg' will not get wikified.
+      // Links like /pages/sherry_Turkle will not get wikified.
+      // Links like http://example.com/sherry_turkle.ogv will not get wikified
+      if (target.indexOf("/") === -1 && !target.match(/.*\.(\w+)$/)) {
+        var parts = target.match(/([^#]*)#*([^#]*)/);
+        var path = parts[1];
+        var hash = parts[2];
+        var capitaliseFirstLetter = function(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+        var path = capitaliseFirstLetter(path.replace(/\s+/g, '_'));
+        var uri = encodeURIComponent(path);
+        if (hash) {
+          // do not escape =, so we can have #t=3.5
+          uri += '#' + encodeURIComponent(hash).replace('%3D', '=');
+        }
+        return uri;
+      }
       return target;
     };
 
@@ -1853,7 +1902,7 @@
    *    <span content="Second Self" property="dc:title">Second Self</span> was
    *    an early book on the social aspects of computation.</p>
    */
-  Aa.inline[ "%%" ] = function semanticwikilink( text ) {
+  Aa.inline[ "%%" ] = function semanticdata( text ) {
     var m = text.match( /^\%\%\s*(?:((\w+):)?([^\%#]+?)\s*::)?\s*(.+?)\s*(?:\|\s*([^\]]+?)\s*)?\%\%(?!\%)/ );
 
     if ( m ) {

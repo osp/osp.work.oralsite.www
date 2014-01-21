@@ -238,8 +238,25 @@ describe("The views", function() {
             expect(_.keys(AA.router.multiplexView.drivers).length).toBe(3);
         });
         
+        it("the drivers are instances of Popcorn.js", function() {
+            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ]).toBeDefined();
+            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ] instanceof Popcorn).toBe(true);
+        });
+        
+        it("and when it’s an audio or video, there’s also a corresponding MediaElement.js instance", function() {
+            expect(AA.router.multiplexView.mE[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ]).toBeDefined();
+            
+        });
+        it("Popcorn.js, MediaElement.js, and the original element, all agree", function() {
+            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].paused()).toBe(true);
+            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].media.paused).toBe(true);
+            expect(AA.router.multiplexView.mE[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].paused).toBe(true);
+        });
+        
         it("the video has 2 registered events", function(){
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].getTrackEvents().length).toBe(2);
         });
+        
+        
     });
 });
