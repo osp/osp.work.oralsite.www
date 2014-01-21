@@ -58,9 +58,13 @@ be found at <https://docs.djangoproject.com/en/1.5/topics/settings/>
     python manage syncdb
 
 
+# Create the media/cache directory
+
+    mkdir -p media/cache
+
 # Run the task queue
 
-    python manage.py celery worker -l info
+    celery -A oralsite worker -l info
 
 # Run the projet
 
