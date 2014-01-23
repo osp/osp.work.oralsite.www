@@ -130,12 +130,12 @@ describe("The views", function() {
                                         "next": null,
                                         "offset": 0,
                                         "previous": null,
-                                        "total_count": 3
+                                        "total_count": 4
                                     },
                                     "objects": [
                                         {
                                             "about": document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
-                                            "body": "# Foo!\n## Bar!\n\nThis is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
+                                            "body": "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
                                             "height": 400,
                                             "id": 2,
                                             "left": 10,
@@ -145,24 +145,34 @@ describe("The views", function() {
                                             "width": 301
                                         },
                                         {
-                                            "body": "Nouvelle annotation\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
+                                            "body": "#A video\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
                                             "height": 400,
                                             "id": 9,
-                                            "left": 35,
+                                            "left": 10,
                                             "page": "/pages/api/v1/page/test-page/",
                                             "resource_uri": "/pages/api/v1/annotation/9/",
                                             "top": 458,
                                             "width": 300
                                         },
                                         {
+                                            "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.",
+                                            "height": 400,
+                                            "id": 66,
+                                            "left": 333,
+                                            "page": "/pages/api/v1/page/test-page/",
+                                            "resource_uri": "/pages/api/v1/annotation/66/",
+                                            "top": 458,
+                                            "width": 300
+                                        },
+                                        {
                                             "about": document.location.origin + '/pages/tests/#annotation-0024',
-                                            "body": "MOCKsuper\n\n## API\n-  Modeling ☑\n-  Versieeoning\n\n## Annotations\n-  manipulation / edition ☑\n-  markdown syntax to javascript ☑\n-  the metadate 'is part of' -> some pages are part of several 'collections'.\n\n## Tags, Indexation\n-  adapting the indexing code to the new architecture\n-  stabilizing filters and tags\n-  contextual tagging within a publication\n\n## User permissions\n-  authentication system ☑\n-  viewing/editing permissions ☑\n-  reverting/indexing permissions\n\n## Interface and layout tools\n-  hotglue like interface ☑\n-  Miniature navigation map\n-  grid and snapping helpers\n-  CSS/templates setup ☑\n-  CSS/templates modifiable\n-  annotation distribution actions: spring layout, cascade layout...\n\n## Media support\n-  flash fallback for unsupported formats\n-  youtube and vimeo support + synchronizing with annotations\n-  setting in and out points for media (enabling basic sound and video editing)\n-  once an annotation becomes active, play the video/sound contained inside\n-  make it possible to link to (a specific time in) another video/sound\n-  make slideshow in non-convoluted way\n-  Adjust appearance of sound player\n\n## Miscellaneous\n-  migrating the old website\n-  deployement\n-  wrap up\n-  better encoding and serving of media files\n-  documentation\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
+                                            "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
                                             "height": 400,
                                             "id": 24,
                                             "left": 333,
                                             "page": "/pages/api/v1/page/test-page/",
                                             "resource_uri": "/pages/api/v1/annotation/24/",
-                                            "top": 48,
+                                            "top": 18,
                                             "width": 300
                                         }
                                     ]
@@ -179,7 +189,7 @@ describe("The views", function() {
         });
         
         it("loads the right number of annotations", function(){
-            expect(AA.router.annotationCollectionView.collection.length).toBe(3);
+            expect(AA.router.annotationCollectionView.collection.length).toBe(4);
         });
         
         it("has turned a semantic link to a video into an actual <video> tag", function(){
@@ -190,25 +200,25 @@ describe("The views", function() {
             expect($("article > .wrapper > section").map(function(i, el) {
                 return $(el).attr('about');
                 }).get().length
-            ).toBe(3);
+            ).toBe(4);
         });
         
         it("the about attributes are absolute hyperlinks", function() {
             expect($("article > .wrapper > section").map(function(i, el) {
                 return $(el).attr('about').match(/http:\/\/[^/]+\//) !== null;
                 }).get()
-            ).toEqual([true, true, true]);
+            ).toEqual([true, true, true, true]);
         });
         
         it("the about attributes are correct", function() {
             expect($("article > .wrapper > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
             expect($("article > .wrapper > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
-            expect($("article > .wrapper > section:nth-child(3)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
+            expect($("article > .wrapper > section:nth-child(4)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
 
         it("features play buttons for two of the annotations", function() {
             expect($("article > .wrapper > section:nth-child(1) .play")).toExist();
-            expect($("article > .wrapper > section:nth-child(3) .play")).toExist();
+            expect($("article > .wrapper > section:nth-child(4) .play")).toExist();
         });
 
         it("except when the annotation is about the page itself", function() {

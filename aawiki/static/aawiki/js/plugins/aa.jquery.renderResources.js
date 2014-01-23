@@ -51,11 +51,13 @@
                 return [    location.protocol,
                             '//',
                             location.host,
-                            '/filters/cache/',
+                            '/filters/processed/',
+                            parsedUri.protocol,
+                            '://',
                             parsedUri.authority,
                             parsedUri.path,
                             filter ? '..' + filter.replace(/\|/g, '..') : '',
-                            extension
+                            filter ? extension : '',
                             ].join('');
             };
         
@@ -91,6 +93,17 @@
                 .find("[rel='aa:embed']")
                     .each(function(i, el) {
                         var $el = $(el);
+                        console.log($el[0]);
+                        // TODO this hack exists because we did not yet implement the
+                        // wikilink syntax for filters
+                        // [[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]] ->
+                        // <aa rel="aa:embed" href="http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg">|bw|thumb</a> ->
+                        // <aa rel="aa:embed" href="http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg" data-filter="bw|thumb">|bw|thumb</a>
+                        var text = $el.text();
+                        if (text.match(/^\|.*/)) {
+                            $el.attr('data-filter', text.substring(1));
+                        }
+                        //
                         var uri = $el.attr('href');
                         var filter = $el.attr('data-filter');
                         var mimeType = AA.utils.path2mime(uri);

@@ -50,9 +50,10 @@ class Bundle(object):
     """
     An object to be passed through the different tasks of a chain.
     """
-    def __init__(self, url=None, to_go=[]):
+    def __init__(self, url=None, to_go=[], target_ext=None):
         self.url = url  # TODO: normalize the URL?
         self.to_go = to_go  # the remaining tasks
+        self.target_ext = target_ext # the extension for the final file (as requested from the view)
         self.mime = "application/octet-stream"  # A default mimetype
         self.consumed = []  # the tasks already performed
 
@@ -71,9 +72,30 @@ class Bundle(object):
         It automatically adds the file extension based on mimetype.
         """
         lock_id = get_lock_id(url=self.url, pipeline=self.consumed)
-        fn = md5(lock_id).hexdigest()
-        ext = mimetypes.guess_extension(self.mime, strict=True)
-        return os.path.join(CACHE_PATH, fn + ext)
+        fn = md5(lock_id).hexdigest() # no longer used
+        local_path = self.url
+        if len(self.consumed) > 0:
+            local_path += u"..%s" % '..'.join(self.consumed)
+        # For the final filename, we want the requested extension,
+        # so that it gets saved on a predictable location
+        if len(self.to_go) == 0:
+            if len(self.consumed) == 0:
+                pass
+            elif self.target_ext:
+                ext = self.target_ext
+                # Yet we do check if the mimetype of the produced result fits with the
+                # requested extension:
+                if ext.lower() not in mimetypes.guess_all_extensions(self.mime, strict=False):
+                    raise TypeError
+                local_path += ext
+        else:
+            ext = mimetypes.guess_extension(self.mime, strict=False)
+            local_path += ext
+        print "%d steps to go in pipeline" % len(self.to_go)
+        local_folder, local_filename = os.path.split(local_path)
+        if not os.path.exists(os.path.join(CACHE_PATH,local_folder)):
+            os.makedirs(os.path.join(CACHE_PATH,local_folder))
+        return os.path.join(CACHE_PATH, local_path)
         #r = urlsplit(url)
         #ret = r.netloc + '/' + r.path
         #if r.query:
@@ -91,11 +113,11 @@ def populate_mime_type(bundle):
     Should be run first, in order to let the next tasks know about the mimetype
     """
     # TODO: use AACore Http sniffer instead to discover the mimetype
+    print(u'try task populate mime type by sniffing %s' % bundle.url)
     request = requests.get(bundle.url, stream=True)
     mime = magic.from_buffer(request.iter_content(1024).next(), mime=True)
     bundle.mime = mime
     print("write " + bundle.url2path())
-    print('task populate mime type')
     return bundle
 
 
@@ -179,7 +201,7 @@ def serialize(bundle):
     return {'url': bundle.url, 'mime': bundle.mime, 'path': bundle.url2path()}
 
 
-def process_pipeline(url=None, pipeline=[]):
+def process_pipeline(url=None, pipeline=[], target_ext=None, synchronous=False):
     """
     Construct and run the chain of tasks
 
@@ -192,7 +214,7 @@ def process_pipeline(url=None, pipeline=[]):
     acquire_lock = lambda: memcache.add(lock_id, task_id, LOCK_EXPIRE)
 
     if acquire_lock():
-        bundle = Bundle(url=url, to_go=pipeline)
+        bundle = Bundle(url=url, to_go=pipeline, target_ext=target_ext)
 
         cb = release_lock.si(lock_id)
 
@@ -202,7 +224,10 @@ def process_pipeline(url=None, pipeline=[]):
         filters.extend([registry[p].subtask(link_error=cb) for p in pipeline])
         filters.extend([serialize.subtask(link_error=cb)])
 
-        chain(*filters).apply_async(link=cb, task_id=task_id)
+        result = chain(*filters).apply_async(link=cb, task_id=task_id)
+        
+        if synchronous:
+            result.wait()
         return task_id
 
     return memcache.get(lock_id)
