@@ -57,7 +57,7 @@
                             parsedUri.authority,
                             parsedUri.path,
                             filter ? '..' + filter.replace(/\|/g, '..') : '',
-                            extension
+                            filter ? extension : '',
                             ].join('');
             };
         
