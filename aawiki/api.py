@@ -128,7 +128,7 @@ class AnnotationResource(ModelResource):
         authorization = PerAnnotationAuthorization()
 
 class PageResource(ModelResource):
-    annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True )
+    annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True, full=True)
 
     class Meta:
         always_return_data = True           # Mainly important when creating a new Page, as the necessary permissions will
@@ -137,7 +137,6 @@ class PageResource(ModelResource):
         resource_name = 'page'
         authorization = PerPageAuthorization()
         detail_uri_name = 'slug'
-        excludes = ['json']
         serializer = PrettyJSONSerializer()
         filtering = {
             "slug": ALL
@@ -152,6 +151,12 @@ class PageResource(ModelResource):
         """
         Add all permissions for current page
         """
+        # FIXME: raises a GitCommandError if there is no revision yet
+        try:
+            bundle.data['revisions'] = bundle.obj.get_revisions()
+        except:
+            pass
+
         current_user_id = get_user(bundle).id
         if current_user_id != -1:
             bundle.data['permissions'] = get_serialized_perms(bundle.obj, current_user_id)
@@ -163,9 +168,9 @@ class PageResource(ModelResource):
         new = set(extract_perms_for_comparison(bundle.data['permissions']))
         old = set(extract_perms_for_comparison(get_serialized_perms(bundle.obj)))
 
-        print "old:", old
-        print "new:", new
-        print "to remove:", old - new, "to add:", new - old
+        #print "old:", old
+        #print "new:", new
+        #print "to remove:", old - new, "to add:", new - old
         return bundle
 
     def obj_create(self, bundle, **kwargs):
@@ -187,3 +192,18 @@ class PageResource(ModelResource):
         assign_perm('aawiki.administer_page', user, bundle.obj)
 
         return bundle
+
+    def get_object_list(self, request):
+        """
+        Overrides Tastypie ModelResource method, an ORM-specific implementation
+        of ``get_object_list``.
+
+        Fetches a page revision if ``rev`` is in the GET parameters, otherwise
+        behave as normal.
+        """
+        rev = request.GET.get('rev')
+
+        if rev:
+            return Page.objects.rev(rev).all()._clone()
+        else:
+            return super(PageResource, self).get_object_list(request)
