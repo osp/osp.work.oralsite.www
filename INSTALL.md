@@ -1,4 +1,8 @@
-# Install libjpeg and libpng
+This file gives the instructions to install Oralsite on Debian GNU/Linux and its
+derivatives (Ubuntu, Mint, etc.).
+
+
+# Install python-dev, libjpeg and libpng
 
 This is required by Pillow, the python library that deals with images, used in
 the filters (see bellow). If you don't, Pillow will fail to compile. On Debian
@@ -6,7 +10,7 @@ based OS, you can install them by
 running
 
     sudo apt-get update
-    sudo apt-get install libjpeg-dev libpng-dev
+    sudo apt-get install python-dev libjpeg-dev libpng-dev
 
 
 # Install a message broker
@@ -14,9 +18,12 @@ running
 This is required to run the resource filters. The filters task is to cache and
 transform Http resources, while keeping a link to the original resource. It may
 be used for embedding a video, or turning a colored image into Black
-and White directly from the wiki.
+and White directly from the wiki. We advise to use Rabbitmq. To install it, see
+<http://www.rabbitmq.com/install-debian.html#apt>.
 
-See <http://www.rabbitmq.com/install-debian.html#apt>
+Once install, start the message broker.
+
+    sudo /etc/init.d/rabbitmq start
 
 
 # Clone the repository
@@ -28,7 +35,9 @@ If you read this, you have most likely already done this.
 
 # Install the python dependencies in a virtualenv
 
-This is the preferred method as it installs everything in an isolated environment
+This is the preferred method as it installs everything in an isolated
+environment. The requirements.txt file contains all the python depencies, which
+will be install automatically with the code below.
 
     sudo apt-get install python-virtualenv
     virtualenv --no-site-packages venv
