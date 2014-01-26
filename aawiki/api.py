@@ -192,7 +192,13 @@ class PageResource(ModelResource):
         if msg:
             try:
                 # TODO: don't store the permissions?
-                backend.commit('aawiki/Page/%s.json' % kwargs['slug'], self.serialize(None, bundle, 'application/json'), message=msg)
+                data = bundle.data.copy()
+
+                for key in ('permissions', 'rev'):
+                    if key in data:
+                        del data[key]
+
+                backend.commit('aawiki/Page/%s.json' % kwargs['slug'], self.serialize(None, data, 'application/json'), message=msg)
             except:
                 # Main case: the content hasn't changed between two calls, and
                 # git refuse to commit because of this.
