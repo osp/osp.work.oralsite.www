@@ -72,6 +72,9 @@
             var that = this;
 
             $(this.element)
+			// Private implementation to turn two clicks in a dblClick.
+			// If they are fired within the delay as set in the default
+			// options.
             .on("click", function(event) {
                 clicks++;  //count clicks
                 if (clicks === 1) {
@@ -112,6 +115,7 @@
             this._buttonCollections[eventType][location].push(elt);
         },
         onEvent: function(event, eventType) {
+	    //console.log (event.target == this.element, event.target, this.element)
             if (this._is_visible) {
                 this.hide();
             } else {

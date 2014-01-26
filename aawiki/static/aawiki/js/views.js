@@ -225,6 +225,7 @@ window.AA = window.AA || {};
 
             this.render();
             
+	    // this is how to listen to global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
         },
         registerDriver : function() {
@@ -317,16 +318,23 @@ window.AA = window.AA || {};
                     }
                 })
                 .draggable({
-                    stop: function(event, ui) { 
+                    cancel: ".cancelDraggable",
+                    start  : function(event, ui) {
+                        $(this).css('cursor','move');
+                    },
+                    stop: function(event, ui) {
+                        $(this).css('cursor','auto'); 
                         model.set({
                             'top': ui.offset.top,
                             'left': ui.offset.left,
                         }).save();
                     },
                     distance: 10
-                }).
-                renderResources();
+                })
+                .on ('click', function (event) {console.log (event)})
+                .renderResources();
                 
+                //console.log (this.$el.find(".handle"))
                 
                 if(this.driver) {
                     this.updateAnnotationEvents();
