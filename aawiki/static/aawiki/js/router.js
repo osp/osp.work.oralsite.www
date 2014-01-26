@@ -6,15 +6,15 @@ window.AA = window.AA || {};
     AA.Router = Backbone.Router.extend({
         currentSlug: '',
         routes: {
-            ":slug/": "page",
+            ":slug/(:rev/)": "page",
         },
-        page: function(slug) {
+        page: function(slug, rev) {
             this.currentSlug = slug;
             //console.log(slug, document.location.pathname);
 
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
-            this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
+            this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug, rev: rev}) });
 
             this.multiplexView && this.multiplexView.remove();
             this.multiplexView = new AA.MultiplexView();

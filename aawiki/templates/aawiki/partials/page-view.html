@@ -1,6 +1,7 @@
 <hgroup>
      <h1 property="dc:title"><%= name %></h1>
 </hgroup>
+<button id="commit">★☆</button>
 <div><%= introduction %></div>
 <div class="ui-layout-content">
     <div id="accordion">
@@ -57,6 +58,13 @@
                 </ul>
             </fieldset>
         </div>
+        <% } %>
+
+
+        <% if (revisions) { %>
+        <ul id="commit-list">
+            <% _.each(revisions, function(revision) { %> <li><a href="Index/<%= revision %>/"><%= revision %></a></li> <% }); %>
+        </ul>
         <% } %>
          <!-- TODO: reimplement Table of Contents & Layers <h3><a href="#">Table of contents</a></h3>
 

@@ -68,6 +68,26 @@ window.AA = window.AA || {};
         templates: {
             view: _.template($('#page-view-template').html()),
         },
+        events: {
+            "click #commit" : "commit",
+            "click #commit-list a": "wayback"
+        },
+        wayback: function(event) {
+            event.preventDefault();
+            var href = $(event.currentTarget).attr('href');
+            AA.router.navigate(href, {trigger: true});
+        },
+        commit: function(event) {
+            var msg = prompt("Commit message", "My modifications");
+            // for now just saves the full model
+            // This could be interesting:
+            // http://stackoverflow.com/questions/20668911/backbone-js-saving-a-model-with-header-params
+            this.model.save(null, {
+                headers: {
+                    Message: msg
+                }
+            });
+        },
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
