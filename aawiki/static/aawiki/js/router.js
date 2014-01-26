@@ -10,7 +10,8 @@ window.AA = window.AA || {};
         },
         page: function(slug) {
             this.currentSlug = slug;
-            console.log(slug, document.location.pathname);
+            //console.log(slug, document.location.pathname);
+
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
             this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug}) });
@@ -19,7 +20,9 @@ window.AA = window.AA || {};
             this.multiplexView = new AA.MultiplexView();
             
             this.annotationCollectionView && this.annotationCollectionView.remove();
-            this.annotationCollectionView = new AA.AnnotationCollectionView({id : slug});
+            // Since we are using backbone-relational.js, An annotation
+            // collection is created as a property of the page view model.
+            this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
         }
     });
     
