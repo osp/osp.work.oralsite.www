@@ -70,13 +70,13 @@ window.AA = window.AA || {};
         },
         events: {
             "click #commit" : "commit",
-            "click #commit-list a": "wayback"
+            //"click #commit-list a": "wayback"
         },
-        wayback: function(event) {
-            event.preventDefault();
-            var href = $(event.currentTarget).attr('href');
-            AA.router.navigate(href, {trigger: true});
-        },
+        //wayback: function(event) {
+            //event.preventDefault();
+            //var href = $(event.currentTarget).attr('href');
+            //AA.router.navigate(href, {trigger: true});
+        //},
         commit: function(event) {
             var msg = prompt("Commit message", "My modifications");
             // for now just saves the full model

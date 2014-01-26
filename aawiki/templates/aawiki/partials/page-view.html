@@ -6,13 +6,13 @@
 <div class="ui-layout-content">
     <div id="accordion">
         <% if (typeof permissions !== 'undefined') {
-        
+
         // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
         var public = false;
         if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
             public = true;
         }
-        
+
         var admin = false;
         if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
             var admin = true;
@@ -34,13 +34,13 @@
                     <% _.each(permissions.view_page, function(permitted) {
                         if (permitted.id !== -1)  { %>
                     <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
-                    <%  } 
+                    <%  }
                     }); %>
                     <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
                 </ul>
             </fieldset>
             <fieldset>
-                <legend>Editable by</legend> 
+                <legend>Editable by</legend>
                 <ul class="tags">
                     <% _.each(permissions.change_page, function(permitted) { %>
                     <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
@@ -63,7 +63,7 @@
 
         <% if (revisions) { %>
         <ul id="commit-list">
-            <% _.each(revisions, function(revision) { %> <li><a href="Index/<%= revision %>/"><%= revision %></a></li> <% }); %>
+            <% _.each(revisions, function(revision) { %> <li><a href="/pages/<%= slug %>/<%= revision %>/"><%= revision %></a></li> <% }); %>
         </ul>
         <% } %>
          <!-- TODO: reimplement Table of Contents & Layers <h3><a href="#">Table of contents</a></h3>

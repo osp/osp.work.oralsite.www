@@ -11,6 +11,7 @@ $(function() {
     
     // The user and alert-view are independent of page-to-page navigation
     AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
+    AA.userView.model.fetch();
     AA.alertView = new AA.AlertView();
     
     // make Backbone handle page changes
