@@ -330,7 +330,19 @@ window.AA = window.AA || {};
                     left: this.model.get("left"),
                 })
                 .resizable({
+                    resize: function (event, ui) {
+                        if (event.ctrlKey) {
+                            $("html").addClass("grid");
+
+                            ui.element.width((Math.floor(ui.size.width / 20) * 20) - (ui.position.left % 20));
+                            ui.element.height((Math.floor(ui.size.height / 20) * 20) - (ui.position.top % 20));
+                        } else {
+                            $("html").removeClass("grid");
+                        }
+                    },
                     stop: function(event, ui) {
+                        $("html").removeClass("grid");
+
                         model.set({
                             'width': ui.size.width,
                             'height': ui.size.height,
@@ -339,17 +351,43 @@ window.AA = window.AA || {};
                 })
                 .draggable({
                     cancel: ".cancelDraggable",
-                    start  : function(event, ui) {
+                    distance: 10,
+                    scroll: true,
+                    start: function(event, ui) {
+                        //that.$el.contextual('hide');
                         $(this).css('cursor','move');
                     },
-                    stop: function(event, ui) {
-                        $(this).css('cursor','auto'); 
-                        model.set({
-                            'top': ui.offset.top,
-                            'left': ui.offset.left,
-                        }).save();
+                    drag: function (event, ui) {
+                        if (event.ctrlKey) {
+                            $("html").addClass("grid");
+                            ui.position.left = Math.floor(ui.position.left / 20) * 20;
+                            ui.position.top = Math.floor(ui.position.top / 20) * 20;
+                        } else {
+                            $("html").removeClass("grid");
+                        }
                     },
-                    distance: 10
+                    stop: function(event, ui) { 
+                        $(this).css('cursor','auto'); 
+                        //that.$el.contextual('show');
+                        $("html").removeClass("grid");
+
+                        // Makes sure an annotation doesn't get a negative
+                        // offset
+                        var pos = $(this).position();
+
+                        pos.top = pos.top < 0 ? 0 : pos.top;
+                        pos.left = pos.left < 0 ? 0 : pos.left;
+
+                        $(this).css({
+                            top: pos.top,
+                            left: pos.left
+                        });
+
+                        model.set({
+                            top: pos.top,
+                            left: pos.left,
+                        }).save();
+                    }
                 })
                 .on ('click', function (event) {console.log (event)})
                 .renderResources();
