@@ -11,8 +11,19 @@ window.AA = window.AA || {};
     });
     
     
-    AA.PageModel = Backbone.Model.extend({
+    AA.PageModel = Backbone.RelationalModel.extend({
         urlRoot: "/pages/api/v1/page/",
+        relations: [{
+            type: Backbone.HasMany,
+            key: 'annotations',
+            relatedModel: 'AA.AnnotationModel',
+            collectionType: 'AA.AnnotationCollection',
+            reverseRelation: {
+                key: 'page',
+                includeInJSON: 'resource_uri'
+                // 'relatedModel' is automatically set to 'Zoo'; the 'relationType' to 'HasOne'.
+            }
+        }],
         initialize: function() {
             var that = this;
             this.fetch({
@@ -43,7 +54,7 @@ window.AA = window.AA || {};
     });
     
     
-    AA.AnnotationModel = Backbone.Model.extend({
+    AA.AnnotationModel = Backbone.RelationalModel.extend({
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
             body: "Nouvelle annotation",

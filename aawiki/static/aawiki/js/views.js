@@ -356,7 +356,6 @@ window.AA = window.AA || {};
         }
     });
 
-
     AA.AnnotationCollectionView = Backbone.View.extend({
         collection: new AA.AnnotationCollection(), 
         el: 'article#canvas .wrapper',
@@ -406,18 +405,9 @@ window.AA = window.AA || {};
                 .on('click', this.organizeAnnotations.bind(this));
             this.$el.contextual('register', 'dblclick', 'cursor', btn);
 
-            this.collection.fetch({
-                data : {
-                    // filters the annotation list for the current Page at
-                    // the API level
-                    "page__slug" : this.id
-                },
-                success: function(result) {
-                    that.render();
-                },
-            });
-
             this.listenTo(this.collection, 'add', this.renderOne);
+
+            this.render();
         },
         renderOne: function(model, collection) {
             var $el = this.$el;
