@@ -1,6 +1,4 @@
 from django.db import models
-from aawiki.backends import backend
-from aawiki.manager import RevisionManager
 
 
 class RCSModel(models.Model):
@@ -9,36 +7,6 @@ class RCSModel(models.Model):
     """
     class Meta:
         abstract = True
-
-    rcskey_format = "%s/%s/%s.json"
-    objects = RevisionManager()
-
-    def get_key(self):
-        format_args = (self._meta.app_label,
-                       self.__class__.__name__,
-                       self.pk)
-        return self.rcskey_format % format_args
-
-    def get_revisions(self):
-        return backend.get_revisions(self.get_key())
-
-    def serialize(self):
-        """
-        Serializes the model using Tastypie
-        """
-        # TODO: make sure pretty printed is enforced here as it now relies on
-        # tastypie serializer
-        from aawiki.api import PageResource
-        resource = PageResource()
-        resource.fields['annotations'].full = True
-        bundle = resource.build_bundle(obj=self)
-        data = resource.full_dehydrate(bundle)
-        return resource.serialize(None, data, 'application/json')
-
-    def save(self, *args, **kwargs):
-        super(RCSModel, self).save(*args, **kwargs)
-        key = self.get_key()
-        backend.commit(key, self.serialize())
 
 
 class Page(RCSModel):
@@ -61,7 +29,7 @@ class Page(RCSModel):
         )
 
 
-class Annotation(models.Model):
+class Annotation(RCSModel):
     """Represent an annotation"""
     page = models.ForeignKey(Page)
     about = models.URLField(blank=True)
