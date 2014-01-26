@@ -89,7 +89,6 @@ window.AA = window.AA || {};
     AA.MultiplexView = Backbone.View.extend({
         initialize: function() {
             this.drivers = {};
-            this.mE = {}; // mediaElementObjects, there to help out with video compatibility.
         },
         registerDriver : function(uri) {
             if (typeof(this.drivers[uri]) === 'undefined') {
@@ -111,14 +110,20 @@ window.AA = window.AA || {};
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
-                    var driverMediaEl = document.querySelector('[src="' + uri + '"]');
+                    var driverMediaEl  = document.querySelector('[src="' + uri + '"]');
+                    var driverMediaRef = document.querySelector('[data-uri="' + uri + '"]');
                     if (driverMediaEl &&
                            ( driverMediaEl.tagName.toLowerCase() === "video" ||
                              driverMediaEl.tagName.toLowerCase() === "audio" )
                            ) {
                         this.drivers[uri] = Popcorn(driverMediaEl);
-                        this.mE[uri] = new MediaElement(driverMediaEl);
+                    } else if (driverMediaRef) {
+                        // TODO: Popcorn now uses Popcorn.youtube instead of Popcorn.smart
+                        // To fix this, we need to insert unique id´s in the embed wrappers,
+                        // because Popcorn.smart only supports id´s and not elements themselves.
+                        this.drivers[uri] = Popcorn.youtube(driverMediaRef, uri);
                     } else {
+                            
                         // And else we don’t know what to do
                         return null;
                     }
@@ -226,6 +231,7 @@ window.AA = window.AA || {};
             this.render();
             
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
         },
         registerDriver : function() {
             /**
@@ -239,6 +245,19 @@ window.AA = window.AA || {};
              */
             this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
             this.updateAnnotationEvents();
+        },
+        registerChildrenAsDrivers: function() {
+            
+            var hostedUris = this.$el.find(".embed.hosted").map(function(i, el) {
+                return $(el).attr("data-uri");
+            }).get();
+            var mediaUris = this.$el.find("video[src],audio[src]").map(function(i, el) {
+                return $(el).attr("src");
+            }).get();
+            var allUris = hostedUris.concat(mediaUris);
+            for (var i=0; i<allUris.length; i++) {
+                AA.router.multiplexView.registerDriver(allUris[i]);
+            }
         },
         deleteAnnotationEvents: function() {
             /**
@@ -327,10 +346,10 @@ window.AA = window.AA || {};
                 }).
                 renderResources();
                 
-                
                 if(this.driver) {
                     this.updateAnnotationEvents();
                 }
+                this.registerChildrenAsDrivers();
             };
 
             return this;

@@ -155,7 +155,8 @@ describe("The views", function() {
                                             "width": 300
                                         },
                                         {
-                                            "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.",
+                                            "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
+                                            "about": "http://www.youtube.com/watch?v=v-7kf7OZQtw",
                                             "height": 400,
                                             "id": 66,
                                             "left": 333,
@@ -252,15 +253,10 @@ describe("The views", function() {
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ]).toBeDefined();
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ] instanceof Popcorn).toBe(true);
         });
-        
-        it("and when it’s an audio or video, there’s also a corresponding MediaElement.js instance", function() {
-            expect(AA.router.multiplexView.mE[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ]).toBeDefined();
-            
-        });
-        it("Popcorn.js, MediaElement.js, and the original element, all agree", function() {
+
+        it("Popcorn.js and the original element agree", function() {
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].paused()).toBe(true);
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].media.paused).toBe(true);
-            expect(AA.router.multiplexView.mE[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].paused).toBe(true);
         });
         
         it("the video has 2 registered events", function(){
