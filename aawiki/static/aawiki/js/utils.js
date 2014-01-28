@@ -42,7 +42,7 @@ window.AA = window.AA || {};
             hash |= 0; // Convert to 32bit integer
         }
         return hash;
-    }
+    };
     
     AA.utils.zeropad = function (n, toplaces) {
         var ret = "" + n;
@@ -82,6 +82,14 @@ window.AA = window.AA || {};
         } else {
             return null;
         }
+    };
+    
+    AA.utils.secondsToTimecode = function(seconds) {
+        var d = Number(seconds);
+        var h = Math.floor(d / 3600);
+        var m = Math.floor(d % 3600 / 60);
+        var s = Math.floor(d % 3600 % 60);
+        return ((h > 0 ? h + ":" : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + ":" : "0:") + (s < 10 ? "0" : "") + s);
     };
     
     AA.utils.dewikify = function(name) {

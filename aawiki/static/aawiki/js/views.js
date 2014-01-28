@@ -168,6 +168,7 @@ window.AA = window.AA || {};
         templates: {
             view: _.template($('#annotation-view-template').html()),
             edit: _.template($('#annotation-edit-template').html()),
+            player: _.template($('#annotation-player-template').html())
         },
         events: {
             "click .play"               : "playPause",
@@ -186,7 +187,7 @@ window.AA = window.AA || {};
                 e.target.textContent = "Pause";
             } else {
                 this.driver.pause();
-                e.target.textContent = "Play"
+                e.target.textContent = "Play";
             }
         },
         editing: false,
@@ -263,6 +264,15 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
         },
+        hasPlay : function() {
+            /** 
+             * Should this annotation feature player controls?
+             * 
+             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
+             * */
+            var uri = this.model.get('about');
+            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
+        },
         registerDriver : function() {
             /**
              * This annotation has an `about` value. It represents what is annotated,
@@ -323,15 +333,7 @@ window.AA = window.AA || {};
                  });
                  that.driverEventIDs.push(p.getLastTrackEventId());
              });
-        },
-        hasPlay : function() {
-            /** 
-             * Should this annotation feature player controls?
-             * 
-             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
-             * */
-            var uri = this.model.get('about');
-            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
+             this.renderPlayer();
         },
         render: function() {
             if (this.editing) {
@@ -344,7 +346,6 @@ window.AA = window.AA || {};
                 this.$el
                 .html(this.templates.view({
                     body:    body,
-                    hasPlay: this.hasPlay(),
                     about:   this.model.get('about')
                 }))
                 .addClass('section1')
@@ -425,6 +426,19 @@ window.AA = window.AA || {};
                 this.registerChildrenAsDrivers();
             };
 
+            return this;
+        },
+
+        renderPlayer: function() {
+            var duration = this.driver.duration();
+            if (duration === 0) {
+                duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
+            }
+            this.$el.find(".controls")
+                .html(this.templates.player({
+                    hasPlay: this.hasPlay(),
+                    duration: AA.utils.secondsToTimecode(duration)
+                }));
             return this;
         },
 
