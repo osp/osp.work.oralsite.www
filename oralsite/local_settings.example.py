@@ -34,6 +34,10 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERY_ALWAYS_EAGER = False
 
 
+# aawiki versioning
+RCS_BACKEND = 'gitcore' # uses git-python
+GIT_REPO_PATH = '/tmp/repo' # where the repo should be created
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
