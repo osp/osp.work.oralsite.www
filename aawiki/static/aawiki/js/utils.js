@@ -29,6 +29,7 @@ window.AA = window.AA || {};
     AA.widgets.Menu = function (options) {
         this.options = {
             position: 'left',
+            layout: 'grid',
             iconSize: 40,
             iconSpacing: 5,
             element: null,
@@ -94,7 +95,6 @@ window.AA = window.AA || {};
         },
         
         show: function (event) {
-            console.log (this.options.position);
             if (this._visible === false) {
                 switch (this.options.position) {
                     case this.positionLeft:
@@ -108,7 +108,7 @@ window.AA = window.AA || {};
                 }
             }
         },
-
+ 
         hide: function () {
             $.each(this._visibleButtons, function(index, value) {
                 value.detach();
@@ -219,6 +219,13 @@ window.AA = window.AA || {};
             };
             
             this._visible = true;
+        },
+ 
+        redraw: function () {
+            if (this.visible()) {
+                this.hide();
+                this.show();
+            }
         },
  
         destroy: function () {
