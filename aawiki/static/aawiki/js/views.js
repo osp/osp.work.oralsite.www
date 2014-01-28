@@ -142,10 +142,9 @@ window.AA = window.AA || {};
                            ) {
                         this.drivers[uri] = Popcorn(driverMediaEl);
                     } else if (driverMediaRef) {
-                        // TODO: Popcorn now uses Popcorn.youtube instead of Popcorn.smart
-                        // To fix this, we need to insert unique id´s in the embed wrappers,
+                        // We go to lengths to specify id’s,
                         // because Popcorn.smart only supports id´s and not elements themselves.
-                        this.drivers[uri] = Popcorn.youtube(driverMediaRef, uri);
+                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri);
                     } else {
                             
                         // And else we don’t know what to do

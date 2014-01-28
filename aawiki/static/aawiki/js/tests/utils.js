@@ -4,6 +4,12 @@ describe("The AA utils", function() {
         expect(AA.utils).toBeDefined();
     });
     
+    describe("The utility toHash", function(){
+        it("always produces the same result", function(){
+            expect(AA.utils.toHash("Sherry Turkle")).toBe(1312915434);
+        });
+    });
+    
     describe("The utility timecodeToSeconds", function() {
         it("knows how to handle timecode in the form of '01:44,738'", function() {
             expect(AA.utils.timecodeToSeconds('01:44,738')).toBe(104.738);

@@ -8,7 +8,7 @@
             html5video:    _.template('<video class="player" controls preload src="<%= uri %>" />'),
             html5audio:    _.template('<audio class="player" controls src="<%= uri %>" />'),
             iframe:        _.template('<iframe src="<%= uri %>"></iframe>'),
-            externalEmbed: _.template('<div class="embed hosted" data-uri="<%= uri %>"></div>'),
+            externalEmbed: _.template('<div id="<%= options.uid %>" class="embed hosted" data-uri="<%= uri %>"></div>'),
             fallback:      _.template('<a href="<%= uri %>"><%= uri %></a>')
         };
         
@@ -33,6 +33,7 @@
         };
         
         var renderResource = function (uri, filter, options) {
+            var options = options || {};
             var renderUri;
             
             var uriForCachedResource = function (uri, filter) {
@@ -94,6 +95,8 @@
             
             if (isHostedService(uri)) {
                 var templateName = 'externalEmbed';
+                var uid = 'uid-' + AA.utils.toHash(uri);
+                options.uid = uid; // because of the way Popcorn works, we need an id to be able to refer to the div: we can’t just pass the element.
             } else {
                 var mimeType = AA.utils.path2mime(uri);
                 var templateName = mimeMap(mimeType);
