@@ -328,11 +328,10 @@ window.AA = window.AA || {};
             /** 
              * Should this annotation feature player controls?
              * 
-             * In most cases, yes, but not if the driver of the annotation is
-             * the page itself. In this case, there will be general player controls
-             * located elsewhere.
+             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
              * */
-            return this.model.get('about') !== document.location.origin + document.location.pathname;
+            var uri = this.model.get('about');
+            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
         },
         render: function() {
             if (this.editing) {
