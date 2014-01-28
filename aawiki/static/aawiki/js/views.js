@@ -373,7 +373,7 @@ window.AA = window.AA || {};
                     }
                 })
                 .draggable({
-                    cancel: ".cancelDraggable",
+                    cancel: ".cancelDraggable, textarea",
                     distance: 10,
                     scroll: true,
                     start: function(event, ui) {
