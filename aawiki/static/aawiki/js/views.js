@@ -69,8 +69,12 @@ window.AA = window.AA || {};
             view: _.template($('#page-view-template').html()),
         },
         events: {
+            "click #toggleDrawer" : "toggleDrawer",
             "click #commit" : "commit",
             //"click #commit-list a": "wayback"
+        },
+        toggleDrawer: function(event) {
+            $('#sidebar, #canvas').toggleClass('hide');
         },
         //wayback: function(event) {
             //event.preventDefault();
