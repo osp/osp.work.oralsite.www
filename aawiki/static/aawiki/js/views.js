@@ -68,6 +68,26 @@ window.AA = window.AA || {};
         templates: {
             view: _.template($('#page-view-template').html()),
         },
+        events: {
+            "click #commit" : "commit",
+            //"click #commit-list a": "wayback"
+        },
+        //wayback: function(event) {
+            //event.preventDefault();
+            //var href = $(event.currentTarget).attr('href');
+            //AA.router.navigate(href, {trigger: true});
+        //},
+        commit: function(event) {
+            var msg = prompt("Commit message", "My modifications");
+            // for now just saves the full model
+            // This could be interesting:
+            // http://stackoverflow.com/questions/20668911/backbone-js-saving-a-model-with-header-params
+            this.model.save(null, {
+                headers: {
+                    Message: msg
+                }
+            });
+        },
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
@@ -230,6 +250,7 @@ window.AA = window.AA || {};
 
             this.render();
             
+	    // this is how to listen to global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
         },
@@ -328,7 +349,19 @@ window.AA = window.AA || {};
                     left: this.model.get("left"),
                 })
                 .resizable({
+                    resize: function (event, ui) {
+                        if (event.ctrlKey) {
+                            $("html").addClass("grid");
+
+                            ui.element.width((Math.floor(ui.size.width / 20) * 20) - (ui.position.left % 20));
+                            ui.element.height((Math.floor(ui.size.height / 20) * 20) - (ui.position.top % 20));
+                        } else {
+                            $("html").removeClass("grid");
+                        }
+                    },
                     stop: function(event, ui) {
+                        $("html").removeClass("grid");
+
                         model.set({
                             'width': ui.size.width,
                             'height': ui.size.height,
@@ -336,15 +369,47 @@ window.AA = window.AA || {};
                     }
                 })
                 .draggable({
-                    stop: function(event, ui) { 
-                        model.set({
-                            'top': ui.offset.top,
-                            'left': ui.offset.left,
-                        }).save();
+                    cancel: ".cancelDraggable",
+                    distance: 10,
+                    scroll: true,
+                    start: function(event, ui) {
+                        //that.$el.contextual('hide');
+                        $(this).css('cursor','move');
                     },
-                    distance: 10
-                }).
-                renderResources();
+                    drag: function (event, ui) {
+                        if (event.ctrlKey) {
+                            $("html").addClass("grid");
+                            ui.position.left = Math.floor(ui.position.left / 20) * 20;
+                            ui.position.top = Math.floor(ui.position.top / 20) * 20;
+                        } else {
+                            $("html").removeClass("grid");
+                        }
+                    },
+                    stop: function(event, ui) { 
+                        $(this).css('cursor','auto'); 
+                        //that.$el.contextual('show');
+                        $("html").removeClass("grid");
+
+                        // Makes sure an annotation doesn't get a negative
+                        // offset
+                        var pos = $(this).position();
+
+                        pos.top = pos.top < 0 ? 0 : pos.top;
+                        pos.left = pos.left < 0 ? 0 : pos.left;
+
+                        $(this).css({
+                            top: pos.top,
+                            left: pos.left
+                        });
+
+                        model.set({
+                            top: pos.top,
+                            left: pos.left,
+                        }).save();
+                    }
+                })
+                .on ('click', function (event) {console.log (event)})
+                .renderResources();
                 
                 if(this.driver) {
                     this.updateAnnotationEvents();

@@ -18,11 +18,13 @@ from tastypie.utils import trailing_slash
 
 from aawiki.models import Annotation, Page
 from aawiki.authorization import *
-
+from django.http import HttpResponse
 
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from tastypie.serializers import Serializer
+
+from aawiki.backends import backend
 
 
 class PrettyJSONSerializer(Serializer):
@@ -116,6 +118,7 @@ def me(request):
     user_view = user_resource.wrap_view('dispatch_detail')
     return user_view(request, pk=user.id)
 
+
 class AnnotationResource(ModelResource):
     page = fields.ForeignKey('aawiki.api.PageResource', 'page')
 
@@ -126,6 +129,7 @@ class AnnotationResource(ModelResource):
             "page": ALL_WITH_RELATIONS
         }
         authorization = PerAnnotationAuthorization()
+
 
 class PageResource(ModelResource):
     annotations = fields.ToManyField('aawiki.api.AnnotationResource', 'annotation_set', null=True, blank=True, full=True)
@@ -143,19 +147,29 @@ class PageResource(ModelResource):
         }
 
     def prepend_urls(self):
+        # FIXME: the slug regex and the wikified name regex should match.
         return [
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d%%'_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
+    def hydrate(self, bundle):
+        """
+        Removes the revisions field which is not stored in the model.
+        """
+        if 'revisions' in bundle.data:
+            del bundle.data['revisions']
+
+        return bundle
+
     def dehydrate(self, bundle):
         """
-        Add all permissions for current page
+        Populates the revision list and permissions for the page
         """
         # FIXME: raises a GitCommandError if there is no revision yet
         try:
-            bundle.data['revisions'] = bundle.obj.get_revisions()
+            bundle.data['revisions'] = backend.get_revisions('aawiki/Page/%s.json' % bundle.data['slug'])
         except:
-            pass
+            bundle.data['revisions'] = []
 
         current_user_id = get_user(bundle).id
         if current_user_id != -1:
@@ -171,6 +185,25 @@ class PageResource(ModelResource):
         #print "old:", old
         #print "new:", new
         #print "to remove:", old - new, "to add:", new - old
+
+        # if there is the "message" field in the HTTP header it means we want
+        # to commit
+        msg = bundle.request.META.get('HTTP_MESSAGE')
+        if msg:
+            try:
+                # TODO: don't store the permissions?
+                data = bundle.data.copy()
+
+                for key in ('permissions', 'rev'):
+                    if key in data:
+                        del data[key]
+
+                backend.commit('aawiki/Page/%s.json' % kwargs['slug'], self.serialize(None, data, 'application/json'), message=msg)
+            except:
+                # Main case: the content hasn't changed between two calls, and
+                # git refuse to commit because of this.
+                pass
+
         return bundle
 
     def obj_create(self, bundle, **kwargs):
@@ -193,17 +226,19 @@ class PageResource(ModelResource):
 
         return bundle
 
-    def get_object_list(self, request):
+    def get_detail(self, request, **kwargs):
         """
-        Overrides Tastypie ModelResource method, an ORM-specific implementation
-        of ``get_object_list``.
-
-        Fetches a page revision if ``rev`` is in the GET parameters, otherwise
-        behave as normal.
+        Shortcuts the whole process if a specific revision is asked by serving
+        the json response directly from the repository.
         """
         rev = request.GET.get('rev')
 
         if rev:
-            return Page.objects.rev(rev).all()._clone()
+            # TODO: implement caching, as done in the super get_detail method
+            filename = 'aawiki/Page/%s.json' % kwargs['slug']
+            data = backend.fetch(filename, rev)
+            data = json.loads(data)
+            data['revisions'] = backend.get_revisions(filename)
+            return HttpResponse(json.dumps(data), content_type="application/json")
         else:
-            return super(PageResource, self).get_object_list(request)
+            return super(PageResource, self).get_detail(request, **kwargs)

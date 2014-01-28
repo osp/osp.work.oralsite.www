@@ -56,7 +56,7 @@ class GitBackend(BaseBackend):
         except:
             return ''
 
-    def commit(self, key, data):
+    def commit(self, key, data, message='auto commit from django'):
         """
         commit changed ``data`` to the entity identified by ``key``.
 
@@ -75,7 +75,7 @@ class GitBackend(BaseBackend):
             repo.git.add(os.path.join(self.repo_path, key))
         except:
             raise
-        repo.git.commit(message='auto commit from django')
+        repo.git.commit(message=message)
 
 
     def get_revisions(self, key):
