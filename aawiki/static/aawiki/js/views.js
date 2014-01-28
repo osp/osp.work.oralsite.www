@@ -344,6 +344,8 @@ window.AA = window.AA || {};
                 this.$el
                 .html(this.templates.edit({body: this.model.get("body")}));
             } else {
+                
+                var that = this;
                 var model = this.model;
                 var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
@@ -387,10 +389,11 @@ window.AA = window.AA || {};
                     distance: 10,
                     scroll: true,
                     start: function(event, ui) {
-                        //that.$el.contextual('hide');
                         $(this).css('cursor','move');
                     },
                     drag: function (event, ui) {
+                        that.editMenu.redraw ();
+                        
                         if (event.ctrlKey) {
                             $("html").addClass("grid");
                             ui.position.left = Math.floor(ui.position.left / 20) * 20;
@@ -400,8 +403,7 @@ window.AA = window.AA || {};
                         }
                     },
                     stop: function(event, ui) { 
-                        $(this).css('cursor','auto'); 
-                        //that.$el.contextual('show');
+                        $(this).css('cursor','auto');
                         $("html").removeClass("grid");
 
                         // Makes sure an annotation doesn't get a negative
