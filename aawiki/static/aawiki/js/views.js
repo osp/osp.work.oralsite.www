@@ -273,6 +273,10 @@ window.AA = window.AA || {};
             var uri = this.model.get('about');
             return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
         },
+        isSlideshow: function() {
+            // for now the same as hasPlay
+            return this.hasPlay();
+        },
         registerDriver : function() {
             /**
              * This annotation has an `about` value. It represents what is annotated,
@@ -345,8 +349,9 @@ window.AA = window.AA || {};
 
                 this.$el
                 .html(this.templates.view({
-                    body:    body,
-                    about:   this.model.get('about')
+                    body:        body,
+                    about:       this.model.get('about'),
+                    isSlideshow: this.isSlideshow()
                 }))
                 .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
