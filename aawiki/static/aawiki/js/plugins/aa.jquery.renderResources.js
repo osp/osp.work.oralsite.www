@@ -4,11 +4,12 @@
     var parseUri = AA.utils.parseUri;
     
         var templates = {
-            img:        _.template('<img src="<%= uri %>" />'),
-            html5video: _.template('<video class="player" controls preload src="<%= uri %>" />'),
-            html5audio: _.template('<audio class="player" controls src="<%= uri %>" />'),
-            iframe:     _.template('<iframe src="<%= uri %>"></iframe>'),
-            fallback:   _.template('<a href="<%= uri %>"><%= uri %></a>')
+            img:           _.template('<img src="<%= uri %>" />'),
+            html5video:    _.template('<video class="player" controls preload src="<%= uri %>" />'),
+            html5audio:    _.template('<audio class="player" controls src="<%= uri %>" />'),
+            iframe:        _.template('<iframe src="<%= uri %>"></iframe>'),
+            externalEmbed: _.template('<div class="embed hosted" data-uri="<%= uri %>"></div>'),
+            fallback:      _.template('<a href="<%= uri %>"><%= uri %></a>')
         };
         
         var mimeMap = function (mimeType) {
@@ -19,8 +20,8 @@
              */
             var mimes = {
                 img: ["image/jpeg", "image/png", "image/gif"],
-                html5video: ["video/ogg", "video/webm"],
-                html5audio: ["audio/ogg"],
+                html5video: ["video/ogg", "video/webm", "video/mp4"],
+                html5audio: ["audio/ogg", "audio/mp3"],
                 iframe: ["text/html"]
             };
             for (var templName in mimes) {
@@ -31,7 +32,7 @@
             return "fallback";
         };
         
-        var renderResource = function (uri, mimeType, filter, options) {
+        var renderResource = function (uri, filter, options) {
             var renderUri;
             
             var uriForCachedResource = function (uri, filter) {
@@ -68,8 +69,20 @@
                 return false;
             };
         
-            // If the image is already local, and needs no filtering we can serve it as is:
+            var isHostedService = function(uri) {
+                /** Is this a hosted service that popcorn can play for us?
+                 * (regexes copied from the Popcorn source) */
+               return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu)/).test( uri ) ||
+                      (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(soundcloud)/).test( uri ) ||
+                      (/player.vimeo.com\/video\/\d+/).test( uri ) ||
+                      (/vimeo.com\/\d+/).test( uri );
+            };
+        
             if (!filter && isLocal(uri)) {
+                // If the image is already local, and needs no filtering, we can serve it as is:
+                renderUri = uri;
+            } else if (isHostedService(uri)) {
+                // For now, if it is on a hosted service, we´re not going to cache it either:
                 renderUri = uri;
             } else {
                 renderUri = uriForCachedResource(uri, filter);
@@ -77,11 +90,14 @@
             
             // TEST:
             // uriC = uriForCachedResource('http://media.boingboing.net/wp-content/themes/2012/sundries/logo_bounce2012.gif', 'size:160|bw');
-            // console.log(uriC, uriC === location.protocol + '//' + location.host + '/filters/cache/media.boingboing.net/wp-content/themes/2012/sundries/logo_bounce2012.gif..size:160..bw.gif');
+            // console.log(uriC, uriC === location.protocol + '//' + location.host + '/filters/processed/http://media.boingboing.net/wp-content/themes/2012/sundries/logo_bounce2012.gif..size:160..bw.gif');
             
-            
-            // http://sarma.be/filters/example.com/truc.png..size:50x50.png
-            var templateName = mimeMap(mimeType);
+            if (isHostedService(uri)) {
+                var templateName = 'externalEmbed';
+            } else {
+                var mimeType = AA.utils.path2mime(uri);
+                var templateName = mimeMap(mimeType);
+            }
             return templates[templateName]({
                 uri: renderUri,
                 options: options
@@ -93,7 +109,6 @@
                 .find("[rel='aa:embed']")
                     .each(function(i, el) {
                         var $el = $(el);
-                        console.log($el[0]);
                         // TODO this hack exists because we did not yet implement the
                         // wikilink syntax for filters
                         // [[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]] ->
@@ -106,13 +121,12 @@
                         //
                         var uri = $el.attr('href');
                         var filter = $el.attr('data-filter');
-                        var mimeType = AA.utils.path2mime(uri);
                         // TODO: in ADMIN mode:
                         // A replace with spinner
                         // B launch HEAD request that tests if URL exists,
                         // and only replace with the template
                         // on succesful callback
-                        $el.replaceWith($(renderResource(uri, mimeType, filter)));
+                        $el.replaceWith($(renderResource(uri, filter)));
                     });
             
         });
