@@ -161,8 +161,6 @@ describe("The views", function() {
         
         AA.router.multiplexView = new AA.MultiplexView();
         
-        console.log(AA.router.pageView.model);
-        console.log(AA.router.pageView.model.get('annotations'));
         AA.router.annotationCollectionView = new AA.AnnotationCollectionView({collection : AA.router.pageView.model.get('annotations')});
         
         it("can be initialised", function(){
