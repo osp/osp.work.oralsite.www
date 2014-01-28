@@ -171,9 +171,9 @@ window.AA = window.AA || {};
             edit: _.template($('#annotation-edit-template').html()),
         },
         events: {
-            "click .play"               : "play",
+            "click .play"               : "playPause",
         },
-        play: function(e) {
+        playPause: function(e) {
             /**
              * Sends a ‘play’ event to the annotation’s driver.
              * 
@@ -182,7 +182,13 @@ window.AA = window.AA || {};
              * (The Popcorn instance wraps the HTML5 audio/video player,
              *  so it shares the same base methods)
              *  */
-            AA.router.multiplexView.drivers[this.model.get('about')].play();
+            if (this.driver.paused()) {
+                this.driver.play();
+                e.target.textContent = "Pause";
+            } else {
+                this.driver.pause();
+                e.target.textContent = "Play"
+            }
         },
         editing: false,
         onPositionChange: function(model, value, options) {
