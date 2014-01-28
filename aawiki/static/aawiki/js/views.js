@@ -142,10 +142,9 @@ window.AA = window.AA || {};
                            ) {
                         this.drivers[uri] = Popcorn(driverMediaEl);
                     } else if (driverMediaRef) {
-                        // TODO: Popcorn now uses Popcorn.youtube instead of Popcorn.smart
-                        // To fix this, we need to insert unique id´s in the embed wrappers,
+                        // We go to lengths to specify id’s,
                         // because Popcorn.smart only supports id´s and not elements themselves.
-                        this.drivers[uri] = Popcorn.youtube(driverMediaRef, uri);
+                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri);
                     } else {
                             
                         // And else we don’t know what to do
@@ -169,12 +168,13 @@ window.AA = window.AA || {};
         templates: {
             view: _.template($('#annotation-view-template').html()),
             edit: _.template($('#annotation-edit-template').html()),
+            player: _.template($('#annotation-player-template').html())
         },
         events: {
-            "click .play"               : "play",
+            "click .play"               : "playPause",
             "dblclick"                  : "toggleEditMenu",
         },
-        play: function(e) {
+        playPause: function(e) {
             /**
              * Sends a ‘play’ event to the annotation’s driver.
              * 
@@ -183,7 +183,13 @@ window.AA = window.AA || {};
              * (The Popcorn instance wraps the HTML5 audio/video player,
              *  so it shares the same base methods)
              *  */
-            AA.router.multiplexView.drivers[this.model.get('about')].play();
+            if (this.driver.paused()) {
+                this.driver.play();
+                e.target.textContent = "Pause";
+            } else {
+                this.driver.pause();
+                e.target.textContent = "Play";
+            }
         },
         toggleEditMenu: function(e) {
             this.editMenu.toggle(e);
@@ -258,6 +264,19 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
         },
+        hasPlay : function() {
+            /** 
+             * Should this annotation feature player controls?
+             * 
+             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
+             * */
+            var uri = this.model.get('about');
+            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
+        },
+        isSlideshow: function() {
+            // for now the same as hasPlay
+            return this.hasPlay();
+        },
         registerDriver : function() {
             /**
              * This annotation has an `about` value. It represents what is annotated,
@@ -318,16 +337,7 @@ window.AA = window.AA || {};
                  });
                  that.driverEventIDs.push(p.getLastTrackEventId());
              });
-        },
-        hasPlay : function() {
-            /** 
-             * Should this annotation feature player controls?
-             * 
-             * In most cases, yes, but not if the driver of the annotation is
-             * the page itself. In this case, there will be general player controls
-             * located elsewhere.
-             * */
-            return this.model.get('about') !== document.location.origin + document.location.pathname;
+             this.renderPlayer();
         },
         render: function() {
             if (this.editing) {
@@ -339,9 +349,9 @@ window.AA = window.AA || {};
 
                 this.$el
                 .html(this.templates.view({
-                    body:    body,
-                    hasPlay: this.hasPlay(),
-                    about:   this.model.get('about')
+                    body:        body,
+                    about:       this.model.get('about'),
+                    isSlideshow: this.isSlideshow()
                 }))
                 .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
@@ -420,6 +430,19 @@ window.AA = window.AA || {};
                 this.registerChildrenAsDrivers();
             };
 
+            return this;
+        },
+
+        renderPlayer: function() {
+            var duration = this.driver.duration();
+            if (duration === 0) {
+                duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
+            }
+            this.$el.find(".controls")
+                .html(this.templates.player({
+                    hasPlay: this.hasPlay(),
+                    duration: AA.utils.secondsToTimecode(duration)
+                }));
             return this;
         },
 

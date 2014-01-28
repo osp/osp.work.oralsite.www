@@ -1,6 +1,6 @@
-<div class="wrapper">
+<div class="wrapper <% if (isSlideshow) { %>slideshow<% } %>">
     <div class="cancelDraggable">
-        <% if (hasPlay) { %><button class="play">Play</button><% } %>
+        <div class="controls"></div>
         <%= body %>
     </div>
 </div>

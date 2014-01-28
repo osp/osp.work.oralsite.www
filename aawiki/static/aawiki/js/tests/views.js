@@ -22,7 +22,7 @@ var mockPageHash = {
                     "width": 300
                 },
                 {
-                    "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
+                    "body": "#Youtube!\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\n",
                     "about": "http://www.youtube.com/watch?v=v-7kf7OZQtw",
                     "height": 400,
                     "id": 66,
@@ -34,7 +34,7 @@ var mockPageHash = {
                 },
                 {
                     "about": document.location.origin + '/pages/tests/#annotation-0024',
-                    "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
+                    "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:01 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
                     "height": 400,
                     "id": 24,
                     "left": 333,
@@ -161,8 +161,6 @@ describe("The views", function() {
         
         AA.router.multiplexView = new AA.MultiplexView();
         
-        console.log(AA.router.pageView.model);
-        console.log(AA.router.pageView.model.get('annotations'));
         AA.router.annotationCollectionView = new AA.AnnotationCollectionView({collection : AA.router.pageView.model.get('annotations')});
         
         it("can be initialised", function(){
@@ -197,8 +195,7 @@ describe("The views", function() {
             expect($("article > .wrapper > section:nth-child(4)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
 
-        it("features play buttons for two of the annotations", function() {
-            expect($("article > .wrapper > section:nth-child(1) .play")).toExist();
+        it("features play buttons for the self-driven annotation, i.e. the slideshow", function() {
             expect($("article > .wrapper > section:nth-child(4) .play")).toExist();
         });
 
