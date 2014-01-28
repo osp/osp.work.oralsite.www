@@ -1,6 +1,98 @@
+var mockPageHash = {
+              "annotations": [
+                {
+                    "about": document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
+                    "body": "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
+                    "height": 400,
+                    "id": 2,
+                    "left": 10,
+                    "page": "/pages/api/v1/page/test-page/",
+                    "resource_uri": "/pages/api/v1/annotation/2/",
+                    "top": 18,
+                    "width": 301
+                },
+                {
+                    "body": "#A video\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
+                    "height": 400,
+                    "id": 9,
+                    "left": 10,
+                    "page": "/pages/api/v1/page/test-page/",
+                    "resource_uri": "/pages/api/v1/annotation/9/",
+                    "top": 458,
+                    "width": 300
+                },
+                {
+                    "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
+                    "about": "http://www.youtube.com/watch?v=v-7kf7OZQtw",
+                    "height": 400,
+                    "id": 66,
+                    "left": 333,
+                    "page": "/pages/api/v1/page/test-page/",
+                    "resource_uri": "/pages/api/v1/annotation/66/",
+                    "top": 458,
+                    "width": 300
+                },
+                {
+                    "about": document.location.origin + '/pages/tests/#annotation-0024',
+                    "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
+                    "height": 400,
+                    "id": 24,
+                    "left": 333,
+                    "page": "/pages/api/v1/page/test-page/",
+                    "resource_uri": "/pages/api/v1/annotation/24/",
+                    "top": 18,
+                    "width": 300
+                }
+              ], 
+              "id": 1, 
+              "introduction": "", 
+              "name": "test-page", 
+              "permissions": {
+                "administer_page": [
+                  {
+                    "current": true, 
+                    "id": 1, 
+                    "name": "osp", 
+                    "type": "user", 
+                    "uri": "/pages/api/v1/user/1/"
+                  }
+                ], 
+                "change_page": [
+                  {
+                    "current": true, 
+                    "id": 1, 
+                    "name": "osp", 
+                    "type": "user", 
+                    "uri": "/pages/api/v1/user/1/"
+                  }
+                ], 
+                "view_page": [
+                  {
+                    "current": true, 
+                    "id": 1, 
+                    "name": "osp", 
+                    "type": "user", 
+                    "uri": "/pages/api/v1/user/1/"
+                  }, 
+                  {
+                    "current": false, 
+                    "id": -1, 
+                    "name": "AnonymousUser", 
+                    "type": "user", 
+                    "uri": "/pages/api/v1/user/-1/"
+                  }
+                ]
+              }, 
+              "resource_uri": "/pages/api/v1/page/test-page/", 
+              "revisions": [], 
+              "slug": "test-page"
+            }
+            
+
 describe("The views", function() {
     
     AA.router = {}; // To fake the fact that some views are normally bound to the router
+
 
     describe("The User view", function(){
         
@@ -47,76 +139,21 @@ describe("The views", function() {
     });
 
     describe("The Page view", function(){
+
+        spyOn($, 'ajax').andCallFake(function(options) {
+            options.success(mockPageHash);
+        });
         
-        var mockPageHash = {
-                    id: 'test_page'
-            };
-        var mockPageModel = new Backbone.Model(mockPageHash);
+        AA.router.annotationCollectionView = new AA.AnnotationCollectionView({id : 'test_page'});
+        
+        var mockPageModel = new AA.PageModel(mockPageHash);
         AA.router.pageView = new AA.PageView({ model : mockPageModel });
         
         it("can be initialised", function(){
             expect(AA.router.pageView).toBeDefined();
         });
-
-        it("won’t render if not provided with info", function(){
-            expect($("#page-meta")).not.toExist();
-        });
-        
-
-        it("will be visible once more info is retrieved", function(){
-            AA.router.pageView.model.set({
-                                    "annotations": [
-                                        "/pages/api/v1/annotation/2/",
-                                        "/pages/api/v1/annotation/9/",
-                                        "/pages/api/v1/annotation/24/"
-                                    ],
-                                    "id": 1,
-                                    "introduction": "Geen intro, het is aan als het begint",
-                                    "name": "Test Page!",
-                                    "permissions": {
-                                        "administer_page": [
-                                            {
-                                                "current": true,
-                                                "id": 1,
-                                                "name": "osp",
-                                                "type": "user",
-                                                "uri": "/pages/api/v1/user/1/"
-                                            }
-                                        ],
-                                        "change_page": [
-                                            {
-                                                "current": true,
-                                                "id": 1,
-                                                "name": "osp",
-                                                "type": "user",
-                                                "uri": "/pages/api/v1/user/1/"
-                                            }
-                                        ],
-                                        "view_page": [
-                                            {
-                                                "current": true,
-                                                "id": 1,
-                                                "name": "osp",
-                                                "type": "user",
-                                                "uri": "/pages/api/v1/user/1/"
-                                            },
-                                            {
-                                                "current": false,
-                                                "id": -1,
-                                                "name": "AnonymousUser",
-                                                "type": "user",
-                                                "uri": "/pages/api/v1/user/-1/"
-                                            }
-                                        ]
-                                    },
-                                    "resource_uri": "/pages/api/v1/page/test-page/",
-                                    "slug": "test-page"
-                                });
-            expect($("#page-meta")).toExist();
-        });
-        
-    });
     
+    });
     
     describe("The Annotation view", function(){
         
@@ -124,66 +161,9 @@ describe("The views", function() {
         
         AA.router.multiplexView = new AA.MultiplexView();
         
-        var mockAnnotationsHash = {
-                                    "meta": {
-                                        "limit": 20,
-                                        "next": null,
-                                        "offset": 0,
-                                        "previous": null,
-                                        "total_count": 4
-                                    },
-                                    "objects": [
-                                        {
-                                            "about": document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
-                                            "body": "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
-                                            "height": 400,
-                                            "id": 2,
-                                            "left": 10,
-                                            "page": "/pages/api/v1/page/test-page/",
-                                            "resource_uri": "/pages/api/v1/annotation/2/",
-                                            "top": 18,
-                                            "width": 301
-                                        },
-                                        {
-                                            "body": "#A video\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
-                                            "height": 400,
-                                            "id": 9,
-                                            "left": 10,
-                                            "page": "/pages/api/v1/page/test-page/",
-                                            "resource_uri": "/pages/api/v1/annotation/9/",
-                                            "top": 458,
-                                            "width": 300
-                                        },
-                                        {
-                                            "body": "#Embedding power!\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed.\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
-                                            "about": "http://www.youtube.com/watch?v=v-7kf7OZQtw",
-                                            "height": 400,
-                                            "id": 66,
-                                            "left": 333,
-                                            "page": "/pages/api/v1/page/test-page/",
-                                            "resource_uri": "/pages/api/v1/annotation/66/",
-                                            "top": 458,
-                                            "width": 300
-                                        },
-                                        {
-                                            "about": document.location.origin + '/pages/tests/#annotation-0024',
-                                            "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
-                                            "height": 400,
-                                            "id": 24,
-                                            "left": 333,
-                                            "page": "/pages/api/v1/page/test-page/",
-                                            "resource_uri": "/pages/api/v1/annotation/24/",
-                                            "top": 18,
-                                            "width": 300
-                                        }
-                                    ]
-                            };
-        
-        spyOn($, 'ajax').andCallFake(function(options) {
-            options.success(mockAnnotationsHash);
-        });
-        
-        AA.router.annotationCollectionView = new AA.AnnotationCollectionView({id : 'test_page'});
+        console.log(AA.router.pageView.model);
+        console.log(AA.router.pageView.model.get('annotations'));
+        AA.router.annotationCollectionView = new AA.AnnotationCollectionView({collection : AA.router.pageView.model.get('annotations')});
         
         it("can be initialised", function(){
             expect(AA.router.annotationCollectionView).toBeDefined();
@@ -246,7 +226,9 @@ describe("The views", function() {
             // 1 driver for the video,
             // 1 for the page
             // 1 for an annotation box
-            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(3);
+            // 1 for a youtube video found in the annotations
+            // 1 for a soundcloud sound found in the annotations
+            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(5);
         });
         
         it("the drivers are instances of Popcorn.js", function() {
