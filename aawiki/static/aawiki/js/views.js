@@ -60,7 +60,7 @@ window.AA = window.AA || {};
                     AA.globalEvents.trigger('aa:changeUser');
                 },
             });
-        }
+        },
     });
 
     AA.PageView = Backbone.View.extend({
@@ -69,8 +69,8 @@ window.AA = window.AA || {};
             view: _.template($('#page-view-template').html()),
         },
         events: {
-            "click #toggleDrawer" : "toggleDrawer",
-            "click #commit" : "commit",
+            "click #toggleDrawer"       : "toggleDrawer",
+            "click #commit"             : "commit",
             //"click #commit-list a": "wayback"
         },
         toggleDrawer: function(event) {
@@ -172,6 +172,7 @@ window.AA = window.AA || {};
         },
         events: {
             "click .play"               : "play",
+            "dblclick"                  : "toggleEditMenu",
         },
         play: function(e) {
             /**
@@ -183,6 +184,12 @@ window.AA = window.AA || {};
              *  so it shares the same base methods)
              *  */
             AA.router.multiplexView.drivers[this.model.get('about')].play();
+        },
+        toggleEditMenu: function(e) {
+            this.editMenu.toggle(e);
+            
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
         },
         editing: false,
         onPositionChange: function(model, value, options) {
@@ -200,7 +207,7 @@ window.AA = window.AA || {};
         },
         deleteAnnotation: function(event) {
             if (window.confirm('This will permanently delete this annotation. Proceed?')) {
-                this.$el.contextual('hide');
+                this.editMenu.destroy();
                 this.model.destroy();
             };
             return false;
@@ -225,33 +232,26 @@ window.AA = window.AA || {};
             
             this.driverEventIDs = [];
             
-            var CreateBtn = AA.widgets.CreateBtn;
-            
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
 
-            this.$el.contextual({iconSize: 40, iconSpacing: 5});
-
-            // Edit Annotation Button
-            var btn = CreateBtn({title: 'edit annotation', class: 'icon7'})
-                .on('click', this.toggle.bind(this));
-            this.$el.contextual('register', 'dblclick', 'left', btn);
-
-            // Delete Annotation Button
-            var btn = CreateBtn({title: 'delete annotation', class: 'icon6'})
-                .on('click', this.deleteAnnotation.bind(this));
-            this.$el.contextual('register', 'dblclick', 'left', btn);
-
-            // Export to Audacity Button
-            var btn = CreateBtn({title: 'export annotation to audacity markers', class: 'icon8'})
-                .on('click', this.exportAnnotationToAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'dblclick', 'left', btn);
-
-            // Import from Audacity Button
-            var btn = CreateBtn({title: 'import annotation from audacity markers', class: 'icon8'})
-                .on('click', this.importAnnotationFromAudacityMarkers.bind(this));
-            this.$el.contextual('register', 'dblclick', 'left', btn);
-
+            this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
+            
+            this.editMenu.register ([
+                // Edit Annotation Button
+                new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                    .on('click', this.toggle.bind(this)),
+               // Delete Annotation Button
+                new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                    .on('click', this.deleteAnnotation.bind(this)),
+                // Export to Audacity Button
+                new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                    .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                // Import from Audacity Button
+                new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                    .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+            ]);
+            
             this.render();
             
 	    // this is how to listen to global events
@@ -412,7 +412,6 @@ window.AA = window.AA || {};
                         }).save();
                     }
                 })
-                .on ('click', function (event) {console.log (event)})
                 .renderResources();
                 
                 if(this.driver) {
@@ -437,18 +436,36 @@ window.AA = window.AA || {};
     });
 
     AA.AnnotationCollectionView = Backbone.View.extend({
+        events: {
+            "dblclick"            : "showMenu",
+            "click"               : "hideMenu",
+        },
+        
+        showMenu: function (e) {
+            //console.log (this.el == event.target);
+            if (this.cursorMenu.visible()) {
+                this.cursorMenu.hide ();
+            }
+            
+            this.cursorMenu.show (e);
+        },
+        
+        hideMenu: function (e) {
+            this.cursorMenu.hide ();
+        },
+        
         collection: new AA.AnnotationCollection(), 
         el: 'article#canvas .wrapper',
+        
         addAnnotation: function(event) {
             var offsetBtn = $(event.currentTarget).position();
             var offsetCanvas = this.$el.position();
             var top = offsetBtn.top - offsetCanvas.top;
             var left = offsetBtn.left - offsetCanvas.left;
             this.collection.create({top: top, left: left});
-            this.$el.contextual('hide');
-
-            return false;
+            this.hideMenu ();
         },
+        
         organizeAnnotations: function (event) {
             this.collection.each(function(model, index) {
                 model.set({
@@ -456,35 +473,31 @@ window.AA = window.AA || {};
                     'top': 20 + (index * 20),
                 }, {animate: true}).save();
             });
-
-            return false;
+            
+            this.hideMenu ();
         },
+        
         initialize: function() {
-            var that = this;
-            var CreateBtn = AA.widgets.CreateBtn;
+            this.cursorMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'cursor'});
+            
+            this.cursorMenu.register ([
+                // Create Annotation Button
+                new AA.widgets.MenuButton ({title: 'new annotation', class: 'icon5'})
+                    .on('click', this.addAnnotation.bind(this)),
 
-            this.$el.contextual({iconSize: 40, iconSpacing: 5});
+                // Create Toggle grid Button (doing nothing at the moment)
+                new AA.widgets.MenuButton ({title: 'toggle grid', class: 'icon2'})
+                    .on('click', function(event) { return false; }),
+                    
+                // Create Change grid Button (doing nothing at the moment)
+                new AA.widgets.MenuButton ({title: 'change grid', class: 'icon3'})
+                    .on('click', function(event) { return false; }),
 
-            // Create Annotation Button
-            var btn = CreateBtn({title: 'new annotation', class: 'icon5'})
-                .on('click', this.addAnnotation.bind(this));
-            this.$el.contextual('register', 'dblclick', 'cursor', btn);
-
-            // Create Toggle grid Button (doing nothing at the moment)
-            var btn = CreateBtn({title: 'toggle grid', class: 'icon2'})
-                .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'dblclick', 'cursor', btn);
-                
-            // Create Change grid Button (doing nothing at the moment)
-            var btn = CreateBtn({title: 'change grid', class: 'icon3'})
-                .on('click', function(event) { return false; });
-            this.$el.contextual('register', 'dblclick', 'cursor', btn);
-
-            // Create Organize annotations Button
-            var btn = CreateBtn({title: 'organize annotations', class: 'icon1'})
-                .on('click', this.organizeAnnotations.bind(this));
-            this.$el.contextual('register', 'dblclick', 'cursor', btn);
-
+                // Create Organize annotations Button
+                new AA.widgets.MenuButton ({title: 'organize annotations', class: 'icon1'})
+                    .on('click', this.organizeAnnotations.bind(this))
+            ]);
+            
             this.listenTo(this.collection, 'add', this.renderOne);
 
             this.render();
@@ -496,6 +509,7 @@ window.AA = window.AA || {};
 
             return this;
         },
+        
         render: function() {
             var $el = this.$el;
             $el.empty();
