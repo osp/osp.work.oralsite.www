@@ -2,7 +2,7 @@ var mockPageHash = {
               "annotations": [
                 {
                     "about": document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
-                    "body": "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
+                    "body": "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.\n\n00:16,867-->00:21,867\n\n And now we showthat sound files in comments get triggered automatically. This is an Italian song:\n\n [[ embed::" + document.location.origin + "/static/components/popcorn-js/test/italia.ogg ]] \n\n  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
                     "height": 400,
                     "id": 2,
                     "left": 10,
@@ -225,7 +225,8 @@ describe("The views", function() {
             // 1 for an annotation box
             // 1 for a youtube video found in the annotations
             // 1 for a soundcloud sound found in the annotations
-            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(5);
+            // 1 for the italian song found in the annotations
+            expect(_.keys(AA.router.multiplexView.drivers).length).toBe(6);
         });
         
         it("the drivers are instances of Popcorn.js", function() {
@@ -238,8 +239,8 @@ describe("The views", function() {
             expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].media.paused).toBe(true);
         });
         
-        it("the video has 2 registered events", function(){
-            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].getTrackEvents().length).toBe(2);
+        it("the video has 3 registered events", function(){
+            expect(AA.router.multiplexView.drivers[ document.location.origin + "/static/components/popcorn-js/test/trailer.ogv" ].getTrackEvents().length).toBe(3);
         });
         
         
