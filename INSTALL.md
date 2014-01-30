@@ -2,6 +2,30 @@ This file gives the instructions to install Oralsite on Debian GNU/Linux and its
 derivatives (Ubuntu, Mint, etc.).
 
 
+# Install Node.js
+
+The version shipped with package managers is often old, so we have been
+compiling it from sources instead. This step is required to use the Less CSS
+compiler used in Django Compressor.
+
+    mkdir src && cd src
+    wget http://nodejs.org/dist/v0.10.25/node-v0.10.25.tar.gz
+    tar zxvf node-v0.10.25.tar.gz
+    cd node-v0.10.25
+    ./configure --prefix /usr/local/
+    make
+    sudo make install
+
+
+# Install the Less CSS compiler
+
+    sudo npm install -g less
+
+If you get a _registry error parsing json_, try using a mirror.
+
+    sudo npm --registry http://registry.npmjs.eu/ install -g less
+
+
 # Install python-dev, libjpeg and libpng
 
 This is required by Pillow, the python library that deals with images, used in

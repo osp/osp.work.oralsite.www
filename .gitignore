@@ -1,6 +1,5 @@
 oralsite/media
 venv
-fabfile.py
 local_settings.py
 
 # text-editor / ide files #
