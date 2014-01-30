@@ -65,6 +65,16 @@ window.AA = window.AA || {};
            playChildren($(this)); // play any audio/videos that are in this annotation
         }).on("end", "[typeof='aa:annotation']", function(e) {
             $(this).removeClass("active");
+        }).on("end", ".slideshow section[typeof='aa:annotation']", function(e) {
+            /* If we are dealing with a slideshow, there’s no real end.
+             * so we tell it to stop if it happen to be the last annotation,
+             * and wind back the clock to the end of the last annotation.
+             * */
+            if (e.last) {
+                e.driver.pause();
+                e.driver.currentTime(e.time - 0.0001);
+                $(this).addClass("active");
+            };
         });
     };
 
