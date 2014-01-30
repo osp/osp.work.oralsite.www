@@ -34,7 +34,7 @@ var mockPageHash = {
                 },
                 {
                     "about": document.location.origin + '/pages/tests/#annotation-0024',
-                    "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:01 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
+                    "body": "#Relative time\n\nThis is an example of a slideshow.\n\n00:00 --> 00:05\n\nFirst slide\n\n00:05 --> 00:10\n\nSecond slide\n",
                     "height": 400,
                     "id": 24,
                     "left": 333,
@@ -86,7 +86,7 @@ var mockPageHash = {
               "resource_uri": "/pages/api/v1/page/test-page/", 
               "revisions": [], 
               "slug": "test-page"
-            }
+        };
             
 
 describe("The views", function() {

@@ -328,10 +328,16 @@ window.AA = window.AA || {};
             this.deleteAnnotationEvents();
             this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
                  var $annotation = $(el);
-                 var begin = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
+                 var start = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
+
+                 // work around Popcorn bug where 0 second events are not triggered
+                 if (start === 0 && that.driver.paused() && that.driver.currentTime() === 0) {
+                     $(this).addClass("active");
+                 } // TODO it should actually trigger a PopCorn event
+
                  var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
                  var p = that.driver.aa({
-                     start: begin,
+                     start: start,
                      end: end,
                      $el: $annotation
                  });
