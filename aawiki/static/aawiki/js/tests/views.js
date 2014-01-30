@@ -176,31 +176,31 @@ describe("The views", function() {
         });
         
         it("has about attributes for all annotations", function() {
-            expect($("article > .wrapper > section").map(function(i, el) {
+            expect($("article > section").map(function(i, el) {
                 return $(el).attr('about');
                 }).get().length
             ).toBe(4);
         });
         
         it("the about attributes are absolute hyperlinks", function() {
-            expect($("article > .wrapper > section").map(function(i, el) {
+            expect($("article > section").map(function(i, el) {
                 return $(el).attr('about').match(/http:\/\/[^/]+\//) !== null;
                 }).get()
             ).toEqual([true, true, true, true]);
         });
         
         it("the about attributes are correct", function() {
-            expect($("article > .wrapper > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
-            expect($("article > .wrapper > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
-            expect($("article > .wrapper > section:nth-child(4)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
+            expect($("article > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
+            expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
+            expect($("article > section:nth-child(4)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
 
         it("features play buttons for the self-driven annotation, i.e. the slideshow", function() {
-            expect($("article > .wrapper > section:nth-child(4) .play")).toExist();
+            expect($("article > section:nth-child(4) .play")).toExist();
         });
 
         it("except when the annotation is about the page itself", function() {
-            expect($("article > .wrapper > section:nth-child(2) .play")).not.toExist();
+            expect($("article > section:nth-child(2) .play")).not.toExist();
         });
 
 
