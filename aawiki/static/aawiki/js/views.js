@@ -202,14 +202,22 @@ window.AA = window.AA || {};
             var defaults = {
                 animate: false
             };
+           
             var options = $.extend({}, defaults, options);
-
+            var that = this;
+            
             if (options.animate === true) {
                 this.$el.animate({
                     left: model.changed.left,
                     top: model.changed.top
-                }, 2000, 'easeOutExpo');
+                }, {
+                    duration: 2000,
+                    easing: 'easeOutExpo',
+                    progress: function () { that.editMenu.redraw(); }
+                });
             };
+            
+            this.editMenu.redraw ();
         },
         deleteAnnotation: function(event) {
             if (window.confirm('This will permanently delete this annotation. Proceed?')) {
@@ -417,7 +425,9 @@ window.AA = window.AA || {};
                             top: pos.top,
                             left: pos.left
                         });
-
+                        
+                        that.editMenu.redraw ();
+                        
                         model.set({
                             top: pos.top,
                             left: pos.left,
@@ -467,7 +477,6 @@ window.AA = window.AA || {};
         },
         
         showMenu: function (e) {
-            //console.log (this.el == event.target);
             if (this.cursorMenu.visible()) {
                 this.cursorMenu.hide ();
             }
@@ -480,7 +489,7 @@ window.AA = window.AA || {};
         },
         
         collection: new AA.AnnotationCollection(), 
-        el: 'article#canvas .wrapper',
+        el: 'article#canvas',
         
         addAnnotation: function(event) {
             var offsetBtn = $(event.currentTarget).position();

@@ -124,35 +124,31 @@ window.AA = window.AA || {};
             };
             
             // the number of menu entries to show
-            var number = this._buttonCollection.length, 
+            var number = this._buttonCollection.length;
 
             // the relative offset of the click event
-            clickX = this.relativeOffset(event).left, 
-            clickY = this.relativeOffset(event).top,
+            var clickX = event.pageX; //this.relativeOffset(event).left, 
+            var clickY = event.pageY; //this.relativeOffset(event).top,
 
             // the number of columns of our grid
-            cols = Math.ceil(Math.sqrt(number)),
+            var cols = Math.ceil(Math.sqrt(number));
 
-            // some shortcuts, and the size of an icon + the gutter
-            iconSize = this.options.iconSize,
-            iconSpacing = this.options.iconSpacing,
-            cumulatedSize = iconSize + iconSpacing,
+            // the size of an icon + the gutter
+            var cumulatedSize = this.options.iconSize + this.options.iconSpacing;
 
             // where to start the grid
-            origin = {
+            var origin = {
                 left: clickX - (cols * cumulatedSize) / 2,
                 top: clickY - (Math.floor(Math.sqrt(number)) * cumulatedSize) / 2
             };
 
-            //console.log (origin);
-            
             for (var i=0; i<number; i++) {
                 var btn = this._buttonCollection[i]
                 // sets the initial position of the icon to the location of the click event
                 .css({
                     position : 'absolute',
-                    left     :  clickX - (iconSize / 2), 
-                    top      :  clickY - (iconSize / 2)
+                    left     :  clickX - (this.options.iconSize / 2), 
+                    top      :  clickY - (this.options.iconSize / 2)
                 })
                 // sets the target position on the grid, with animation
                 .animate({
