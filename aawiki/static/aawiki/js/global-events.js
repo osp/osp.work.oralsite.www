@@ -23,6 +23,28 @@ window.AA = window.AA || {};
         AA.router.pageView.model.fetch();
     });
     
+    var playChildren = function($annotEl) {
+        /**
+         * Given an annotation element, play the media elements contained in there.
+         * @param {jQuery element} $annotEl - section[typeof='aa:annotation']
+         * @returns no return value
+         * */
+        var hostedUris = $annotEl.find(".embed.hosted").map(function(i, el) {
+            return $(el).attr("data-uri");
+        }).get();
+        var mediaUris = $annotEl.find("video[src],audio[src]").map(function(i, el) {
+            return $(el).attr("src");
+        }).get();
+        var allUris = hostedUris.concat(mediaUris);
+        for (var i=0; i<allUris.length; i++) {
+            var driver = AA.router.multiplexView.drivers[allUris[i]];
+            if (typeof driver !== "undefined" && driver.paused()) {
+                driver.play();
+            }
+        }
+    };
+    
+    
     AA.listeningAnnotations = function() {
         /*
          * In plugins/aa.popcorn.js it is defined that a passed element gets triggered
@@ -40,6 +62,7 @@ window.AA = window.AA || {};
          */
         $("article#canvas").on("start", "[typeof='aa:annotation']", function(e) {
            $(this).addClass("active");
+           playChildren($(this)); // play any audio/videos that are in this annotation
         }).on("end", "[typeof='aa:annotation']", function(e) {
             $(this).removeClass("active");
         });

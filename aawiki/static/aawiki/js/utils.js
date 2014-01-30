@@ -39,14 +39,14 @@ window.AA = window.AA || {};
         this.positionTop =  'top';
         this.positionAtCursor = 'cursor';
  
-        return this.init (options)
-    }
+        return this.init (options);
+    };
     
     AA.widgets.Menu.prototype = {
             init: function (options) {
             this._visible = false;
-            this._buttonCollection = []
-            this._visibleButtons = []
+            this._buttonCollection = [];
+            this._visibleButtons = [];
             this.options = $.extend ({}, this.options, options);
             
             return this;
@@ -56,10 +56,10 @@ window.AA = window.AA || {};
         register: function (button) {
             if (button instanceof Array) {
                 while (button.length > 0) {
-                    this._buttonCollection.push (button.shift())
+                    this._buttonCollection.push (button.shift());
                 }
             } else {
-                this._buttonCollection.push (button)
+                this._buttonCollection.push (button);
             }
         },
 
@@ -144,7 +144,7 @@ window.AA = window.AA || {};
                 top: clickY - (Math.floor(Math.sqrt(number)) * cumulatedSize) / 2
             };
 
-            console.log (origin)
+            //console.log (origin);
             
             for (var i=0; i<number; i++) {
                 var btn = this._buttonCollection[i]
@@ -257,7 +257,7 @@ window.AA = window.AA || {};
             
             return this.btn;
         }
-    }
+    };
     
     AA.utils = AA.utils || {};
     
