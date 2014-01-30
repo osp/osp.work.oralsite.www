@@ -10,6 +10,9 @@ window.AA = window.AA || {};
     
     AA.PageModel = Backbone.RelationalModel.extend({
         urlRoot: "/pages/api/v1/page/",
+        defaults: {
+            revisions: []
+        },
         relations: [{
             type: Backbone.HasMany,
             key: 'annotations',
