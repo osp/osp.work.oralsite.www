@@ -55,6 +55,30 @@
 }
 /* }}} */
 
+/* Mixins {{{ */
+.transition (@prop: all, @time: 1s, @ease: linear, @delay: 0s) {
+    -webkit-transition: @prop @time @ease @delay;
+       -moz-transition: @prop @time @ease @delay;
+         -o-transition: @prop @time @ease @delay;
+        -ms-transition: @prop @time @ease @delay;
+            transition: @prop @time @ease @delay;
+}
+
+.box-sizing (@type: border-box) {
+    -webkit-box-sizing: @type;
+       -moz-box-sizing: @type;
+        -ms-box-sizing: @type;
+            box-sizing: @type;
+}
+
+.user-select(@argument: none) {
+    -webkit-user-select: @argument;
+       -moz-user-select: @argument;
+        -ms-user-select: @argument;
+            user-select: @argument;
+}
+/* }}} */
+
 
 /* Layout {{{ */
 html,
@@ -65,7 +89,7 @@ body {
 
 #sidebar,
 #canvas {
-    box-sizing: border-box;
+    .box-sizing(border-box);
 }
 
 #sidebar {
@@ -76,18 +100,10 @@ body {
     bottom: 0;
     padding: 13px;
     z-index: 9999999999999999;
-    -webkit-transition: left 250ms ease-out 0s;
-    -moz-transition: left 250ms ease-out 0s;
-    -o-transition: left 250ms ease-out 0s;
-    transition: left 250ms ease-out 0s;
+    .transition(left, 250ms, ease-out, 0s);
 
     &.hide {
         left: -250px;
-        -webkit-transition: left 250ms ease-out 0s;
-        -moz-transition: left 250ms ease-out 0s;
-        -o-transition: left 250ms ease-out 0s;
-        transition: left 250ms ease-out 0s;
-
     }
 
     #commit{
@@ -113,18 +129,10 @@ body {
     right: 0;
     bottom: 0;
     overflow: auto;
-    -webkit-transition: left 250ms ease-out 0s;
-    -moz-transition: left 250ms ease-out 0s;
-    -o-transition: left 250ms ease-out 0s;
-    transition: left 250ms ease-out 0s;
+    .transition(left, 250ms, ease-out, 0s);
 
     &.hide {
         left: 0px;
-        -webkit-transition: left 250ms ease-out 0s;
-        -moz-transition: left 250ms ease-out 0s;
-        -o-transition: left 250ms ease-out 0s;
-        transition: left 250ms ease-out 0s;
-
     }
 
     > .wrapper {
@@ -317,10 +325,7 @@ section.section1 {
     > div.wrapper {
         overflow-x: hidden;
         height: 100%;
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
+        .box-sizing(border-box);
         padding: 5px;
         cursor: move;
     }
@@ -337,17 +342,17 @@ section.section1 {
     .slideshow .active {
         background-color: inherit;
     }
-    
+
     .slideshow section[typeof="aa:annotation"] {
         position: absolute;
         visibility: hidden;
     }
-    
+
     .slideshow section[typeof="aa:annotation"].active {
         visibility: visible;
         background-color: inherit;
     }
-    
+
     .slideshow section[typeof="aa:annotation"]:first-child {
         visibility: visible;
     }
@@ -357,29 +362,25 @@ section.section1 {
 }
 
 body {
-   -moz-user-select     : none;
-   -khtml-user-select   : none;
-   -webkit-user-select  : none;
-   -o-user-select       : none;
-   user-select          : none;
+   .user-select(none);
 }
 
 section {
-   -moz-user-select     : text;
-   -khtml-user-select   : text;
-   -webkit-user-select  : text;
-   -o-user-select       : text;
-   user-select          : text;
+   .user-select(none);
 }
 
 .grid #canvas {
     background-size: 20px 20px, 20px 20px;
     background-position: 0 0,0 0;
     background-image: -webkit-linear-gradient(top, transparent, transparent 19px, cyan 20px), -webkit-linear-gradient(left, transparent, transparent 19px, cyan 20px);
+    background-image:    -moz-linear-gradient(top, transparent, transparent 19px, cyan 20px),    -moz-linear-gradient(left, transparent, transparent 19px, cyan 20px);
+    background-image:     -ms-linear-gradient(top, transparent, transparent 19px, cyan 20px),     -ms-linear-gradient(left, transparent, transparent 19px, cyan 20px);
+    background-image:      -o-linear-gradient(top, transparent, transparent 19px, cyan 20px),      -o-linear-gradient(left, transparent, transparent 19px, cyan 20px);
+    background-image:         linear-gradient(to bottom, transparent, transparent 19px, cyan 20px),   linear-gradient(to right, transparent, transparent 19px, cyan 20px);
 }
 
 .ui-resizable-handle { z-index: auto !important; }
-// No ugly jquery ui icon
+/* No ugly jquery ui icon */
 .ui-resizable-se { background-image: none !important; }
 
 
