@@ -129,6 +129,7 @@ class AnnotationResource(ModelResource):
             "page": ALL_WITH_RELATIONS
         }
         authorization = PerAnnotationAuthorization()
+        always_return_data = True
 
 
 class PageResource(ModelResource):
