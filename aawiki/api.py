@@ -2,6 +2,7 @@
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.sites.models import Site
 
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
@@ -35,6 +36,11 @@ class PrettyJSONSerializer(Serializer):
         data = self.to_simple(data, options)
         return json.dumps(data, cls=DjangoJSONEncoder,
                 sort_keys=True, ensure_ascii=False, indent=self.json_indent)
+
+class SiteResource(ModelResource):
+    class Meta:
+        resource_name = 'site'
+        queryset = Site.objects.all()
 
 
 class UserResource(ModelResource):

@@ -3,6 +3,28 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+    AA.SiteView = Backbone.View.extend({
+        id: 'site-meta', // <div id="user-meta"></div>
+        templates: {
+            view: _.template($('#site-view-template').html()),
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            // if we want to already render the template, without the values fetched: this.render();
+        },
+        render: function() {
+            var context = this.model.toJSON();
+            this.$el.html( this.templates.view( context ) );
+
+            // If the element is not yet part of the DOM:
+            if ($('#site-meta').length === 0 ) {
+                $('#site-meta-container').prepend(this.el);
+            }
+
+            return this;
+        },
+    });
+    
     AA.UserView = Backbone.View.extend({
         id: 'user-meta', // <div id="user-meta"></div>
         templates: {

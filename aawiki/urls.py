@@ -1,10 +1,11 @@
 from django.conf.urls import include, patterns, url
 from tastypie.api import Api
 from django.views.generic.base import TemplateView
-from aawiki.api import PageResource, AnnotationResource, UserResource
+from aawiki.api import SiteResource, PageResource, AnnotationResource, UserResource
 from django.views.generic import RedirectView
 
 v1_api = Api(api_name='v1')
+v1_api.register(SiteResource())
 v1_api.register(AnnotationResource())
 v1_api.register(PageResource())
 v1_api.register(UserResource())

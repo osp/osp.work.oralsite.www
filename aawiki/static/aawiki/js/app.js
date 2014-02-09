@@ -6,6 +6,9 @@ $(function() {
     // listen for annotations ( knows how to handle new annotations added at runtime )
     AA.listeningAnnotations();
 
+    AA.siteView = new AA.SiteView({ model: new AA.SiteModel({id : 1 }) });
+    AA.siteView.model.fetch();
+    
     // loads the views that change from page to page
     AA.router = new AA.Router();
     

@@ -7,6 +7,10 @@
 {% block extrahead %}
 {{ block.super }}
 
+<script type="text/template" id="site-view-template">
+{% include "aawiki/partials/site-view.html" %}
+</script>
+
 <script type="text/template" id="page-view-template">
 {% include "aawiki/partials/page-view.html" %}
 </script>
@@ -49,13 +53,9 @@
 
 {% block body %}
 <header id="sidebar">
-    <!-- TODO: implement Site View in Backbone for these kind of infos:
-        <div id="site-name"><a title="Back to main page" href="/oralsite/">Oralsite</a>
-(<a title="About Oral Site" href="/oralsite/pages/Oral_Site/">about</a>)</div> -->
-    <!-- Backbone inserts here:
-        <div id="user-meta">(…)</div>
-        ( $('#sidebar').prepend(this.el); )
-    -->
+    <div id="site-meta-container">
+    	
+    </div>
     <div id="user-meta-container">
         
     </div>

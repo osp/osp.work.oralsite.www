@@ -2,6 +2,10 @@ window.AA = window.AA || {};
 
 (function(undefined) {
     'use strict';
+
+    AA.SiteModel = Backbone.Model.extend({
+        urlRoot: "/pages/api/v1/site/",
+    });
     
     AA.UserModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/user/",
