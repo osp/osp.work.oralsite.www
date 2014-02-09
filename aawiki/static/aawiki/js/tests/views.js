@@ -156,6 +156,8 @@ describe("The views", function() {
     });
     
     describe("The Annotation view", function(){
+    	
+        AA.listeningAnnotations();
         
         Popcorn.player( "baseplayer" );
         
@@ -202,14 +204,17 @@ describe("The views", function() {
         it("except when the annotation is about the page itself", function() {
             expect($("article > section:nth-child(2) .play")).not.toExist();
         });
+        
+        it("the slideshow has a forward button enabled, and a backwards button disabled", function() {
+            expect($("article > section:nth-child(4) .next")).not.toHaveClass("disabled");
+            expect($("article > section:nth-child(4) .previous")).toHaveClass("disabled");
+        });
 
 
     });
 
 
     describe("The Multiplex view", function() {
-        
-        AA.listeningAnnotations();
         
         it("can be initialised", function(){
             expect(AA.router.multiplexView).toBeDefined();

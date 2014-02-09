@@ -61,8 +61,8 @@ window.AA = window.AA || {};
          * fire.
          */
         $("article#canvas").on("start", "[typeof='aa:annotation']", function(e) {
-           $(this).addClass("active");
-           playChildren($(this)); // play any audio/videos that are in this annotation
+            $(this).addClass("active");
+            playChildren($(this)); // play any audio/videos that are in this annotation
         }).on("end", "[typeof='aa:annotation']", function(e) {
             $(this).removeClass("active");
         }).on("end", ".slideshow section[typeof='aa:annotation']", function(e) {

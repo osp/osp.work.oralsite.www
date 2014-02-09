@@ -172,6 +172,8 @@ window.AA = window.AA || {};
         },
         events: {
             "click .play"               : "playPause",
+            "click .next"               : "next",
+            "click .previous"           : "previous",            
             "dblclick"                  : "toggleEditMenu",
         },
         playPause: function(e) {
@@ -185,10 +187,42 @@ window.AA = window.AA || {};
              *  */
             if (this.driver.paused()) {
                 this.driver.play();
-                e.target.textContent = "Pause";
+                e.target.textContent = "‖";
             } else {
                 this.driver.pause();
-                e.target.textContent = "Play";
+                e.target.textContent = "▶";
+            }
+        },
+        stopCurrentEvent: function() {
+        	this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+        },
+        nextEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
+        },
+        next: function(e) {
+            var nextEvent = this.nextEvent();
+            if (nextEvent) {
+            	this.stopCurrentEvent();
+                this.driver.currentTime(nextEvent.start);
+                this.renderPlayer();
+            }
+        },
+        previousEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
+
+        },
+        previous: function(e) {
+            var previousEvent = this.previousEvent();
+            if (previousEvent) {
+            	this.stopCurrentEvent();
+                this.driver.currentTime(previousEvent.start);
+                this.renderPlayer();        
             }
         },
         toggleEditMenu: function(e) {
@@ -339,9 +373,14 @@ window.AA = window.AA || {};
                  var start = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
 
                  // work around Popcorn bug where 0 second events are not triggered
+                 // we trigger it manually
                  if (start === 0 && that.driver.paused() && that.driver.currentTime() === 0) {
-                     $(this).addClass("active");
-                 } // TODO it should actually trigger a PopCorn event
+                      $annotation.trigger({
+                          type : "start",
+                          time:   0,
+                          driver: that.driver
+                      });
+                 }
 
                  var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
                  var p = that.driver.aa({
@@ -458,8 +497,11 @@ window.AA = window.AA || {};
             }
             this.$el.find(".controls")
                 .html(this.templates.player({
-                    hasPlay: this.hasPlay(),
-                    duration: AA.utils.secondsToTimecode(duration)
+                    hasPlay:     this.hasPlay(),
+                    duration:    AA.utils.secondsToTimecode(duration),
+                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
+                    next:        this.nextEvent(),
+                    previous:    this.previousEvent(),
                 }));
             return this;
         },

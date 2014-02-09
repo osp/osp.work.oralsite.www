@@ -1,1 +1,4 @@
-<% if (hasPlay) { %><button class="play" value="Play">Play</button> <%= duration %><% } %>
+<% if (hasPlay) { %>
+	<a class="play">▶</a> <a class="previous<% if (!previous) { %> disabled<% } %>">◄◄</a> <a class="next<% if (!next) { %> disabled<% } %>">►►</a>
+	<%= currentTime %> / <%= duration %> 
+<% } %>
