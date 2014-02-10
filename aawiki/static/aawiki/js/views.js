@@ -192,8 +192,25 @@ window.AA = window.AA || {};
 
     AA.AnnotationView = Backbone.View.extend({
         /**
+         * This is the workhorse of OLGA
+         *
+         * Each annotation is connected to a driver.
+         * This driver can be a sound, a video, the page, or the annotation itself.
+         *
+         * The view takes care of quite some different actions.
+         *
+         * 1) It renders Markdown content, and allows it to be edited
+         * 2) In this Markdown content, one can embed time based annotations
+         * 3) The view keeps track of the timed annotations, and registers them
+         *    with the corresponding driver in the MultiPlexView
+         *    It reruns this process when the Markdown content is updated.
+         * 4) The view has a series of controls to play and scroll through
+         *    the corresponding driver.
+         *
+         * The driver where the events are registered is a PopCorn instance.
          * For the Popcorn player API,
          * see: https://gist.github.com/boazsender/729213
+         *
          * */
         tagName: 'section',
         templates: {
@@ -207,54 +224,45 @@ window.AA = window.AA || {};
             "click .previous"           : "previous",            
             "dblclick"                  : "toggleEditMenu",
         },
-        playPause: function(e) {
-            /**
-             * Sends a ‘play’ event to the annotation’s driver.
-             * 
-             * We should implement a full HTML5 player interface.
-             * 
-             * (The Popcorn instance wraps the HTML5 audio/video player,
-             *  so it shares the same base methods)
-             *  */
-            if (this.driver.paused()) {
-                this.driver.play();
-                e.target.textContent = "‖";
-            } else {
-                this.driver.pause();
-                e.target.textContent = "▶";
+        initialize: function() {
+            // if the driver is not specified, this annotation is about the current page
+            if (!this.model.get('about')) {
+                // this will give us the uri sans the #hash
+                this.model.set('about', document.location.origin + document.location.pathname);
             }
-        },
-        stopCurrentEvent: function() {
-        	this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
-        },
-        nextEvent: function() {
-            var currentTime = this.driver.currentTime();
-            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
-            // returns undefined if no such element encountered:
-            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
-        },
-        next: function(e) {
-            var nextEvent = this.nextEvent();
-            if (nextEvent) {
-            	this.stopCurrentEvent();
-                this.driver.currentTime(nextEvent.start);
-                this.renderPlayer();
-            }
-        },
-        previousEvent: function() {
-            var currentTime = this.driver.currentTime();
-            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
-            // returns undefined if no such element encountered:
-            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
 
-        },
-        previous: function(e) {
-            var previousEvent = this.previousEvent();
-            if (previousEvent) {
-            	this.stopCurrentEvent();
-                this.driver.currentTime(previousEvent.start);
-                this.renderPlayer();        
-            }
+            // references to timed annotations
+            this.driverEventIDs = [];
+
+            // local events
+            this.listenTo(this.model, 'destroy', this.remove);
+            this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
+
+	        // global events
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
+            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
+
+            // setup the contextual menu with editing options
+            this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
+            this.editMenu.register ([
+                // Edit Annotation Button
+                new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                    .on('click', this.toggle.bind(this)),
+               // Delete Annotation Button
+                new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                    .on('click', this.deleteAnnotation.bind(this)),
+                // Export to Audacity Button
+                new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                    .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                // Import from Audacity Button
+                new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                    .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+            ]);
+
+            this.render();
+
+
         },
         toggleEditMenu: function(e) {
             this.editMenu.toggle(e);
@@ -284,6 +292,16 @@ window.AA = window.AA || {};
             
             this.editMenu.redraw ();
         },
+        toggle: function() {
+            if (this.editing) {
+                this.model.set({
+                    'body': $('textarea', this.$el).val()
+                }).save();
+            };
+
+            this.editing = !this.editing;
+            this.render();
+        },
         deleteAnnotation: function(event) {
             if (window.confirm('This will permanently delete this annotation. Proceed?')) {
                 this.editMenu.destroy();
@@ -300,57 +318,6 @@ window.AA = window.AA || {};
             window.open('/annotations/' + this.model.get('id') + '/update/', '', "status=yes, height=500; width=500; resizeable=0");
                 
             return false;
-        },
-        initialize: function() {
-            // the annotation can be about any element on the page,
-            // however is this is not specified, it is about the current page
-            if (!this.model.get('about')) {
-                // this will give us the uri sans the #hash
-                this.model.set('about', document.location.origin + document.location.pathname);
-            }
-            
-            this.driverEventIDs = [];
-            
-            this.listenTo(this.model, 'destroy', this.remove);
-            this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
-
-            this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
-            
-            this.editMenu.register ([
-                // Edit Annotation Button
-                new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
-                    .on('click', this.toggle.bind(this)),
-               // Delete Annotation Button
-                new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
-                    .on('click', this.deleteAnnotation.bind(this)),
-                // Export to Audacity Button
-                new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
-                    .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                // Import from Audacity Button
-                new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
-                    .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-            ]);
-            
-            this.render();
-            
-	        // global events
-            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
-            this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
-            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
-
-        },
-        hasPlay : function() {
-            /** 
-             * Should this annotation feature player controls?
-             * 
-             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
-             * */
-            var uri = this.model.get('about');
-            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
-        },
-        isSlideshow: function() {
-            // for now the same as hasPlay
-            return this.hasPlay();
         },
         registerDriver : function() {
             /**
@@ -422,6 +389,68 @@ window.AA = window.AA || {};
                  that.driverEventIDs.push(p.getLastTrackEventId());
              });
              this.renderPlayer();
+        },
+        hasPlay : function() {
+            /**
+             * Should this annotation feature player controls?
+             *
+             * For now we only feature player controls for self-driven annotations, i.e. slideshows.
+             * */
+            var uri = this.model.get('about');
+            return uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ;
+        },
+        isSlideshow: function() {
+            // for now the same as hasPlay
+            return this.hasPlay();
+        },
+        playPause: function(e) {
+            /**
+             * Sends a ‘play’ event to the annotation’s driver.
+             *
+             * We should implement a full HTML5 player interface.
+             *
+             * (The Popcorn instance wraps the HTML5 audio/video player,
+             *  so it shares the same base methods)
+             *  */
+            if (this.driver.paused()) {
+                this.driver.play();
+                e.target.textContent = "‖";
+            } else {
+                this.driver.pause();
+                e.target.textContent = "▶";
+            }
+        },
+        stopCurrentEvent: function() {
+        	this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+        },
+        nextEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
+        },
+        next: function(e) {
+            var nextEvent = this.nextEvent();
+            if (nextEvent) {
+            	this.stopCurrentEvent();
+                this.driver.currentTime(nextEvent.start);
+                this.renderPlayer();
+            }
+        },
+        previousEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
+
+        },
+        previous: function(e) {
+            var previousEvent = this.previousEvent();
+            if (previousEvent) {
+            	this.stopCurrentEvent();
+                this.driver.currentTime(previousEvent.start);
+                this.renderPlayer();
+            }
         },
         render: function() {
             if (this.editing) {
@@ -540,17 +569,6 @@ window.AA = window.AA || {};
                     previous:    this.previousEvent(),
                 }));
             return this;
-        },
-
-        toggle: function() {
-            if (this.editing) {
-                this.model.set({
-                    'body': $('textarea', this.$el).val()
-                }).save();
-            };
-
-            this.editing = !this.editing;
-            this.render();
         }
     });
 
