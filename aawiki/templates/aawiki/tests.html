@@ -3,6 +3,9 @@
 
 {% block extrahead %}
 {{ block.super }}
+<script type="text/template" id="site-view-template">
+{% include "aawiki/partials/site-view.html" %}
+</script>
 <script type="text/template" id="page-view-template">
 {% include "aawiki/partials/page-view.html" %}
 </script>
@@ -62,7 +65,9 @@ article#canvas {
 
 {% block body %}
 <nav id="sidebar">
-    
+    <div id="site-meta-container">
+
+    </div>
     <div id="user-meta-container">
     </div>
     <div id="page-meta-container">
