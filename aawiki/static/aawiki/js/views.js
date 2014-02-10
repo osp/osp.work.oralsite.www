@@ -173,6 +173,15 @@ window.AA = window.AA || {};
                         return null;
                     }
                 }
+                if (this.drivers[uri] instanceof Popcorn && !(/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu)/).test( uri ) ) {
+                    // Sent out time update events to our Backbone event funnel
+                    // FIXME: Disabled this now for Youtube drivers as for some reason or another they emit events continuously
+                    // maybe a bug upstream?
+                    // TODO: Disabled this now in general as the timeUpdate functions clash with the previous next functionality
+                    // this.drivers[uri].on("timeupdate", function() {
+                    //     AA.globalEvents.trigger('aa:timeUpdate', uri);
+                    // });
+                }
                 return this.drivers[uri];
             } else {
                 // already registered, just return it
@@ -324,9 +333,11 @@ window.AA = window.AA || {};
             
             this.render();
             
-	    // this is how to listen to global events
+	        // global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
+            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
+
         },
         hasPlay : function() {
             /** 
@@ -398,9 +409,7 @@ window.AA = window.AA || {};
                  // we trigger it manually
                  if (start === 0 && that.driver.paused() && that.driver.currentTime() === 0) {
                       $annotation.trigger({
-                          type : "start",
-                          time:   0,
-                          driver: that.driver
+                          type : "start"
                       });
                  }
 
@@ -511,7 +520,11 @@ window.AA = window.AA || {};
 
             return this;
         },
-
+        renderPlayerConditionally: function(uri) {
+            if (uri === this.model.get("about")) {
+                this.renderPlayer();
+            };
+        },
         renderPlayer: function() {
             var duration = this.driver.duration();
             if (duration === 0) {
@@ -520,6 +533,7 @@ window.AA = window.AA || {};
             this.$el.find(".controls")
                 .html(this.templates.player({
                     hasPlay:     this.hasPlay(),
+                    paused:      this.driver.paused(),
                     duration:    AA.utils.secondsToTimecode(duration),
                     currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
                     next:        this.nextEvent(),
