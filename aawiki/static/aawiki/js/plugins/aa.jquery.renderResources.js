@@ -6,7 +6,7 @@
         var templates = {
             img:           _.template('<img src="<%= uri %>" />'),
             html5video:    _.template('<video class="player" controls preload src="<%= uri %>" />'),
-            html5audio:    _.template('<audio class="player" controls src="<%= uri %>" />'),
+            html5audio:    _.template('<% if (options.small) { %><div class="mini-player paused" rel="<%= uri %>" style="width:50px;height:50px" /></div><audio class="player" src="<%= uri %>" /><% } else { %><audio class="player" controls src="<%= uri %>" /><% } %>'),
             iframe:        _.template('<iframe src="<%= uri %>"></iframe>'),
             externalEmbed: _.template('<div id="<%= options.uid %>" class="embed hosted" data-uri="<%= uri %>"></div>'),
             fallback:      _.template('<a href="<%= uri %>"><%= uri %></a>')
@@ -124,12 +124,33 @@
                         //
                         var uri = $el.attr('href');
                         var filter = $el.attr('data-filter');
+
+                        /**
+                         * Create the options object
+                         *
+                         * [[ embed::http://example.com/sherry_turkle.ogv ]]{: class='small nocontrols' } creates html ->
+                         * <a ... class="small nocontrols"></a>
+                         * from which we create the options object -> {"small": true, "nocontrols" : true}
+                         * that we pass to the renderResource function
+                         */
+
+                        var ca = $el.attr('class'); // cf http://stackoverflow.com/questions/2787291/use-jquery-to-get-a-list-of-classes
+                        var classes = [];
+                        if(ca && ca.length && ca.split){
+                            ca = jQuery.trim(ca); /* strip leading and trailing spaces */
+                            ca = ca.replace(/\s+/g,' '); /* remove double spaces */
+                            classes = ca.split(' ');
+                        }
+
+                        var options = {};
+                        classes.forEach( function(c) { options[c] = true ; } );
+
                         // TODO: in ADMIN mode:
                         // A replace with spinner
                         // B launch HEAD request that tests if URL exists,
                         // and only replace with the template
                         // on succesful callback
-                        $el.replaceWith($(renderResource(uri, filter)));
+                        $el.replaceWith($(renderResource(uri, filter, options)));
                     });
             
         });

@@ -181,6 +181,17 @@ window.AA = window.AA || {};
                     // this.drivers[uri].on("timeupdate", function() {
                     //     AA.globalEvents.trigger('aa:timeUpdate', uri);
                     // });
+
+                    /* Adding the appropriate classes to the miniplayers based on pause and play events */
+                    // I’m not sure this is the right way to go about this:
+                    var miniPlayerPlayUI = function() {
+                        $('.mini-player[rel="' + uri + '"]').removeClass("paused").addClass("playing");
+                    };
+                    var miniPlayerPauseUI = function() {
+                        $('.mini-player[rel="' + uri + '"]').removeClass("playing").addClass("paused");
+                    };
+                    this.drivers[uri].on("play", miniPlayerPlayUI).on("playing", miniPlayerPlayUI);
+                    this.drivers[uri].on("pause", miniPlayerPauseUI).on("ended", miniPlayerPauseUI).on("abort", miniPlayerPauseUI);
                 }
                 return this.drivers[uri];
             } else {
@@ -219,10 +230,11 @@ window.AA = window.AA || {};
             player: _.template($('#annotation-player-template').html())
         },
         events: {
-            "click .play"               : "playPause",
+            "click .controls .play"     : "playPause",
             "click .next"               : "next",
             "click .previous"           : "previous",            
             "dblclick"                  : "toggleEditMenu",
+            "click .mini-player"         : "playPauseMiniPlayer"
         },
         initialize: function() {
             // if the driver is not specified, this annotation is about the current page
@@ -418,6 +430,14 @@ window.AA = window.AA || {};
             } else {
                 this.driver.pause();
                 e.target.textContent = "▶";
+            }
+        },
+        playPauseMiniPlayer: function(e) {
+            var miniPlayerDriver = AA.router.multiplexView.drivers[$(e.target).attr("rel")];
+            if (miniPlayerDriver.paused()) {
+                miniPlayerDriver.play();
+            } else {
+                miniPlayerDriver.pause();
             }
         },
         stopCurrentEvent: function() {
