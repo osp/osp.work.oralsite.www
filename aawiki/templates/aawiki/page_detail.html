@@ -5,6 +5,9 @@
 
 
 {% block extrahead %}
+<script src="{{ STATIC_URL }}components/pace/pace.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}components/pace/themes/pace-theme-minimal.css">
+
 {{ block.super }}
 
 <script type="text/template" id="site-view-template">
