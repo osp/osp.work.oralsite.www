@@ -270,6 +270,12 @@ window.AA = window.AA || {};
                 // Import from Audacity Button
                 new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
                     .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+                // Set About Value Button
+                new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                    .on('click', this.setAbout.bind(this)),
+                // Set as slideshow (changes about value)
+                new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                    .on('click', this.setAsSlideshow.bind(this)),
             ]);
 
             this.render();
@@ -330,6 +336,19 @@ window.AA = window.AA || {};
             window.open('/annotations/' + this.model.get('id') + '/update/', '', "status=yes, height=500; width=500; resizeable=0");
                 
             return false;
+        },
+        setAbout: function() {
+        	var aboutPrompt = prompt("The about value", this.model.get("about"));
+        	this.model.set("about", aboutPrompt);
+        	
+        	return false;
+        },
+        setAsSlideshow: function() {
+            if (window.confirm('Set as slideshow?')) {
+        		this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
+			}
+			this.render();
+        	return false;
         },
         registerDriver : function() {
             /**
