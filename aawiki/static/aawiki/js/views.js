@@ -480,7 +480,9 @@ window.AA = window.AA || {};
                 
                 var that = this;
                 var model = this.model;
-                var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
+                // FIXME: typogrify throw an error on empty strings
+                //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
+                var body = markdown.toHTML(this.model.get("body"), "Aa");
 
                 this.$el
                 .html(this.templates.view({
