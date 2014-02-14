@@ -341,6 +341,7 @@ window.AA = window.AA || {};
         	var aboutPrompt = prompt("The about value", this.model.get("about"));
         	this.model.set("about", aboutPrompt);
         	
+			this.render();
         	return false;
         },
         setAsSlideshow: function() {
