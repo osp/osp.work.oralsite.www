@@ -624,7 +624,6 @@ window.AA = window.AA || {};
                 if(this.driver) {
                     this.updateAnnotationEvents();
                 }
-                this.registerChildrenAsDrivers();
             };
 
             return this;
@@ -723,6 +722,11 @@ window.AA = window.AA || {};
             var annotationView = new AA.AnnotationView({model: model});
             $el.append(annotationView.el);
 
+            // As the registration function queries the document, the
+            // annotation needs to be appended first in order for the program
+            // to find the drivers
+            annotationView.registerChildrenAsDrivers();
+
             return this;
         },
         
@@ -733,6 +737,11 @@ window.AA = window.AA || {};
                 var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);
                 
+                // As the registration function queries the document, the
+                // annotation needs to be appended first in order for the program
+                // to find the drivers
+                annotationView.registerChildrenAsDrivers();
+                    
             });
 
             AA.globalEvents.trigger('aa:newDrivers');
