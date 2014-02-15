@@ -311,15 +311,52 @@ window.AA = window.AA || {};
             return null;
         }
     };
+
+    // FIXME: namespace and export the functions below
+    function rpad (n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : n + new Array(width - n.length + 1).join(z);
+    }
+
+    function lpad (n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    function divmod (a, b) {
+        return [ Math.floor(a / b), a % b ];
+    }
+
+    function ms2tc (ms) {
+        var _, ms = ms, ss, mm, hh;
+
+        _ = divmod(ms, 1000); ss = _[0]; ms = _[1];
+        _ = divmod(ss, 3600); hh = _[0]; ss = _[1];
+        _ = divmod(ss, 60); mm = _[0]; ss = _[1];
+
+        ms = rpad(hh, 3);
+        ss = lpad(ss, 2);
+        mm = lpad(mm, 2);
+        hh = lpad(hh, 2);
+
+        return hh + ':' + mm + ':' + ss + ',' + ms;
+    }
+
+    function ss2tc (ss) {
+        return ms2tc(ss * 1000);
+    }
     
-    AA.utils.secondsToTimecode = function(seconds) {
-        var d = Number(seconds);
-        var h = Math.floor(d / 3600);
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 % 60);
-        return ((h > 0 ? h + ":" : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + ":" : "0:") + (s < 10 ? "0" : "") + s);
-    };
-    
+    AA.utils.secondsToTimecode = ss2tc;
+    //AA.utils.secondsToTimecode = function(seconds) {
+        //var d = Number(seconds);
+        //var h = Math.floor(d / 3600);
+        //var m = Math.floor(d % 3600 / 60);
+        //var s = Math.floor(d % 3600 % 60);
+        //return ((h > 0 ? h + ":" : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + ":" : "0:") + (s < 10 ? "0" : "") + s);
+    //};
+
     AA.utils.dewikify = function(name) {
         /*
         Turns URL name/slug into a proper name (reverse of wikify).

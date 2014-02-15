@@ -493,12 +493,50 @@ window.AA = window.AA || {};
             }
         },
         render: function() {
+            var that = this;
+
             if (this.editing) {
                 this.$el
-                .html(this.templates.edit({body: this.model.get("body")}));
+                .html(this.templates.edit({body: this.model.get("body")}))
+                .find('textarea')
+                .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
+                    event.preventDefault()
+
+                    // FIXME: call that.driver instead
+                    var driver = AA.router.multiplexView.drivers[that.model.get('about')];
+                    $(this).insertAtCaret('\n\n' + AA.utils.secondsToTimecode(driver.currentTime()) + ' -->\n\n');
+                })
+                .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
+                    event.preventDefault()
+
+                    // FIXME: call that.driver instead
+                    var driver = AA.router.multiplexView.drivers[that.model.get('about')];
+                    if (driver.paused()) {
+                        driver.play();
+                    } else {
+                        driver.pause();
+                        //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+                    }
+                })
+                .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
+                    event.preventDefault()
+
+                    // FIXME: call that.driver instead
+                    var driver = AA.router.multiplexView.drivers[that.model.get('about')];
+                    var nextTime = Math.max(driver.currentTime() - 5, 0);
+                    driver.currentTime(nextTime);
+                    //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+                })
+                .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
+                    event.preventDefault()
+
+                    // FIXME: call that.driver instead
+                    var driver = AA.router.multiplexView.drivers[that.model.get('about')];
+                    var nextTime = Math.min(driver.currentTime() + 5, driver.duration());
+                    driver.currentTime(nextTime);
+                    //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+                });
             } else {
-                
-                var that = this;
                 var model = this.model;
                 // FIXME: typogrify throw an error on empty strings
                 //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
