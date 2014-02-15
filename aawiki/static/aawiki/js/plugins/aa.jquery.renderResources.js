@@ -1,7 +1,7 @@
 (function( $ ) {
  
     $.fn.renderResources = function() {
-    var parseUri = AA.utils.parseUri;
+        var parseUri = AA.utils.parseUri;
     
         var templates = {
             img:           _.template('<img src="<%= uri %>" />'),
@@ -79,8 +79,9 @@
                       (/vimeo.com\/\d+/).test( uri );
             };
         
-            if (!filter && isLocal(uri)) {
-                // If the image is already local, and needs no filtering, we can serve it as is:
+            //if (!filter && isLocal()) {
+                //// If the image is already local, and needs no filtering, we can serve it as is:
+            if (!filter) {
                 renderUri = uri;
             } else if (isHostedService(uri)) {
                 // For now, if it is on a hosted service, we´re not going to cache it either:
