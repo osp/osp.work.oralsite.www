@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 import os
 
+
 from django.shortcuts import redirect
 from .tasks import process_pipeline
 from djcelery.views import task_status
@@ -13,12 +14,12 @@ from djcelery.views import task_status
 def process(request, pipeline_string):
     """
     With a url like /filters/process/http://s2.lemde.fr/image/2012/05/09/644x322/1698586_3_83ef_francois-hollande-et-nicolas-sarkozy-durant-la_cc28a6e60a381054c901fecf8fe39886.jpg..bw.jpg
-    
+
     Find:
     url = 'http://s2.lemde.fr/image/2012/05/09/644x322/1698586_3_83ef_francois-hollande-et-nicolas-sarkozy-durant-la_cc28a6e60a381054c901fecf8fe39886.jpg'
     extension = '.jpg'
     pipeline = '[u'bw']'
-    
+
     And send it of to Celery
     """
     parts = pipeline_string.split('..')
@@ -28,7 +29,12 @@ def process(request, pipeline_string):
     if len(parts) > 1:
         pipeline = parts[1:]
         pipeline[-1], extension = os.path.splitext(pipeline[-1])
-    print url, pipeline_string, extension
+
+    # FIXME: There is redirection loop in the script
+    # We temporary redirect to the original URL to avoid it if there
+    if not pipeline:
+        return redirect(url)
+
     if 'async' in request.GET:
         task_id = process_pipeline(url=url, pipeline=pipeline, target_ext=extension)
         return task_status(request, task_id=task_id)
