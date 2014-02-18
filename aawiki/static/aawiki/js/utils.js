@@ -425,6 +425,12 @@ window.AA = window.AA || {};
         }
     };
     
+    AA.utils.uri2mime = function(uri) {
+        // We parse the uri, so we know there won’t be fragment identifiers etc.
+        var parsedUri = AA.utils.parseUri(uri);
+        return AA.utils.path2mime(parsedUri.file);
+    }
+    
     AA.utils.path2mime = function(filename) {
         /*
          * Based on Dominic Tarr’s fork of node-mime,

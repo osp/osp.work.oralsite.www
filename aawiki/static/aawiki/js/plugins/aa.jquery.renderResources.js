@@ -99,7 +99,7 @@
                 var uid = 'uid-' + AA.utils.toHash(uri);
                 options.uid = uid; // because of the way Popcorn works, we need an id to be able to refer to the div: we can’t just pass the element.
             } else {
-                var mimeType = AA.utils.path2mime(uri);
+                var mimeType = AA.utils.uri2mime(uri);
                 var templateName = mimeMap(mimeType);
             }
             return templates[templateName]({
