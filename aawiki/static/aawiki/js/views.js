@@ -340,15 +340,18 @@ window.AA = window.AA || {};
         setAbout: function() {
         	var aboutPrompt = prompt("The about value", this.model.get("about"));
         	this.model.set("about", aboutPrompt);
-        	
+        	this.model.save();
 			this.render();
+			this.renderPlayer();
         	return false;
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
         		this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
 			}
+			this.model.save();
 			this.render();
+			this.renderPlayer();
         	return false;
         },
         registerDriver : function() {
