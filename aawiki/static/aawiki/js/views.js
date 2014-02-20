@@ -503,14 +503,14 @@ window.AA = window.AA || {};
                 .html(this.templates.edit({body: this.model.get("body")}))
                 .find('textarea')
                 .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
                     $(this).insertAtCaret('\n\n' + AA.utils.secondsToTimecode(driver.currentTime()) + ' -->\n\n');
                 })
                 .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
@@ -522,7 +522,7 @@ window.AA = window.AA || {};
                     }
                 })
                 .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
@@ -531,7 +531,7 @@ window.AA = window.AA || {};
                     //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
                 })
                 .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
