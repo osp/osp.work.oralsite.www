@@ -250,7 +250,7 @@ window.AA = window.AA || {};
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
 
-	        // global events
+            // global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
@@ -338,21 +338,21 @@ window.AA = window.AA || {};
             return false;
         },
         setAbout: function() {
-        	var aboutPrompt = prompt("The about value", this.model.get("about"));
-        	this.model.set("about", aboutPrompt);
-        	this.model.save();
-			this.render();
-			this.renderPlayer();
-        	return false;
+            var aboutPrompt = prompt("The about value", this.model.get("about"));
+            this.model.set("about", aboutPrompt);
+            this.model.save();
+            this.render();
+            this.renderPlayer();
+            return false;
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
-        		this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
-			}
-			this.model.save();
-			this.render();
-			this.renderPlayer();
-        	return false;
+                this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
+            }
+            this.model.save();
+            this.render();
+            this.renderPlayer();
+            return false;
         },
         registerDriver : function() {
             /**
@@ -464,7 +464,7 @@ window.AA = window.AA || {};
             }
         },
         stopCurrentEvent: function() {
-        	this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
         },
         nextEvent: function() {
             var currentTime = this.driver.currentTime();
@@ -475,7 +475,7 @@ window.AA = window.AA || {};
         next: function(e) {
             var nextEvent = this.nextEvent();
             if (nextEvent) {
-            	this.stopCurrentEvent();
+                this.stopCurrentEvent();
                 this.driver.currentTime(nextEvent.start);
                 this.renderPlayer();
             }
@@ -490,7 +490,7 @@ window.AA = window.AA || {};
         previous: function(e) {
             var previousEvent = this.previousEvent();
             if (previousEvent) {
-            	this.stopCurrentEvent();
+                this.stopCurrentEvent();
                 this.driver.currentTime(previousEvent.start);
                 this.renderPlayer();
             }
