@@ -369,7 +369,6 @@ window.AA = window.AA || {};
 
             this.render();
 
-
         },
         toggleEditMenu: function(e) {
             this.editMenu.toggle(e);
@@ -455,6 +454,7 @@ window.AA = window.AA || {};
              */
             this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
             this.updateAnnotationEvents();
+            this.renderPlayer();
         },
         registerChildrenAsDrivers: function() {
             
@@ -828,7 +828,8 @@ window.AA = window.AA || {};
             // As the registration function queries the document, the
             // annotation needs to be appended first in order for the program
             // to find the drivers
-            annotationView.registerChildrenAsDrivers();
+
+            AA.globalEvents.trigger('aa:newDrivers');
 
             return this;
         },
@@ -839,14 +840,12 @@ window.AA = window.AA || {};
             this.collection.each(function(annotation) {
                 var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);
-                
+
                 // As the registration function queries the document, the
                 // annotation needs to be appended first in order for the program
                 // to find the drivers
-                annotationView.registerChildrenAsDrivers();
-                    
             });
-
+            
             AA.globalEvents.trigger('aa:newDrivers');
             return this;
         }
