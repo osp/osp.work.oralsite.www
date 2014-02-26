@@ -407,14 +407,6 @@ window.AA = window.AA || {};
                  var $annotation = $(el);
                  var start = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
 
-                 // work around Popcorn bug where 0 second events are not triggered
-                 // we trigger it manually
-                 if (start === 0 && that.driver.paused() && that.driver.currentTime() === 0) {
-                      $annotation.trigger({
-                          type : "start"
-                      });
-                 }
-
                  var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
                  var p = that.driver.aa({
                      start: start,
@@ -437,6 +429,20 @@ window.AA = window.AA || {};
         isSlideshow: function() {
             // for now the same as hasPlay
             return this.hasPlay();
+        },
+        isMedia: function() {
+            // We need to find one and only one audio or video,
+            // inside one and only one annotation,
+            // then we know this is a media box
+
+            var annotations = this.$el.find("[typeof='aa:annotation']");
+            if (annotations.length !== 1) { return false; }
+            
+            var media = annotations.find("audio[src], video[src]");
+            if (media.length !== 1) {
+                return false;
+            }
+            return true;
         },
         playPause: function(e) {
             /**
@@ -549,7 +555,8 @@ window.AA = window.AA || {};
                 .html(this.templates.view({
                     body:        body,
                     about:       this.model.get('about'),
-                    isSlideshow: this.isSlideshow()
+                    isSlideshow: this.isSlideshow(),
+                    // isMedia:     this.isMedia() added this down below because the resources need to be rendered first
                 }))
                 .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
@@ -623,6 +630,10 @@ window.AA = window.AA || {};
                     }
                 })
                 .renderResources();
+
+                if (this.isMedia()) {
+                    this.$el.addClass("media");
+                }
                 
                 if(this.driver) {
                     this.updateAnnotationEvents();
