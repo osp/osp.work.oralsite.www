@@ -140,9 +140,6 @@ LOGGING = {
     }
 }
 
-APPEND_SLASH=False
-
-
 # Django Compressor setup
 COMPRESS_PRECOMPILERS = (
    ('text/less', 'lessc {infile} {outfile}'),
