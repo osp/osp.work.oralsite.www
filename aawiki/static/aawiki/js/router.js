@@ -50,6 +50,9 @@ window.AA = window.AA || {};
             // Since we are using backbone-relational.js, An annotation
             // collection is created as a property of the page view model.
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
+            
+            this.timelinePlayerView && this.timelinePlayerView.remove();
+            this.timelinePlayerView = new AA.TimelinePlayerView();
         }
     });
     

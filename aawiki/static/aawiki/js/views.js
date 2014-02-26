@@ -141,7 +141,7 @@ window.AA = window.AA || {};
                 
                 if (uri === document.location.origin + document.location.pathname) {
                     // If the about is the current page, attach to the general timeline
-                    this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
+                    this.drivers[uri] = Popcorn.baseplayer( "#timeline" );
                 } 
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
@@ -200,6 +200,95 @@ window.AA = window.AA || {};
             }
         }
     });
+
+    AA.AbstractPlayer = {
+        playPause: function(e) {
+            /**
+             * Sends a ‘play’ event to the driver,
+             * or a pause event if it is already playing.
+             *
+             * (The Popcorn instance wraps the HTML5 audio/video player,
+             *  so it shares the same base methods)
+             *  */
+            if (this.driver.paused()) {
+                this.driver.play();
+            } else {
+                this.driver.pause();
+            }
+            this.render();
+        },
+        stopCurrentEvent: function() {
+            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+        },
+        nextEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
+        },
+        next: function(e) {
+            var nextEvent = this.nextEvent();
+            if (nextEvent) {
+                this.stopCurrentEvent();
+                this.driver.currentTime(nextEvent.start);
+                this.render();
+            }
+        },
+        previousEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
+
+        },
+        previous: function(e) {
+            var previousEvent = this.previousEvent();
+            if (previousEvent) {
+                this.stopCurrentEvent();
+                this.driver.currentTime(previousEvent.start);
+                this.render();
+            }
+        },
+        duration: function() {
+            var duration = this.driver.duration();
+            if (duration === 0) {
+                return _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
+            }
+            return duration;
+        }
+    };
+
+    AA.AbstractPlayerEvents = {
+        "click .play":     "playPause",
+        "click .next":     "next",
+        "click .previous": "previous",
+    };
+
+    AA.TimelinePlayerView = Backbone.View.extend({
+        el: '#timeline',
+        events: AA.AbstractPlayerEvents,
+        templates: {
+            view: _.template($('#timeline-player-template').html()),
+        },
+        initialize: function() {
+            this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
+        },
+        hasPlay: function() {
+            return this.driver.getTrackEvents().length > 0;
+        },
+        render: function() {
+            this.$el.html(
+                this.templates.view({
+                    hasPlay:     this.hasPlay(),
+                    paused:      this.driver.paused(),
+                    duration:    AA.utils.secondsToTimecode(this.duration()),
+                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
+                    next:        this.nextEvent(),
+                    previous:    this.previousEvent(),
+                })
+            );
+        },
+    }).extend(AA.AbstractPlayer);
 
     AA.AnnotationView = Backbone.View.extend({
         /**
