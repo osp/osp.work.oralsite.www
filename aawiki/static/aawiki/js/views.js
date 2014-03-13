@@ -3,6 +3,14 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+
+    Backbone.View.prototype.empty = function() {
+        this.el.innerHTML = "";
+        this.stopListening();
+        return this;
+    };
+
+
     AA.SiteView = Backbone.View.extend({
         id: 'site-meta', // <div id="user-meta"></div>
         templates: {
@@ -24,6 +32,54 @@ window.AA = window.AA || {};
             return this;
         },
     });
+
+
+    AA.PopUpView = Backbone.View.extend({
+        tagName: 'div',
+        attributes: {class: 'popup-wrapper'},
+        events: {
+            'click input[value="cancel"]': 'remove', 
+            "submit"                     : 'login',
+            "keypress input"             : "loginOnEnter",
+        },
+        template: _.template($('#popup-view-template').html()),
+        login: function (event){
+            var that = this;
+            event.preventDefault();
+
+            var data = JSON.stringify({
+                username: $("input[name=username]").val(),
+                password: $("input[name=password]").val()
+            });
+
+            $.ajax({
+                url: '/pages/api/v1/user/login/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: data,
+                dataType: 'json',
+                processData: false,
+                success: function(data) { 
+                    AA.globalEvents.trigger('aa:changeUser');
+                    that.remove();
+                },
+            });
+        },
+        loginOnEnter: function(event) {
+            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.login(event);
+            }
+        },
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            this.$el.html( this.template( {} ) );
+            $('body').append(this.$el);
+        },
+    });
+
     
     AA.UserView = Backbone.View.extend({
         id: 'user-meta', // <div id="user-meta"></div>
@@ -32,15 +88,7 @@ window.AA = window.AA || {};
         },
         events: {
             "click #login-link"         : "login",
-            "submit"                    : "login",
-            "keypress input"            : "loginOnEnter",
             "click #logout-link"        : "logout",
-        },
-        loginOnEnter: function(e) {
-        // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( e.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(e);
-            }
         },
         render: function() {
             this.$el.html( this.templates.view( this.model.toJSON() ) );
@@ -55,21 +103,7 @@ window.AA = window.AA || {};
         },
         login: function(e) {
             e.preventDefault();
-            var data = JSON.stringify({
-                username: $("input[name=username]").val(),
-                password: $("input[name=password]").val()
-            });
-            $.ajax({
-                url: '/pages/api/v1/user/login/',
-                type: 'POST',
-                contentType: 'application/json',
-                data: data,
-                dataType: 'json',
-                processData: false,
-                success: function(data) { 
-                    AA.globalEvents.trigger('aa:changeUser');
-                },
-            });
+            new AA.PopUpView();
         },
         logout: function(e) {
             e.preventDefault();
@@ -85,6 +119,7 @@ window.AA = window.AA || {};
         },
     });
 
+
     AA.PageView = Backbone.View.extend({
         id: 'page-meta', // <div id="page-meta"></div>
         templates: {
@@ -93,16 +128,16 @@ window.AA = window.AA || {};
         events: {
             "click #toggleDrawer"       : "toggleDrawer",
             "click #commit"             : "commit",
-            //"click #commit-list a": "wayback"
+            "click #commit-list a"      : "wayback"
         },
         toggleDrawer: function(event) {
             $('#sidebar, #canvas').toggleClass('hide');
         },
-        //wayback: function(event) {
-            //event.preventDefault();
-            //var href = $(event.currentTarget).attr('href');
-            //AA.router.navigate(href, {trigger: true});
-        //},
+        wayback: function(event) {
+            event.preventDefault();
+            var href = $(event.currentTarget).attr('href');
+            AA.router.navigate(href.substring(6), {trigger: true});
+        },
         commit: function(event) {
             var msg = prompt("Commit message", "My modifications");
             // for now just saves the full model
@@ -117,7 +152,11 @@ window.AA = window.AA || {};
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
-            this.$el.html( this.templates.view( context ) );
+            this.$el.html( this.templates.view( context ) )
+                .find('#permalink').draggable({ helper: "clone" })
+                .end()
+                .find('#accordion').tabs() 
+                ;
 
             // If the element is not yet part of the DOM:
             if ($('#page-meta').length === 0 ) {
@@ -131,6 +170,32 @@ window.AA = window.AA || {};
             // if we want to already render the template, without the values fetched: this.render();
         },
     });
+
+
+    AA.RevisionView = Backbone.View.extend({
+        el: '#revisions_browser_ctrl',
+        template: _.template($('#revisions-browser-template').html()),
+        render: function() {
+            this.$el
+            .empty()
+            .html(this.template({
+                prev: this.model.prev_rev(),
+                next: this.model.next_rev(),
+                rev: this.model.current_rev(),
+                revisions: this.model.get('revisions'),
+                slug: AA.router.currentSlug
+            }))
+            .find('a').on('click', function(event) {
+                event.preventDefault();
+                var href = $(event.currentTarget).attr('href');
+                AA.router.navigate(href.substring(6), {trigger: true});
+            });
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+        },
+    });
+
 
     AA.MultiplexView = Backbone.View.extend({
         initialize: function() {
@@ -200,6 +265,7 @@ window.AA = window.AA || {};
             }
         }
     });
+
 
     AA.AnnotationView = Backbone.View.extend({
         /**
@@ -279,8 +345,6 @@ window.AA = window.AA || {};
             ]);
 
             this.render();
-
-
         },
         toggleEditMenu: function(e) {
             this.editMenu.toggle(e);
@@ -365,7 +429,6 @@ window.AA = window.AA || {};
             this.updateAnnotationEvents();
         },
         registerChildrenAsDrivers: function() {
-            
             var hostedUris = this.$el.find(".embed.hosted").map(function(i, el) {
                 return $(el).attr("data-uri");
             }).get();
@@ -482,7 +545,6 @@ window.AA = window.AA || {};
             var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
             // returns undefined if no such element encountered:
             return _.find(sortedEvents, function(event){ return currentTime > event.start; });
-
         },
         previous: function(e) {
             var previousEvent = this.previousEvent();
@@ -619,6 +681,12 @@ window.AA = window.AA || {};
                         }).save();
                     }
                 })
+                .droppable({ 
+                    accept: "#permalink",
+                    drop: function( event, ui ) {
+                        console.log(ui.draggable.attr('href'));
+                    }
+                })
                 .renderResources();
                 
                 if(this.driver) {
@@ -650,6 +718,7 @@ window.AA = window.AA || {};
             return this;
         }
     });
+
 
     AA.AnnotationCollectionView = Backbone.View.extend({
         events: {

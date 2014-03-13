@@ -174,7 +174,7 @@ class PageResource(ModelResource):
         """
         # FIXME: raises a GitCommandError if there is no revision yet
         try:
-            bundle.data['revisions'] = backend.get_revisions('aawiki/Page/%s.json' % bundle.data['slug'])
+            bundle.data['revisions'] = backend.get_verbose_revisions('aawiki/Page/%s.json' % bundle.data['slug'])
         except:
             bundle.data['revisions'] = []
 
@@ -245,7 +245,7 @@ class PageResource(ModelResource):
             filename = 'aawiki/Page/%s.json' % kwargs['slug']
             data = backend.fetch(filename, rev)
             data = json.loads(data)
-            data['revisions'] = backend.get_revisions(filename)
+            data['revisions'] = backend.get_verbose_revisions(filename)
             return HttpResponse(json.dumps(data), content_type="application/json")
         else:
             return super(PageResource, self).get_detail(request, **kwargs)

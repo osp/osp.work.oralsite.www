@@ -77,6 +77,16 @@
         -ms-user-select: @argument;
             user-select: @argument;
 }
+
+.opacity(@opacity: 0.5) {
+       -moz-opacity: @opacity;
+     -khtml-opacity: @opacity;
+    -webkit-opacity: @opacity;
+            opacity: @opacity;
+            @opperc: @opacity * 100;
+         -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=@{opperc})";
+             filter: ~"alpha(opacity=@{opperc})";
+}
 /* }}} */
 
 
@@ -94,29 +104,30 @@ body {
 
 #sidebar {
     position: fixed;
-    width: 250px;
+    width: 290px;
     top: 0;
-    left: 0;
+    right: 0;
     bottom: 0;
     padding: 13px;
     z-index: 9999999999999999;
-    .transition(left, 250ms, ease-out, 0s);
+    .transition(right, 250ms, ease-out, 0s);
 
     &.hide {
-        left: -250px;
+        right: -290px;
     }
 
-    #commit{
+    nav {
         cursor: default;
         position: fixed;
         right: 20px;
         top: 10px;
         z-index: 9999999999999;
     }
+
     #toggleDrawer {
         cursor: default;
         position: absolute;
-        left: 260px;
+        right: 300px;
         top: 10px;
         z-index: 9999999999999;
     }
@@ -124,15 +135,15 @@ body {
 
 #canvas {
     position: fixed;
-    left: 250px;
+    right: 290px;
     top: 0;
-    right: 0;
+    left: 0;
     bottom: 0;
     overflow: auto;
-    .transition(left, 250ms, ease-out, 0s);
+    .transition(right, 250ms, ease-out, 0s);
 
     &.hide {
-        left: 0px;
+        right: 0px;
     }
 
     > .wrapper {
@@ -182,12 +193,11 @@ blockquote {
 
 #sidebar {
     font-family: 'News Cycle', sans;
-    font-size: 13px;
-    line-height: 18px;
+    font-size: 15px;
+    line-height: 20px;
+    color: darkslategrey;
 
     hgroup {
-        border-top: 2px solid black;
-        border-bottom: 2px solid black;
         margin: 0;
         position: relative;
         top: 5px;
@@ -268,8 +278,24 @@ section.section1 {
     height: 400px;
     outline: 1px solid #ccc;
 
+
+    .annotation-handle {
+        background-color: paleGreen;
+        height: 20px;
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        display: none;
+        outline: 1px solid paleGreen;
+    }
+
     &:hover {
         outline: 1px solid paleGreen;
+
+        .annotation-handle {
+            display: block;
+        }
     }
 
     span[property="aa:begin"],
@@ -416,8 +442,136 @@ section {
     cursor: pointer;
 }
 
+.fa {
+    font-size: 14px;
+    color: darkGrey;
+    cursor: pointer;
+
+    &:hover {
+        color: inherit;
+    }
+}
+
+#revisions_browser_ctrl {
+    font-family: 'News Cycle', sans;
+    font-size: 15px;
+    line-height: 20px;
+    background-color: white;
+    bottom: 10px;
+    height: 300px;
+    /*opacity: 0.7;*/
+    position: fixed;
+    left: 10px;
+    width: 300px;
+    z-index: 200;
+    padding: 18px;
+    color: white;
+    background-color: darkslategrey;
+
+    overflow-y: scroll;
+
+    li {
+        margin-bottom: 18px;
+
+        &.current {
+            color: red;
+        } 
+
+    }
+
+    a {
+        color: white;
+        text-decoration: none;
+    }
+}
+
+#revisions_browser_prev, 
+#revisions_browser_next {
+    /*float: left;*/
+    /*height: 100%;*/
+    /*max-width: 25%;*/
+    /*min-width: 25%;*/
+    /*text-align: center;*/
+    /*margin-top: auto;*/
+    /*margin-bottom: auto;*/
+}
+
+#revisions_browser_cur {
+    /*float: left;*/
+    /*height: 100%;*/
+    /*max-width: 50%;*/
+    /*min-width: 50%;*/
+    /*text-align: center;*/
+}
 /* UI */
 
 /* }}} */
 
-/* vim: set foldmethod=indent */
+.popup-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999999999;
+    background: rgba(0,0,0,0.6667);
+    text-align: center;
+
+    &:before {
+        position: relative;
+        height: 100%;
+        content: "";
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .popup {
+        display: inline-block;
+        vertical-align: middle;
+        background-color: white;
+        padding: 30px;
+    }
+}
+
+.ui-tabs {
+    .ui-tabs-nav {
+        border-bottom: 2px solid currentcolor;
+
+        li {
+            display: inline-block;
+            .opacity(0.5);
+
+            &.ui-tabs-active {
+                .opacity(1);
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+                font-size: 11px;
+                text-transform: uppercase;
+            }
+        }
+
+    }
+}
+
+#commit-list {
+    li {
+        margin-bottom: 18px;
+    } 
+    
+}
+
+.ui-resizable { position: relative;}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
+.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
+.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
+.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
+.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
+.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
+.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+

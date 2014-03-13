@@ -1,81 +1,105 @@
 <hgroup>
      <h1 property="dc:title"><%= name %></h1>
+     <!--<h2><%= rev %></h2>-->
 </hgroup>
 
-<span id="toggleDrawer">☰</span>
-<span id="commit">☆</span>
-
-<div><%= introduction %></div>
-<div class="ui-layout-content">
-    <div id="accordion">
-        <% if (typeof permissions !== 'undefined') {
-
-        // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
-        var public = false;
-        if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
-            public = true;
-        }
-
-        var admin = false;
-        if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
-            var admin = true;
-        }
-        %>
-
-        <div id="tab-permissions">
-            <fieldset>
-                <legend>Visible by</legend>
-                <label>
-                    <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% }; if (!admin) { %> disabled<% }%>>
-                    The public
-                </label>
-                <label>
-                    <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
-                    Selected:
-                </label>
-                <ul class="tags">
-                    <% _.each(permissions.view_page, function(permitted) {
-                        if (permitted.id !== -1)  { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
-                    <%  }
-                    }); %>
-                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
-                </ul>
-            </fieldset>
-            <fieldset>
-                <legend>Editable by</legend>
-                <ul class="tags">
-                    <% _.each(permissions.change_page, function(permitted) { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
-                    <% }); %>
-                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
-                </ul>
-            </fieldset>
-            <fieldset>
-                <legend>Administrated by</legend>
-                <ul class="tags">
-                    <% _.each(permissions.administer_page, function(permitted) { %>
-                    <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
-                    <% }); %>
-                    <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
-                </ul>
-            </fieldset>
-        </div>
-        <% } %>
+<i id="toggleDrawer" class="fa fa-bars"></i>
+<nav>
+    <a href="http://foo.com/" id="permalink" class="fa fa-link"></a>
+    <i id="commit" class="fa fa-star-o"></i>
+</nav>
 
 
+<div id="accordion">
+    <ul>
+        <li><a href="#tab-introduction">introduction</a></li>
+        <li><a href="#tab-permissions">permissions</a></li>
+        <li><a href="#tab-commits">history</a></li>
+        <li><a href="#tab-help">help</a></li>
+    </ul>
+    <div id="tab-introduction"><%= introduction %></div>
+
+    <% if (typeof permissions !== 'undefined') {
+
+    // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
+    var public = false;
+    if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
+        public = true;
+    }
+
+    var admin = false;
+    if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
+        var admin = true;
+    }
+    %>
+
+    <div id="tab-permissions">
+        <fieldset>
+            <legend>Visible by</legend>
+            <label>
+                <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% }; if (!admin) { %> disabled<% }%>>
+                The public
+            </label>
+            <label>
+                <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
+                Selected:
+            </label>
+            <ul class="tags">
+                <% _.each(permissions.view_page, function(permitted) {
+                    if (permitted.id !== -1)  { %>
+                <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
+                <%  }
+                }); %>
+                <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
+            </ul>
+        </fieldset>
+        <fieldset>
+            <legend>Editable by</legend>
+            <ul class="tags">
+                <% _.each(permissions.change_page, function(permitted) { %>
+                <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
+                <% }); %>
+                <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
+            </ul>
+        </fieldset>
+        <fieldset>
+            <legend>Administrated by</legend>
+            <ul class="tags">
+                <% _.each(permissions.administer_page, function(permitted) { %>
+                <li rel="<%= permitted.uri %>"><%= permitted.name %><% if (admin) { %> <span class="del">×</span><% } %></li>
+                <% }); %>
+                <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
+            </ul>
+        </fieldset>
+    </div>
+    <% } %>
+
+    <div id="tab-commits">
         <% if (revisions) { %>
         <ul id="commit-list">
-            <% _.each(revisions, function(revision) { %> <li><a href="/pages/<%= slug %>/<%= revision %>/"><%= revision %></a></li> <% }); %>
+            <!--<li>-->
+                <!--<dl>-->
+                    <!--<dt>id</dt>-->
+                    <!--<dd><a href="/pages/<%= slug %>/">HEAD</a></dd>-->
+                <!--</dl>-->
+            <!--</li>-->
+
+            <% _.each(revisions, function(revision) { %>
+            <li>
+                <p><%= moment.unix(revision.date).calendar() %>, by <%= revision.name %> (<%= revision.id %>)</p>
+                <blockquote><%= revision.message %></blockquote>
+            </li>
+            <% }); %>
         </ul>
         <% } %>
-         <!-- TODO: reimplement Table of Contents & Layers <h3><a href="#">Table of contents</a></h3>
+    </div>
+        <!-- TODO: reimplement Table of Contents & Layers <h3><a href="#">Table of contents</a></h3>
 
-        <div id="tab-layers" class="aa-tab"></div> -->
-         <!-- TODO: reimplement Help <h3><a href="#">Help</a></h3>
+    <div id="tab-layers" class="aa-tab"></div> -->
+        <!-- TODO: reimplement Help <h3><a href="#">Help</a></h3>
+        -->
 
-        <div id="tab-help">
-            <p>Description of preferred browser and where to send bugs.</p>
-        </div> -->
+    <div id="tab-help">
+        <p>Description of preferred browser and where to send bugs.</p>
     </div>
 </div>

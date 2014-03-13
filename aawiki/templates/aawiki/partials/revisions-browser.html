@@ -1,0 +1,25 @@
+<div id="revisions_browser_prev">
+    <% if (prev) { %>
+    <a href="/pages/<%= slug %>/<%= prev.id %>/">prev</a>
+    <% }; %>
+</div>
+<div id="revisions_browser_cur">
+    <a href="/pages/<%= slug %>/">back to editing mode</a>
+</div>
+<div id="revisions_browser_next">
+    <% if (next) { %>
+    <a href="/pages/<%= slug %>/<%= next.id %>/">next</a>
+    <% }; %>
+</div>
+
+<% if (revisions) { %>
+<ul>
+    <% _.each(revisions, function(revision) { %>
+    <li<% if (rev && revision.id === rev.id) { %> class="current"<% }; %>>
+    <p><a href="/pages/<%= slug %>/<%= revision.id %>/"><%= moment.unix(revision.date).calendar() %>, by <%= revision.name %></a></p>
+        <blockquote><%= revision.message %></blockquote>
+    </li>
+    <% }); %>
+</ul>
+<% } %>
+

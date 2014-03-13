@@ -1,11 +1,8 @@
 <p>
     <% if (typeof id === "undefined" | id === -1) { %>
-        <form>
-            <input type="text" name="username" />
-            <input type="password" name="password" />
-        </form>
-        <a title="Login" id="login-link">Login</a>
-    <% } else {%> 
+        Welcome, <span class="user self">Anonymous</span>.
+        <a title="login" id="login-link">Login</a>
+    <% } else {%>
         Welcome, <span class="user self"><%= first_name ? first_name : username %></span>.
         <a title="Logout" id="logout-link">Logout</a>
     <% } %>

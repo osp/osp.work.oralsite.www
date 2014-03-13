@@ -5,6 +5,7 @@ Uses Git to versionize content.
 """
 
 import os
+from time import mktime
 from git import Git, Repo
 from git.errors import InvalidGitRepositoryError, NoSuchPathError, GitCommandError
 from django.conf import settings
@@ -87,6 +88,17 @@ class GitBackend(BaseBackend):
         repo = Repo(self.repo_path)
         crevs = [r.id for r in repo.log(path=key)]
         return crevs[1:] # cut of the head revision-number
+
+    def get_verbose_revisions(self, key):
+        """
+        returns a list with all revisions at which ``key`` was changed.
+        Revisions are Git hashes.
+
+        """
+        repo = Repo(self.repo_path)
+
+        crevs = [{'id': r.id, 'name': r.author.name, 'message': r.message, 'date': mktime(r.authored_date)} for r in repo.log(path=key)]
+        return crevs
 
     def move(self, key_from, key_to):
         """

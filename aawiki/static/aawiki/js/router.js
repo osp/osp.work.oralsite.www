@@ -9,12 +9,14 @@ window.AA = window.AA || {};
             ":slug/(:rev/)": "page",
         },
         page: function(slug, rev) {
+            var that = this;
             this.currentSlug = slug;
-            //console.log(slug, document.location.pathname);
+            this.pageModel = this.pageModel || new AA.PageModel();
+            this.pageModel.set({id : slug, rev: rev})
 
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
-            this.pageView = new AA.PageView({ model: new AA.PageModel({id : slug, rev: rev}) });
+            this.pageView = new AA.PageView({ model: this.pageModel });
             this.pageView.model.fetch({
                 data: {
                     rev: rev
@@ -41,16 +43,25 @@ window.AA = window.AA || {};
                         model.save(); 
                     }
                 },
+                success : function() {
+                    //console.log(that.pageModel)
+                }
             });
 
             this.multiplexView && this.multiplexView.remove();
             this.multiplexView = new AA.MultiplexView();
             
-            this.annotationCollectionView && this.annotationCollectionView.remove();
-            // Since we are using backbone-relational.js, An annotation
+            // empty() is a custom method acting like remove() except that it
+            // doesn't remove the container
+            this.annotationCollectionView && this.annotationCollectionView.empty();
+            // Since we are using backbone-associations.js, An annotation
             // collection is created as a property of the page view model.
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
-        }
+
+
+            this.revisionView && this.revisionView.empty();
+            this.revisionView = new AA.RevisionView({ model: this.pageModel });
+        },
     });
     
 })();  // end of the namespace AA

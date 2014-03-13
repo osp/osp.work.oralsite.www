@@ -33,14 +33,23 @@
 <script type="text/template" id="annotation-player-template">
 {% include "aawiki/partials/annotation-player.html" %}
 </script>
+
+<script type="text/template" id="revisions-browser-template">
+{% include "aawiki/partials/revisions-browser.html" %}
+</script>
+
+<script type="text/template" id="popup-view-template">
+{% include "aawiki/partials/popup-view.html" %}
+</script>
 {% endblock %}
 
 
 {% block css %}
 {{ block.super }}
 
-<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">
+<!--<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">-->
 <link rel="stylesheet" href="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}components/font-awesome/css/font-awesome.css">
 
 {% if debug %}
 <!-- This is the client-side way to compile less and an ok choice for local dev -->
@@ -72,6 +81,8 @@
 <div class="error">
     Generic Error Message
 </div>
+
+<div id="revisions_browser_ctrl"></div>
 {% endblock %}
 
 
@@ -88,11 +99,22 @@
 
 <script src="{{ STATIC_URL }}components/jquery/jquery.min.js"></script>
 <script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
-<script src="{{ STATIC_URL }}components/underscore/underscore-min.js"></script>
-<script src="{{ STATIC_URL }}components/backbone/backbone-min.js"></script>
+
+<!--
+lodash is a superset of underscore. We use it as it provides a couple of
+additional useful functions, and it is supposed to be faster. In case there is
+a bug with backbone (which relies on underscore), we can use lodash underscore
+compatble build. See <https://github.com/lodash/lodash/wiki/build-differences>
+-->
+<!--<script src="{{ STATIC_URL }}components/underscore/underscore.js"></script>-->
+<script src="{{ STATIC_URL }}components/lodash/dist/lodash.js"></script>
+
+<script src="{{ STATIC_URL }}components/backbone/backbone.js"></script>
 <script src="{{ STATIC_URL }}components/backbone-tastypie/backbone_tastypie/static/js/backbone-tastypie.js"></script>
-<script src="{{ STATIC_URL }}components/backbone-relational/backbone-relational.js"></script>
+<script src="{{ STATIC_URL }}components/backbone-associations/backbone-associations.js"></script>
+
 <script src="{{ STATIC_URL }}components/popcorn-js/popcorn-complete.js"></script>
+<script src="{{ STATIC_URL }}components/moment/moment.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.popcorn.js"></script>
 
 <script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
