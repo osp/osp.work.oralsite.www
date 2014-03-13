@@ -101,14 +101,21 @@ article#canvas {
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 
 <script src="{{ STATIC_URL }}components/jquery/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
 
 <script src="{{ STATIC_URL }}components/jasmine-jquery/lib/jasmine-jquery.js"></script>
+<!--
+lodash is a superset of underscore. We use it as it provides a couple of
+additional useful functions, and it is supposed to be faster. In case there is
+a bug with backbone (which relies on underscore), we can use lodash underscore
+compatble build. See <https://github.com/lodash/lodash/wiki/build-differences>
+-->
+<!--<script src="{{ STATIC_URL }}components/underscore/underscore.js"></script>-->
+<script src="{{ STATIC_URL }}components/lodash/dist/lodash.js"></script>
 
-<script src="{{ STATIC_URL }}components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
-<script src="{{ STATIC_URL }}components/underscore/underscore-min.js"></script>
-<script src="{{ STATIC_URL }}components/backbone/backbone-min.js"></script>
+<script src="{{ STATIC_URL }}components/backbone/backbone.js"></script>
 <script src="{{ STATIC_URL }}components/backbone-tastypie/backbone_tastypie/static/js/backbone-tastypie.js"></script>
-<script src="{{ STATIC_URL }}components/backbone-relational/backbone-relational.js"></script>
+<script src="{{ STATIC_URL }}components/backbone-associations/backbone-associations.js"></script>
 
 <script src="{{ STATIC_URL }}components/popcorn-js/popcorn-complete.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.popcorn.js"></script>
