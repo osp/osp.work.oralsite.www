@@ -206,7 +206,7 @@ window.AA = window.AA || {};
                 
                 if (uri === document.location.origin + document.location.pathname) {
                     // If the about is the current page, attach to the general timeline
-                    this.drivers[uri] = Popcorn.baseplayer( "#baseplayer" );
+                    this.drivers[uri] = Popcorn.baseplayer( "#timeline" );
                 } 
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
@@ -266,6 +266,94 @@ window.AA = window.AA || {};
         }
     });
 
+    AA.AbstractPlayer = {
+        playPause: function(e) {
+            /**
+             * Sends a ‘play’ event to the driver,
+             * or a pause event if it is already playing.
+             *
+             * (The Popcorn instance wraps the HTML5 audio/video player,
+             *  so it shares the same base methods)
+             *  */
+            if (this.driver.paused()) {
+                this.driver.play();
+            } else {
+                this.driver.pause();
+            }
+            this.render();
+        },
+        stopCurrentEvent: function() {
+            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+        },
+        nextEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
+        },
+        next: function(e) {
+            var nextEvent = this.nextEvent();
+            if (nextEvent) {
+                this.stopCurrentEvent();
+                this.driver.currentTime(nextEvent.start);
+                this.render();
+            }
+        },
+        previousEvent: function() {
+            var currentTime = this.driver.currentTime();
+            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
+            // returns undefined if no such element encountered:
+            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
+
+        },
+        previous: function(e) {
+            var previousEvent = this.previousEvent();
+            if (previousEvent) {
+                this.stopCurrentEvent();
+                this.driver.currentTime(previousEvent.start);
+                this.render();
+            }
+        },
+        duration: function() {
+            var duration = this.driver.duration();
+            if (duration === 0) {
+                return _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
+            }
+            return duration;
+        }
+    };
+
+    AA.AbstractPlayerEvents = {
+        "click .play":     "playPause",
+        "click .next":     "next",
+        "click .previous": "previous",
+    };
+
+    AA.TimelinePlayerView = Backbone.View.extend({
+        el: '#timeline',
+        events: AA.AbstractPlayerEvents,
+        templates: {
+            view: _.template($('#timeline-player-template').html()),
+        },
+        initialize: function() {
+            this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
+        },
+        hasPlay: function() {
+            return this.driver.getTrackEvents().length > 0;
+        },
+        render: function() {
+            this.$el.html(
+                this.templates.view({
+                    hasPlay:     this.hasPlay(),
+                    paused:      this.driver.paused(),
+                    duration:    AA.utils.secondsToTimecode(this.duration()),
+                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
+                    next:        this.nextEvent(),
+                    previous:    this.previousEvent(),
+                })
+            );
+        },
+    }).extend(AA.AbstractPlayer);
 
     AA.AnnotationView = Backbone.View.extend({
         /**
@@ -316,7 +404,7 @@ window.AA = window.AA || {};
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
 
-	        // global events
+            // global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
@@ -402,18 +490,21 @@ window.AA = window.AA || {};
             return false;
         },
         setAbout: function() {
-        	var aboutPrompt = prompt("The about value", this.model.get("about"));
-        	this.model.set("about", aboutPrompt);
-        	
-			this.render();
-        	return false;
+            var aboutPrompt = prompt("The about value", this.model.get("about"));
+            this.model.set("about", aboutPrompt);
+            this.model.save();
+            this.render();
+            this.renderPlayer();
+            return false;
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
-        		this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
-			}
-			this.render();
-        	return false;
+                this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
+            }
+            this.model.save();
+            this.render();
+            this.renderPlayer();
+            return false;
         },
         registerDriver : function() {
             /**
@@ -427,6 +518,7 @@ window.AA = window.AA || {};
              */
             this.driver = AA.router.multiplexView.registerDriver(this.model.get('about'));
             this.updateAnnotationEvents();
+            this.renderPlayer();
         },
         registerChildrenAsDrivers: function() {
             var hostedUris = this.$el.find(".embed.hosted").map(function(i, el) {
@@ -467,14 +559,6 @@ window.AA = window.AA || {};
                  var $annotation = $(el);
                  var start = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
 
-                 // work around Popcorn bug where 0 second events are not triggered
-                 // we trigger it manually
-                 if (start === 0 && that.driver.paused() && that.driver.currentTime() === 0) {
-                      $annotation.trigger({
-                          type : "start"
-                      });
-                 }
-
                  var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
                  var p = that.driver.aa({
                      start: start,
@@ -497,6 +581,20 @@ window.AA = window.AA || {};
         isSlideshow: function() {
             // for now the same as hasPlay
             return this.hasPlay();
+        },
+        isMedia: function() {
+            // We need to find one and only one audio or video,
+            // inside one and only one annotation,
+            // then we know this is a media box
+
+            var annotations = this.$el.find("[typeof='aa:annotation']");
+            if (annotations.length !== 1) { return false; }
+            
+            var media = annotations.find("audio[src], video[src]");
+            if (media.length !== 1) {
+                return false;
+            }
+            return true;
         },
         playPause: function(e) {
             /**
@@ -524,7 +622,7 @@ window.AA = window.AA || {};
             }
         },
         stopCurrentEvent: function() {
-        	this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
+            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
         },
         nextEvent: function() {
             var currentTime = this.driver.currentTime();
@@ -535,7 +633,7 @@ window.AA = window.AA || {};
         next: function(e) {
             var nextEvent = this.nextEvent();
             if (nextEvent) {
-            	this.stopCurrentEvent();
+                this.stopCurrentEvent();
                 this.driver.currentTime(nextEvent.start);
                 this.renderPlayer();
             }
@@ -549,7 +647,7 @@ window.AA = window.AA || {};
         previous: function(e) {
             var previousEvent = this.previousEvent();
             if (previousEvent) {
-            	this.stopCurrentEvent();
+                this.stopCurrentEvent();
                 this.driver.currentTime(previousEvent.start);
                 this.renderPlayer();
             }
@@ -562,14 +660,14 @@ window.AA = window.AA || {};
                 .html(this.templates.edit({body: this.model.get("body")}))
                 .find('textarea')
                 .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
                     $(this).insertAtCaret('\n\n' + AA.utils.secondsToTimecode(driver.currentTime()) + ' -->\n\n');
                 })
                 .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
@@ -581,7 +679,7 @@ window.AA = window.AA || {};
                     }
                 })
                 .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
@@ -590,7 +688,7 @@ window.AA = window.AA || {};
                     //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
                 })
                 .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
-                    event.preventDefault()
+                    event.preventDefault();
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
@@ -608,7 +706,8 @@ window.AA = window.AA || {};
                 .html(this.templates.view({
                     body:        body,
                     about:       this.model.get('about'),
-                    isSlideshow: this.isSlideshow()
+                    isSlideshow: this.isSlideshow(),
+                    // isMedia:     this.isMedia() added this down below because the resources need to be rendered first
                 }))
                 .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
@@ -688,6 +787,10 @@ window.AA = window.AA || {};
                     }
                 })
                 .renderResources();
+
+                if (this.isMedia()) {
+                    this.$el.addClass("media");
+                }
                 
                 if(this.driver) {
                     this.updateAnnotationEvents();
@@ -794,7 +897,8 @@ window.AA = window.AA || {};
             // As the registration function queries the document, the
             // annotation needs to be appended first in order for the program
             // to find the drivers
-            annotationView.registerChildrenAsDrivers();
+
+            AA.globalEvents.trigger('aa:newDrivers');
 
             return this;
         },
@@ -805,14 +909,12 @@ window.AA = window.AA || {};
             this.collection.each(function(annotation) {
                 var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);
-                
+
                 // As the registration function queries the document, the
                 // annotation needs to be appended first in order for the program
                 // to find the drivers
-                annotationView.registerChildrenAsDrivers();
-                    
             });
-
+            
             AA.globalEvents.trigger('aa:newDrivers');
             return this;
         }

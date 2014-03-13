@@ -58,10 +58,12 @@ window.AA = window.AA || {};
             // collection is created as a property of the page view model.
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
 
-
             this.revisionView && this.revisionView.empty();
             this.revisionView = new AA.RevisionView({ model: this.pageModel });
-        },
+            
+            this.timelinePlayerView && this.timelinePlayerView.remove();
+            this.timelinePlayerView = new AA.TimelinePlayerView();
+        }
     });
     
 })();  // end of the namespace AA

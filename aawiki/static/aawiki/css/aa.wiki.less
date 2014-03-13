@@ -135,9 +135,15 @@ body {
 
 #canvas {
     position: fixed;
-    right: 290px;
-    top: 0;
-    left: 0;
+/*<<<<<<< HEAD*/
+    /*right: 290px;*/
+    /*top: 0;*/
+    /*left: 0;*/
+/*=======*/
+    left: 250px;
+    top: 20px;
+    right: 0;
+/*>>>>>>> 1c935cb54aacac94b82d37e1a2f58af33f414b5a*/
     bottom: 0;
     overflow: auto;
     .transition(right, 250ms, ease-out, 0s);
@@ -151,6 +157,15 @@ body {
         height: 100%;
 
     }
+}
+
+#timeline {
+    position: fixed;
+    left: 250px;
+    top: 0;
+    right: 0;
+    height: 20px;
+    overflow: auto;
 }
 /* }}} */
 
@@ -412,10 +427,10 @@ section {
 /* Video controls */
 
 .controls {
-    line-height: 38px;
+    line-height: 16px;
    
     a {
-        font-size: 24px;
+        font-size: 16px;
     }
     a:hover {
         cursor: pointer;

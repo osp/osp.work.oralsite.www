@@ -12,7 +12,7 @@ var mockPageHash = {
                     "width": 301
                 },
                 {
-                    "body": "#A video\n\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
+                    "body": "#A video\n\n\n00:00:01,000 --> 00:01:05,000\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
                     "height": 400,
                     "id": 9,
                     "left": 10,
@@ -210,6 +210,9 @@ describe("The views", function() {
             expect($("article > section:nth-child(4) .previous")).toHaveClass("disabled");
         });
 
+        it("there is one video that is a media box: it gets the class media", function() {
+            expect($("article > section:nth-child(2)")).toHaveClass("media");
+        })
 
     });
 
@@ -249,5 +252,14 @@ describe("The views", function() {
         });
         
         
+    });
+    
+    describe("The Timeline Player view", function(){
+        AA.router.timelinePlayerView = new AA.TimelinePlayerView();
+        AA.router.timelinePlayerView.render();
+        
+        it("can be initialised", function() {
+            expect(AA.router.timelinePlayerView).toBeDefined();;
+        });
     });
 });

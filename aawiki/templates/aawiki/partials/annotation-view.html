@@ -1,17 +1,4 @@
-<div class="wrapper <% if (isSlideshow) { %>slideshow<% } %>">
-    <div class="annotation-handle">
-        <i class="fa fa-minus"></i>
-        <i class="fa fa-pencil"></i>
-        <!--<i class="fa fa-bars"></i>-->
-        <i class="fa fa-start-o"></i>
-        <!--<i class="fa fa-info-circle"></i>-->
-        <i class="fa fa-link"></i>
-        <!--<i class="fa fa-unlink"></i>-->
-        <i class="fa fa-arrows"></i>
-        <i class="fa fa-fast-backward"></i>
-        <i class="fa fa-play"></i>
-        <i class="fa fa-fast-forward"></i>
-    </div>
+<div class="wrapper <% if (isSlideshow) { %>slideshow<% } %> <% /* if (isMedia) { %>media<% } */ %>">
     <div class="cancelDraggable">
         <div class="controls"></div>
         <%= body %>
