@@ -1,4 +1,5 @@
 <% if (hasPlay) { %>
-	<a class="play"><% if (paused) { %>▶<% } else { %>‖<% } %></a> <a class="previous<% if (!previous) { %> disabled<% } %>">◄◄</a> <a class="next<% if (!next) { %> disabled<% } %>">►►</a>
+<<<<<<< HEAD
+	<a class="play fa <% if (paused) { %>fa-play<% } else { %>fa-pause<% } %>">ff</a> <a class="previous fa fa-step-backward <% if (!previous) { %> disabled<% } %>"></a> <a class="next fa fa-step-forward <% if (!next) { %> disabled<% } %>"></a>
 	<%= currentTime %> / <%= duration %> 
 <% } %>

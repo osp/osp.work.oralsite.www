@@ -605,6 +605,7 @@ window.AA = window.AA || {};
              * (The Popcorn instance wraps the HTML5 audio/video player,
              *  so it shares the same base methods)
              *  */
+            console.log("playPause");
             if (this.driver.paused()) {
                 this.driver.play();
                 e.target.textContent = "‖";
