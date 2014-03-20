@@ -242,10 +242,9 @@ window.AA = window.AA || {};
                     // Sent out time update events to our Backbone event funnel
                     // FIXME: Disabled this now for Youtube drivers as for some reason or another they emit events continuously
                     // maybe a bug upstream?
-                    // TODO: Disabled this now in general as the timeUpdate functions clash with the previous next functionality
-                    // this.drivers[uri].on("timeupdate", function() {
-                    //     AA.globalEvents.trigger('aa:timeUpdate', uri);
-                    // });
+                    this.drivers[uri].on("timeupdate", function() {
+                         AA.globalEvents.trigger('aa:timeUpdate', uri);
+                    });
 
                     /* Adding the appropriate classes to the miniplayers based on pause and play events */
                     // I’m not sure this is the right way to go about this:
@@ -336,10 +335,16 @@ window.AA = window.AA || {};
             view: _.template($('#timeline-player-template').html()),
         },
         initialize: function() {
+            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
         },
         hasPlay: function() {
             return this.driver.getTrackEvents().length > 0;
+        },
+        renderConditionally: function(uri) {
+            if (uri === document.location.origin + document.location.pathname) {
+                this.render();
+            };
         },
         render: function() {
             this.$el.html(
