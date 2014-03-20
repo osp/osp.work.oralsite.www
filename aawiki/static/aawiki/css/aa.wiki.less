@@ -305,13 +305,13 @@ section.section1 {
         outline: 1px solid paleGreen;
     }
 
-    /*&:hover {
+    &:hover {
         outline: 1px solid paleGreen;
 
         .annotation-handle {
             display: block;
         }
-    }*/
+    }
 
     span[property="aa:begin"],
     span[property="aa:end"] {
@@ -427,11 +427,8 @@ section {
 /* Video controls */
 
 .controls {
-    height: 20px;
-    border: 1px solid #ccc;
-    z-index: 111111;
     line-height: 16px;
-    padding: 5px 5px 0 5px;
+    padding: 5px 5px 0px 5px;
    
     a {
         color: #000;
@@ -444,6 +441,11 @@ section {
     a.disabled, a.disabled:hover {
         color: #ccc;
         cursor: initial;
+    }
+    .timer {
+        margin-left: 5px;
+        font-family: 'News Cycle', sans;
+        font-size: 11px;
     }
 }
 
