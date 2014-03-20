@@ -36,7 +36,10 @@ CELERY_ALWAYS_EAGER = False
 
 # aawiki versioning
 RCS_BACKEND = 'gitcore' # uses git-python
-GIT_REPO_PATH = '/tmp/repo' # where the repo should be created
+# Conflicts with the project git repository
+# Makes sure to set the GIT_REPO_PATH value to a path outside of the project repository!
+GIT_REPO_PATH = os.path.join(PROJECT_DIR, '../../osp.work.oralsite.www.repository') # where the repo should be created
+
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
