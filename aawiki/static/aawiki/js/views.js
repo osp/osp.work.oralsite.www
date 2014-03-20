@@ -175,6 +175,14 @@ window.AA = window.AA || {};
     AA.RevisionView = Backbone.View.extend({
         el: '#revisions_browser_ctrl',
         template: _.template($('#revisions-browser-template').html()),
+        events: {
+            'click #toggleRevisions': 'toggleRevisions',
+        },
+        toggleRevisions: function(event) {
+            event.preventDefault();
+
+            $('#revisions_browser_ctrl').toggleClass('hidden');
+        },
         render: function() {
             this.$el
             .empty()

@@ -1,25 +1,35 @@
-<div id="revisions_browser_prev">
-    <% if (prev) { %>
-    <a href="/pages/<%= slug %>/<%= prev.id %>/">prev</a>
-    <% }; %>
-</div>
-<div id="revisions_browser_cur">
-    <a href="/pages/<%= slug %>/">back to editing mode</a>
-</div>
-<div id="revisions_browser_next">
-    <% if (next) { %>
-    <a href="/pages/<%= slug %>/<%= next.id %>/">next</a>
-    <% }; %>
-</div>
-
-<% if (revisions) { %>
-<ul>
-    <% _.each(revisions, function(revision) { %>
-    <li<% if (rev && revision.id === rev.id) { %> class="current"<% }; %>>
-    <p><a href="/pages/<%= slug %>/<%= revision.id %>/"><%= moment.unix(revision.date).calendar() %>, by <%= revision.name %></a></p>
-        <blockquote><%= revision.message %></blockquote>
-    </li>
-    <% }); %>
-</ul>
+<% if (rev) { %>
+    <p>This is an old revision of this page, last edited by <%= rev.name %> at <%= moment.unix(rev.date).calendar() %>. It may differ significantly from the current revision.</p>
+    <!--(diff) ← Previous revision | Latest revision (diff) | Newer revision → (diff)-->
+    <div id="revisions_browser_cur">
+        <a href="/pages/<%= slug %>/">back to editing mode</a>
+    </div>
 <% } %>
 
+
+<%= console.log(revisions) %>
+<% if (revisions.length) { %>
+    <div id="revisions_browser_prev">
+        <% if (prev) { %>
+        <a href="/pages/<%= slug %>/<%= prev.id %>/">prev</a>
+        <% }; %>
+    </div>
+    <div id="revisions_browser_next">
+        <% if (next) { %>
+        <a href="/pages/<%= slug %>/<%= next.id %>/">next</a>
+        <% }; %>
+    </div>
+
+    <ul>
+        <% _.each(revisions, function(revision) { %>
+        <li<% if (rev && revision.id === rev.id) { %> class="current"<% }; %>>
+        <p><a href="/pages/<%= slug %>/<%= revision.id %>/"><%= moment.unix(revision.date).calendar() %>, by <%= revision.name %></a></p>
+            <blockquote><%= revision.message %></blockquote>
+        </li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    There is no revisions for this page
+<% } %>
+
+<i id="toggleRevisions" class="fa fa-bookmark"></i>

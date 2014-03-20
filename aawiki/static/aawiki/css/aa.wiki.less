@@ -467,6 +467,12 @@ section {
     }
 }
 
+#toggleRevisions {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
 #revisions_browser_ctrl {
     font-family: 'News Cycle', sans;
     font-size: 15px;
@@ -498,25 +504,15 @@ section {
         color: white;
         text-decoration: none;
     }
-}
 
-#revisions_browser_prev, 
-#revisions_browser_next {
-    /*float: left;*/
-    /*height: 100%;*/
-    /*max-width: 25%;*/
-    /*min-width: 25%;*/
-    /*text-align: center;*/
-    /*margin-top: auto;*/
-    /*margin-bottom: auto;*/
-}
-
-#revisions_browser_cur {
-    /*float: left;*/
-    /*height: 100%;*/
-    /*max-width: 50%;*/
-    /*min-width: 50%;*/
-    /*text-align: center;*/
+    &.hidden {
+        height: 10px;
+    
+    }
+    &.hidden div,
+    &.hidden ul {
+        display: none;
+    }
 }
 /* UI */
 
