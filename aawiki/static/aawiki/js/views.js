@@ -149,6 +149,9 @@ window.AA = window.AA || {};
                 }
             });
         },
+        setTitle: function() {
+            document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
+        },
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
@@ -162,7 +165,8 @@ window.AA = window.AA || {};
             if ($('#page-meta').length === 0 ) {
                 $('#page-meta-container').prepend(this.el);
             }
-
+            
+            this.setTitle();
             return this;
         },
         initialize: function() {
