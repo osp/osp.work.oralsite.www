@@ -33,7 +33,7 @@ var mockPageHash = {
                     "width": 300
                 },
                 {
-                    "about": document.location.origin + '/pages/tests/#annotation-0024',
+                    "about": document.location.origin + '/pages/Tests/#annotation-0024',
                     "body": "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n",
                     "height": 400,
                     "id": 24,
