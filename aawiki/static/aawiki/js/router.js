@@ -12,7 +12,7 @@ window.AA = window.AA || {};
             var that = this;
             this.currentSlug = slug;
             this.pageModel = this.pageModel || new AA.PageModel();
-            this.pageModel.set({id : slug, rev: rev})
+            this.pageModel.set({id : slug, rev: rev});
 
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
@@ -31,7 +31,14 @@ window.AA = window.AA || {};
                         model.unset('id', { silent: true });
                         /* We set the model’s name and slug based on the page’s uri
                          * */
-                        model.set({ slug: AA.router.currentSlug, name : AA.utils.dewikify(AA.router.currentSlug), introduction: '' });
+                        model.set({
+                            slug:         AA.utils.wikify(AA.router.currentSlug),
+                            name:         AA.utils.dewikify(AA.router.currentSlug),
+                            introduction: ''
+                        });
+                        console.log(AA.router.currentSlug);
+                        console.log(AA.utils.wikify(AA.router.currentSlug));
+                        console.log(model.attributes);
                         /* We save. The API returns the newly created object,
                          * which also contains the appropriate permissions,
                          * created on the server-side.
