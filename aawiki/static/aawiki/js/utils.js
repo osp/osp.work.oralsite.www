@@ -357,6 +357,33 @@ window.AA = window.AA || {};
         //return ((h > 0 ? h + ":" : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + ":" : "0:") + (s < 10 ? "0" : "") + s);
     //};
 
+    AA.utils.wikify = function(target) {
+      // Links like 'sherry Turkle' will get wikified.
+      // Links like 'sherry.jpeg' will not get wikified.
+      // Links like /pages/sherry_Turkle will not get wikified.
+      // Links like http://example.com/sherry_turkle.ogv will not get wikified
+      if (target.indexOf("/") === -1 && !target.match(/.*\.(\w+)$/)) {
+        var capitaliseFirstLetter = function(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+        var spaceToUnderscore = function(str) {
+            return str.replace(/\s+/g, '_');
+        };
+        var parts = target.match(/([^#]*)#*([^#]*)/);
+        var path = parts[1];
+        var hash = parts[2];
+        
+        var uri = encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
+        
+        if (hash) {
+          // do not escape =, so we can have #t=3.5
+          uri += '#' + encodeURIComponent(hash).replace('%3D', '=');
+        }
+        return uri;
+      }
+      return target;
+    };
+    
     AA.utils.dewikify = function(name) {
         /*
         Turns URL name/slug into a proper name (reverse of wikify).
@@ -429,7 +456,7 @@ window.AA = window.AA || {};
         // We parse the uri, so we know there won’t be fragment identifiers etc.
         var parsedUri = AA.utils.parseUri(uri);
         return AA.utils.path2mime(parsedUri.file);
-    }
+    };
     
     AA.utils.path2mime = function(filename) {
         /*

@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-01-30T16:10Z
+ * Date: 2014-04-22T13:38Z
  */
 
 (function(expose) {
@@ -1968,14 +1968,18 @@
       // Links like /pages/sherry_Turkle will not get wikified.
       // Links like http://example.com/sherry_turkle.ogv will not get wikified
       if (target.indexOf("/") === -1 && !target.match(/.*\.(\w+)$/)) {
-        var parts = target.match(/([^#]*)#*([^#]*)/);
-        var path = parts[1];
-        var hash = parts[2];
         var capitaliseFirstLetter = function(string) {
           return string.charAt(0).toUpperCase() + string.slice(1);
         };
-        var path = capitaliseFirstLetter(path.replace(/\s+/g, '_'));
-        var uri = encodeURIComponent(path);
+        var spaceToUnderscore = function(str) {
+            return str.replace(/\s+/g, '_');
+        };
+        var parts = target.match(/([^#]*)#*([^#]*)/);
+        var path = parts[1];
+        var hash = parts[2];
+        
+        var uri = '../' + encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
+        
         if (hash) {
           // do not escape =, so we can have #t=3.5
           uri += '#' + encodeURIComponent(hash).replace('%3D', '=');
