@@ -757,43 +757,33 @@ window.AA = window.AA || {};
                 })
                 .draggable({
                     cancel: ".cancelDraggable, textarea",
+                    containment: "parent",
                     distance: 10,
                     scroll: true,
-                    start: function(event, ui) {
-                        $(this).css('cursor','move');
-                    },
+                    scrollSensitivity: 100,
+                    //start: function(event, ui) {
+                        //$(this).css('cursor','move');
+                    //},
                     drag: function (event, ui) {
                         that.editMenu.redraw ();
                         
                         if (event.ctrlKey) {
-                            $("html").addClass("grid");
+                            $("#canvas").addClass("grid");
                             ui.position.left = Math.floor(ui.position.left / 20) * 20;
                             ui.position.top = Math.floor(ui.position.top / 20) * 20;
                         } else {
-                            $("html").removeClass("grid");
+                            $("#canvas").removeClass("grid");
                         }
                     },
                     stop: function(event, ui) { 
-                        $(this).css('cursor','auto');
-                        $("html").removeClass("grid");
+                        //$(this).css('cursor','auto');
+                        $("#canvas").removeClass("grid");
 
-                        // Makes sure an annotation doesn't get a negative
-                        // offset
-                        var pos = $(this).position();
-
-                        pos.top = pos.top < 0 ? 0 : pos.top;
-                        pos.left = pos.left < 0 ? 0 : pos.left;
-
-                        $(this).css({
-                            top: pos.top,
-                            left: pos.left
-                        });
-                        
                         that.editMenu.redraw ();
                         
                         model.set({
-                            top: pos.top,
-                            left: pos.left,
+                            top: parseInt($(this).css('top')),
+                            left: parseInt($(this).css('left')),
                         }).save();
                     }
                 })
