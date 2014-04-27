@@ -1,56 +1,18 @@
-# Oralsite Django Project
+Oral Site is a new open source software and platform that Myriam Van Imschoot
+initiated as part of her artistic work on orality, transmission and interview
+archives. In 2011 it has been developed by a team of coders, writers and sound
+specialists of Sarma, Constant and Rits, who share an interest in oral and
+experimental publication formats.
 
-## Prerequisites
+Oral Site enables users to read, edit and publish online multimodal
+publications that merge sound, image, text and graphics. Oral Site is both an
+instrument and a place where one can "expand" publication within an environment
+that encourages contributors to move beyond the classical written form and to
+practice new ways of dealing with text, orality, visuality, graphicality,
+temporality, spaciality, performativity etc.
 
-- python &gt;= 2.6
-- pip
-- virtualenv
-
-## Installation
-
-### Creating the environment
-
-Create a virtual python environment for the project.
-If you're not using virtualenv you may skip this step.
-
-```bash
-virtualenv --no-site-packages oralsite-env
-cd oralsite-env
-source bin/activate
-```
-
-### Clone the code
-
-```bash
-git clone git@git.constantvzw.org:/osp.work.oralsite.www.git oralsite
-```
-
-### Install the requirements
-
-```bash
-cd oralsite
-pip install -r requirements.txt
-```
-
-### Configure the project
-
-```bash
-cp oralsite/local_settings.example.py oralsite/local_settings.py
-vi oralsite/local_settings.py
-```
-
-### Synchronize the database
-
-```bash
-python manage.py syncdb
-```
-
-## Run the project
-
-```bash
-python manage.py runserver
-```
-
-Navigate to <http://localhost:8000/admin/>. Create a first page with slug `Index` manually at <http://localhost:8000/admin/aawiki/page/add/>.
-
-Open your browser at <http://localhost:8000>.
+Currently, the first publication 'What's the Score?' opens Oral Site's
+publication series on scores. Future publication series will pay attention to
+experimental documentation and sound-text based art work. The platform, which
+was officially inaugurated on 13 April 2012, hosts also a portal to Sarma's
+archive.
