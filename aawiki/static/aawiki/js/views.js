@@ -154,7 +154,19 @@ window.AA = window.AA || {};
         },
         render: function() {
             var context = this.model.toJSON();
-            context.introduction = markdown.toHTML(context.introduction, "Aa");
+
+            var tree = markdown.parse(context.introduction, "Aa");
+            var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
+            context.introduction = markdown.toHTML(tree);
+
+            if ('style' in meta) {
+                $("#canvas").attr('style', meta['style']);
+            }
+
+            if ('class' in meta) {
+                $("#canvas").attr('class', meta['class']);
+            }
+
             this.$el.html( this.templates.view( context ) )
                 .find('#permalink').draggable({ helper: "clone" })
                 .end()
@@ -717,7 +729,19 @@ window.AA = window.AA || {};
                 var model = this.model;
                 // FIXME: typogrify throw an error on empty strings
                 //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
-                var body = markdown.toHTML(this.model.get("body"), "Aa");
+
+                var tree = markdown.parse(this.model.get("body"), "Aa");
+                var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
+                var body = markdown.toHTML(tree);
+
+                if ('style' in meta) {
+                    this.$el.attr('style', meta['style']);
+                }
+
+                if ('class' in meta) {
+                    this.$el.attr('class', meta['class']);
+                }
+
 
                 this.$el
                 .html(this.templates.view({
