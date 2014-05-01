@@ -37,14 +37,14 @@ def process(request, pipeline_string):
     # We temporary redirect to the original URL to avoid it
     else:
         return redirect(url)
-    
+
     bundle = process_pipeline(url=url, pipeline=pipeline, target_ext=extension)
-    
+
     """
     At this point, the file should have been generated,
     and the bundle will tell us its path.
-    
-    We then serve it with Python—which is not the most efficient
+
+    We then serve it with Python-which is not the most efficient
     of strategies, but as long as we do it only once it should
     be fine.
     """
