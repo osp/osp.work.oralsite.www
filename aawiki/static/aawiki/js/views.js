@@ -459,6 +459,8 @@ window.AA = window.AA || {};
                 // Set as slideshow (changes about value)
                 new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
                     .on('click', this.setAsSlideshow.bind(this)),
+                new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                    .on('click', this.setZIndex.bind(this)),
             ]);
 
             this.render();
@@ -526,6 +528,28 @@ window.AA = window.AA || {};
             this.model.save();
             this.render();
             this.renderPlayer();
+            return false;
+        },
+        setZIndex: function() {
+            var index_highest = 0;   
+            
+            $(".section1").each(function() {
+                // always use a radix when using parseInt
+                var index_current = parseInt($(this).css("zIndex"), 10);
+                if(index_current > index_highest) {
+                    index_highest = index_current;
+                }
+            });
+
+            var style_attr = $('<div>')
+                .attr('style', this.$el.attr('style'))
+                .css('z-index', index_highest + 1)
+                .attr('style');
+
+            this.model.set("style", style_attr);
+            this.model.save();
+            this.render();
+
             return false;
         },
         setAsSlideshow: function() {
@@ -748,17 +772,14 @@ window.AA = window.AA || {};
                 //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
                 var tree = markdown.parse(this.model.get("body"), "Aa");
-                var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
+                //var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
                 var body = markdown.toHTML(tree);
 
-                if ('style' in meta) {
-                    this.$el.attr('style', meta['style']);
-                }
+                //if ('class' in meta) {
+                    //this.$el.attr('class', meta['class']);
+                //}
 
-                if ('class' in meta) {
-                    this.$el.attr('class', meta['class']);
-                }
-
+                this.$el.attr('style', this.model.get('style'));
 
                 this.$el
                 .html(this.templates.view({
