@@ -254,6 +254,35 @@ window.AA = window.AA || {};
             return this.btn;
         }
     };
+
+
+    /* Taken from hotglue, GPL License*/
+    AA.widgets.slider = function(event, change, stop) {
+        var oldEvent = event;
+        var mousemove = function(event) {
+            if (typeof change == 'function') {
+                change(event.pageX - oldEvent.pageX, event.pageY - oldEvent.pageY, event);
+            }
+            return false;
+        };
+        var mouseup = function(event) {
+            $('html')
+            .unbind('mousemove', mousemove)
+            .unbind('mouseup', mouseup);
+
+            if (typeof change == 'function') {
+                change(event.pageX - oldEvent.pageX, event.pageY - oldEvent.pageY, event);
+            }
+            if (typeof stop == 'function') {
+                stop(event.pageX - oldEvent.pageX, event.pageY-oldEvent.pageY, event);
+            }
+            return false;
+        };
+
+        $('html')
+        .bind('mousemove', mousemove)
+        .bind('mouseup', mouseup);	
+    };
     
     AA.utils = AA.utils || {};
     

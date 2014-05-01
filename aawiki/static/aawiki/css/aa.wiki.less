@@ -319,6 +319,25 @@ section.section1 {
     outline: 1px solid #ccc;
 
 
+    &.hidden {
+        .opacity(0.5);
+
+        &:hover {
+            .opacity(1);
+        }
+
+        .anonymous & {
+            display: none;
+        }
+    }
+
+    &.collapsed {
+        outline: 1px dashed #ccc;
+        height: 30px !important;
+        overflow: hidden;
+    }
+
+
     .annotation-handle {
         background-color: paleGreen;
         height: 20px;

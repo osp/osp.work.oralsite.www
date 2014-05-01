@@ -91,6 +91,15 @@ window.AA = window.AA || {};
             "click #logout-link"        : "logout",
         },
         render: function() {
+            // Adds an anonymous class if not connected so we can "unpublish"
+            // wip annotations using css
+            var id = this.model.get('id');
+            if (typeof id === "undefined" | id === -1) {
+                $('#canvas').addClass('anonymous');
+            } else {
+                $('#canvas').removeClass('anonymous');
+            }
+
             this.$el.html( this.templates.view( this.model.toJSON() ) );
             // If the element is not yet part of the DOM:
             if ($('#user-meta').length === 0 ) {
@@ -154,18 +163,7 @@ window.AA = window.AA || {};
         },
         render: function() {
             var context = this.model.toJSON();
-
-            var tree = markdown.parse(context.introduction, "Aa");
-            var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
-            context.introduction = markdown.toHTML(tree);
-
-            if ('style' in meta) {
-                $("#canvas").attr('style', meta['style']);
-            }
-
-            if ('class' in meta) {
-                $("#canvas").attr('class', meta['class']);
-            }
+            context.introduction = markdown.toHTML(context.introduction, "Aa");
 
             this.$el.html( this.templates.view( context ) )
                 .find('#permalink').draggable({ helper: "clone" })
@@ -461,6 +459,12 @@ window.AA = window.AA || {};
                     .on('click', this.setAsSlideshow.bind(this)),
                 new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
                     .on('click', this.setZIndex.bind(this)),
+                new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                    .on('click', this.toggleVisibility.bind(this)),
+                new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                    .on('click', this.toggleCollapsing.bind(this)),
+                new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                    .on('mousedown', this.testSlider.bind(this)),
             ]);
 
             this.render();
@@ -528,6 +532,41 @@ window.AA = window.AA || {};
             this.model.save();
             this.render();
             this.renderPlayer();
+            return false;
+        },
+        testSlider: function() {
+            var that = this;
+
+            AA.widgets.slider(event, function(x, y) {
+                console.log(that);
+                $(that.$el).css('z-index', x);
+            }, function(x, y) {
+            });
+
+            return false;
+        },
+        toggleCollapsing: function() {
+            var class_attr = $('<div>')
+                .attr('class', this.$el.attr('class'))
+                .toggleClass('collapsed')
+                .attr('class');
+
+            this.model.set("klass", class_attr);
+            this.model.save();
+            this.render();
+
+            return false;
+        },
+        toggleVisibility: function() {
+            var class_attr = $('<div>')
+                .attr('class', this.$el.attr('class'))
+                .toggleClass('hidden')
+                .attr('class');
+
+            this.model.set("klass", class_attr);
+            this.model.save();
+            this.render();
+
             return false;
         },
         setZIndex: function() {
@@ -771,15 +810,10 @@ window.AA = window.AA || {};
                 // FIXME: typogrify throw an error on empty strings
                 //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
-                var tree = markdown.parse(this.model.get("body"), "Aa");
-                //var meta = _.isObject(tree[1]) && !_.isArray(tree[1]) ? tree[1] : {};
-                var body = markdown.toHTML(tree);
-
-                //if ('class' in meta) {
-                    //this.$el.attr('class', meta['class']);
-                //}
+                var body = markdown.toHTML(this.model.get("body"), "Aa");
 
                 this.$el.attr('style', this.model.get('style'));
+                this.$el.attr('class', this.model.get('klass'));
 
                 this.$el
                 .html(this.templates.view({

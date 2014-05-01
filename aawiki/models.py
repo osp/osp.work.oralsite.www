@@ -39,6 +39,7 @@ class Annotation(RCSModel):
     height = models.IntegerField(default=400)
     body = models.TextField(blank=True)
     style = models.TextField(blank=True)
+    klass = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.body[0:100]
