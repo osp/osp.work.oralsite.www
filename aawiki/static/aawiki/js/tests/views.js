@@ -6,7 +6,7 @@ var mockPageHash = {
                     "height": 400,
                     "id": 2,
                     "left": 10,
-                    "page": "/pages/api/v1/page/test-page/",
+                    "page": "/pages/api/v1/page/Tests/",
                     "resource_uri": "/pages/api/v1/annotation/2/",
                     "top": 18,
                     "width": 301
@@ -16,20 +16,31 @@ var mockPageHash = {
                     "height": 400,
                     "id": 9,
                     "left": 10,
-                    "page": "/pages/api/v1/page/test-page/",
+                    "page": "/pages/api/v1/page/Tests/",
                     "resource_uri": "/pages/api/v1/annotation/9/",
                     "top": 458,
                     "width": 300
                 },
                 {
-                    "body": "#Youtube!\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\n",
+                    "body": "#Youtube!\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
                     "about": "http://www.youtube.com/watch?v=v-7kf7OZQtw",
                     "height": 400,
                     "id": 66,
                     "left": 333,
-                    "page": "/pages/api/v1/page/test-page/",
+                    "page": "/pages/api/v1/page/Tests/",
                     "resource_uri": "/pages/api/v1/annotation/66/",
                     "top": 458,
+                    "width": 300
+                },
+                {
+                    "body": "#Filters\n\nFor now, OLGA knows two filters: `thumb` and `embed`.\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\n`embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb`\n\nWith the order reversed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||thumb|bw ]]\n\n`embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb`\n\nJust a thumbnail (another image):\n\n[[ embed::https://farm8.staticflickr.com/7244/14035829911_e077859733_c.jpg||thumb ]]\n\n`embed::https://farm8.staticflickr.com/7244/14035829911_e077859733_c.jpg||thumb`",
+                    "about": "",
+                    "height": 400,
+                    "id": 69,
+                    "left": 333,
+                    "page": "/pages/api/v1/page/Tests/",
+                    "resource_uri": "/pages/api/v1/annotation/69/",
+                    "top": 868,
                     "width": 300
                 },
                 {
@@ -38,7 +49,7 @@ var mockPageHash = {
                     "height": 400,
                     "id": 24,
                     "left": 333,
-                    "page": "/pages/api/v1/page/test-page/",
+                    "page": "/pages/api/v1/page/Tests/",
                     "resource_uri": "/pages/api/v1/annotation/24/",
                     "top": 18,
                     "width": 300
@@ -170,7 +181,7 @@ describe("The views", function() {
         });
         
         it("loads the right number of annotations", function(){
-            expect(AA.router.annotationCollectionView.collection.length).toBe(4);
+            expect(AA.router.annotationCollectionView.collection.length).toBe(5);
         });
         
         it("has turned a semantic link to a video into an actual <video> tag", function(){
@@ -181,24 +192,24 @@ describe("The views", function() {
             expect($("article > section").map(function(i, el) {
                 return $(el).attr('about');
                 }).get().length
-            ).toBe(4);
+            ).toBe(5);
         });
         
         it("the about attributes are absolute hyperlinks", function() {
             expect($("article > section").map(function(i, el) {
                 return $(el).attr('about').match(/http:\/\/[^/]+\//) !== null;
                 }).get()
-            ).toEqual([true, true, true, true]);
+            ).toEqual([true, true, true, true, true]);
         });
         
         it("the about attributes are correct", function() {
             expect($("article > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
             expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
-            expect($("article > section:nth-child(4)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
+            expect($("article > section:nth-child(5)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
         });
 
         it("features play buttons for the self-driven annotation, i.e. the slideshow", function() {
-            expect($("article > section:nth-child(4) .play")).toExist();
+            expect($("article > section:nth-child(5) .play")).toExist();
         });
 
         it("except when the annotation is about the page itself", function() {
@@ -206,8 +217,8 @@ describe("The views", function() {
         });
         
         it("the slideshow has a forward button enabled, and a backwards button disabled", function() {
-            expect($("article > section:nth-child(4) .next")).not.toHaveClass("disabled");
-            expect($("article > section:nth-child(4) .previous")).toHaveClass("disabled");
+            expect($("article > section:nth-child(5) .next")).not.toHaveClass("disabled");
+            expect($("article > section:nth-child(5) .previous")).toHaveClass("disabled");
         });
 
         it("there is one video that is a media box: it gets the class media", function() {

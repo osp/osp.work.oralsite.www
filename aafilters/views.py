@@ -5,11 +5,14 @@ from __future__ import absolute_import
 # for relative imports by default.
 
 import os
+import stat
 
-
+from django.http import StreamingHttpResponse
+from django.utils.http import http_date
 from django.shortcuts import redirect
-from .tasks import process_pipeline
-from djcelery.views import task_status
+
+from .filters import process_pipeline
+
 
 def process(request, pipeline_string):
     """
@@ -20,7 +23,7 @@ def process(request, pipeline_string):
     extension = '.jpg'
     pipeline = '[u'bw']'
 
-    And send it of to Celery
+    And send it of to the filters
     """
     parts = pipeline_string.split('..')
     url = parts[0]
@@ -31,16 +34,24 @@ def process(request, pipeline_string):
         pipeline[-1], extension = os.path.splitext(pipeline[-1])
 
     # FIXME: There is redirection loop in the script
-    # We temporary redirect to the original URL to avoid it if there
-    if not pipeline:
-        return redirect(url)
-
-    if 'async' in request.GET:
-        task_id = process_pipeline(url=url, pipeline=pipeline, target_ext=extension)
-        return task_status(request, task_id=task_id)
+    # We temporary redirect to the original URL to avoid it
     else:
-        task_id = process_pipeline(url=url, pipeline=pipeline, target_ext=extension, synchronous=True)
-    if 'info' in request.GET:
-        return task_status(request, task_id=task_id)
-    return redirect('processed', path=pipeline_string)
+        return redirect(url)
+    
+    bundle = process_pipeline(url=url, pipeline=pipeline, target_ext=extension)
+    
+    """
+    At this point, the file should have been generated,
+    and the bundle will tell us its path.
+    
+    We then serve it with Python—which is not the most efficient
+    of strategies, but as long as we do it only once it should
+    be fine.
+    """
+    statobj = os.stat(bundle['path'])
+    response = StreamingHttpResponse(open(bundle['path'], 'rb'), content_type=bundle['mime'])
+    response["Last-Modified"] = http_date(statobj.st_mtime)
+    if stat.S_ISREG(statobj.st_mode):
+        response["Content-Length"] = statobj.st_size
+    return response
 
