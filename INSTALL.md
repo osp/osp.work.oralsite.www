@@ -8,7 +8,7 @@ The version shipped with package managers is often old, so we have been
 compiling it from sources instead. This step is required to use the Less CSS
 compiler used in Django Compressor.
 
-    mkdir src && cd src
+    mkdir -p src && cd src
     wget http://nodejs.org/dist/v0.10.25/node-v0.10.25.tar.gz
     tar zxvf node-v0.10.25.tar.gz
     cd node-v0.10.25
@@ -30,8 +30,7 @@ If you get a _registry error parsing json_, try using a mirror.
 
 This is required by Pillow, the python library that deals with images, used in
 the filters (see bellow). If you don't, Pillow will fail to compile. On Debian
-based OS, you can install them by
-running
+based OS, you can install them by running
 
     sudo apt-get update
     sudo apt-get install python-dev libjpeg-dev libpng-dev
@@ -45,7 +44,7 @@ be used for embedding a video, or turning a colored image into Black
 and White directly from the wiki. We advise to use Rabbitmq. To install it, see
 <http://www.rabbitmq.com/install-debian.html#apt>.
 
-Once install, start the message broker.
+Once installed, start the message broker.
 
     sudo /etc/init.d/rabbitmq start
 
@@ -61,7 +60,7 @@ If you read this, you have most likely already done this.
 
 This is the preferred method as it installs everything in an isolated
 environment. The requirements.txt file contains all the python depencies, which
-will be install automatically with the code below.
+will be installed automatically with the code below.
 
     sudo apt-get install python-virtualenv
     virtualenv --no-site-packages venv
@@ -78,7 +77,7 @@ one machine to an other. It completes the settings found in
     cp oralsite/local_settings.example.py oralsite/local_settings.py
     vim oralsite/local_settings.py
 
-The file contains default values to run the project with Django devellopment
+The file contains default values to run the project with Django development
 server. You only need to set the `SECRET_KEY` value (search for "django
 generate secret key" in your favorite search engine).
 
