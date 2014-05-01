@@ -48,10 +48,11 @@
 body {
     width: inherit;
     height: inherit;
+    background-color: #fff;
 }
 article#canvas {
     box-sizing: border-box;
-    padding-right: 420px;
+    right: 420px;
 }
 #HTMLReporter {
     box-sizing: border-box;
@@ -68,20 +69,21 @@ article#canvas {
 
 
 {% block body %}
-<nav id="sidebar">
+<header id="sidebar">
     <div id="site-meta-container">
-
+        
     </div>
     <div id="user-meta-container">
+        
     </div>
     <div id="page-meta-container">
+        
     </div>
-
-</nav>
+</header>
 <div id="timeline">
+    
 </div>
 <article id="canvas">
-    <div class="wrapper"></div>
 </article>
 <div class="error">
 </div>
@@ -97,7 +99,7 @@ article#canvas {
 {% endif %}
 
 <!-- Disabled for now as we don't use it -->
-<!--<script src="/static/components/typogr.js/typogr.min.js"></script>-->
+<!--<script src="{{ STATIC_URL }}components/typogr.js/typogr.min.js"></script>-->
 
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine.js"></script>
 <script src="{{ STATIC_URL }}components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
@@ -120,9 +122,15 @@ compatble build. See <https://github.com/lodash/lodash/wiki/build-differences>
 <script src="{{ STATIC_URL }}components/backbone-associations/backbone-associations.js"></script>
 
 <script src="{{ STATIC_URL }}components/popcorn-js/popcorn-complete.js"></script>
+<script src="{{ STATIC_URL }}components/moment/moment.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.popcorn.js"></script>
 
 <script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
+<script src="{{ STATIC_URL }}components/jQuery-caret-utilities/jquery.caret.js"></script>
+<script src="{{ STATIC_URL }}components/jquery.hotkeys/jquery.hotkeys.js"></script>
+
+<script src="{{ STATIC_URL }}components/js-yaml-front-matter/build.js"></script>
+<script src="{{ STATIC_URL }}components/js-yaml/js-yaml.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/utils.js"></script>
 
