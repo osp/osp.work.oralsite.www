@@ -493,9 +493,11 @@ window.AA = window.AA || {};
         },
         toggle: function() {
             if (this.editing) {
-                this.model.set({
-                    'body': $('textarea', this.$el).val()
-                }).save();
+                jsFront(jsyaml);
+                var foo = jsyaml.loadFront($('textarea', this.$el).val(), 'body');
+                console.log(foo);
+
+                this.model.set(foo).save();
             };
 
             this.editing = !this.editing;
@@ -685,8 +687,23 @@ window.AA = window.AA || {};
             var that = this;
 
             if (this.editing) {
+
+                var foo = this.model.toJSON();
+                var body = foo['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
+                delete foo.body;
+                delete foo.page;
+                delete foo.resource_uri;
+                delete foo.id;
+                delete foo.pk;
+
+                var output = "---\n";
+                output += jsyaml.dump(foo, 4);
+                output += "---\n\n";
+                output += body;
+
+
                 this.$el
-                .html(this.templates.edit({body: this.model.get("body")}))
+                .html(this.templates.edit({body: output}))
                 .find('textarea')
                 .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
                     event.preventDefault();

@@ -24,6 +24,8 @@
     "backbone-tastypie": "https://github.com/PaulUithol/backbone-tastypie.git",
     "marked": "http://github.com/aleray/marked.git#aa",
     "jquery.contextual": "https://github.com/aleray/aa.jquery.contextual.git",
-    "jasmine": "1.3.x"
+    "jasmine": "1.3.x",
+    "js-yaml": "",
+    "js-yaml-front-matter": "https://github.com/dworthen/js-yaml-front-matter.git"
   }
 }
