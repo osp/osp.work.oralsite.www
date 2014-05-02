@@ -1064,7 +1064,7 @@ window.AA = window.AA || {};
             var top = offsetBtn.top - offsetCanvas.top;
             var left = offsetBtn.left - offsetCanvas.left;
             this.collection.create({top: top, left: left});
-            this.hideMenu ();
+            this.cursorMenu.hide();
         },
         
         organizeAnnotations: function (event) {
@@ -1075,7 +1075,7 @@ window.AA = window.AA || {};
                 }, {animate: true}).save();
             });
             
-            this.hideMenu ();
+            this.cursorMenu.hide();
         },
         
         initialize: function() {
