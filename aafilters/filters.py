@@ -111,7 +111,7 @@ def populate_mime_type(bundle):
     """
     # TODO: use AACore Http sniffer instead to discover the mimetype
     print(u'try task populate mime type by sniffing %s' % bundle.url)
-    request = requests.get(bundle.url, stream=True)
+    request = requests.get(bundle.url, stream=True, verify=False)
     mime = magic.from_buffer(request.iter_content(1024).next(), mime=True)
     bundle.mime = mime
     print("write " + bundle.url2path())
