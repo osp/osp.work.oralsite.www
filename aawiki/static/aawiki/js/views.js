@@ -850,6 +850,8 @@ window.AA = window.AA || {};
                 });
 
                 this.$el.find('.menu-top').append([
+                    // Drag icon
+                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon1'}),
                     // Edit Annotation Button
                     new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
                         .on('click', this.toggle.bind(this)),
@@ -925,7 +927,8 @@ window.AA = window.AA || {};
                     }
                 })
                 .draggable({
-                    cancel: ".cancelDraggable, textarea",
+                    handle: '[title="drag annotation"]',
+                    //cancel: ".cancelDraggable, textarea",
                     containment: "parent",
                     distance: 10,
                     scroll: true,
@@ -971,6 +974,8 @@ window.AA = window.AA || {};
                 .renderResources();
 
                 this.$el.find('.menu-top').append([
+                    // Drag icon
+                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon1'}),
                     // Edit Annotation Button
                     new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
                         .on('click', this.toggle.bind(this)),
