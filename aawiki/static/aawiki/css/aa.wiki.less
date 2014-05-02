@@ -88,6 +88,12 @@
              filter: ~"alpha(opacity=@{opperc})";
 }
 
+.box-shadow(@arguments) {
+    -webkit-box-shadow: @arguments;
+       -moz-box-shadow: @arguments;
+            box-shadow: @arguments;
+}
+
 /* 
 See <http://jsfiddle.net/decx/sffs5/1/> for a generative version of it 
 <http://lea.verou.me/css3patterns/#blueprint-grid>
@@ -322,12 +328,47 @@ section.section1 {
     height: 400px;
     outline: 1px solid #ccc;
 
+    &.drop-hover {
+        .box-shadow(0px 0px 3px 3px yellow);
+    }
+
+    .menu-top,
+    .menu-left {
+        z-index: 999999999;
+        display: none;
+        position: absolute;
+
+        .icon {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    }
+
+    .menu-left {
+        top: 0;
+        left: -45px;
+    }
+
+    .menu-top {
+        top: -45px;
+        left: 0;
+
+        .icon {
+            display: inline-block;
+        }
+    }
+
+    &.focused .menu-top,
+    &.focused .menu-left {
+        display: block;
+    }
+
 
     &.hidden {
         .opacity(0.5);
 
         &:hover {
-            .opacity(1);
+            /*.opacity(1);*/
         }
 
         .anonymous & {
@@ -338,7 +379,8 @@ section.section1 {
     &.collapsed {
         outline: 1px dashed #ccc;
         height: 30px !important;
-        overflow: hidden;
+
+        /*overflow: hidden;*/
     }
 
 

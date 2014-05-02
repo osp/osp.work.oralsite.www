@@ -3,6 +3,11 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
+    //AA.NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
+        //'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
+        //'highlight', 'drop-hover', 'active', 'focused'].join(' ');
+    AA.NON_PERSISTANT_CLASSES = ['section1', 'ui-resizable', 'ui-draggable', 'ui-droppable', 'focused'].join(' ');
+
 
     Backbone.View.prototype.empty = function() {
         this.el.innerHTML = "";
@@ -411,10 +416,11 @@ window.AA = window.AA || {};
             player: _.template($('#annotation-player-template').html())
         },
         events: {
+            "click"                     : "focus",
             "click .controls .play"     : "playPause",
             "click .next"               : "next",
             "click .previous"           : "previous",            
-            "dblclick"                  : "toggleEditMenu",
+            //"dblclick"                  : "toggleEditMenu",
             "click .mini-player"         : "playPauseMiniPlayer"
         },
         initialize: function() {
@@ -437,37 +443,49 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
 
             // setup the contextual menu with editing options
-            this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
-            this.editMenu.register ([
-                // Edit Annotation Button
-                new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
-                    .on('click', this.toggle.bind(this)),
-               // Delete Annotation Button
-                new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
-                    .on('click', this.deleteAnnotation.bind(this)),
-                // Export to Audacity Button
-                new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
-                    .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                // Import from Audacity Button
-                new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
-                    .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-                // Set About Value Button
-                new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                    .on('click', this.setAbout.bind(this)),
-                // Set as slideshow (changes about value)
-                new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                    .on('click', this.setAsSlideshow.bind(this)),
-                new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                    .on('click', this.setZIndex.bind(this)),
-                new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                    .on('click', this.toggleVisibility.bind(this)),
-                new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
-                    .on('click', this.toggleCollapsing.bind(this)),
-                new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
-                    .on('mousedown', this.testSlider.bind(this)),
-            ]);
+            //this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
+            //this.editMenu.register ([
+                //// Edit Annotation Button
+                //new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                    //.on('click', this.toggle.bind(this)),
+               //// Delete Annotation Button
+                //new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                    //.on('click', this.deleteAnnotation.bind(this)),
+                //// Export to Audacity Button
+                //new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                    //.on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                //// Import from Audacity Button
+                //new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                    //.on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+                //// Set About Value Button
+                //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                    //.on('click', this.setAbout.bind(this)),
+                //// Set as slideshow (changes about value)
+                //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                    //.on('click', this.setAsSlideshow.bind(this)),
+                //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                    //.on('click', this.setZIndex.bind(this)),
+                //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                    //.on('click', this.toggleVisibility.bind(this)),
+                //new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                    //.on('click', this.toggleCollapsing.bind(this)),
+                //new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                    //.on('mousedown', this.testSlider.bind(this)),
+            //]);
 
             this.render();
+        },
+        focus: function(e) {
+            if (AA.router.annotationCollectionView.cursorMenu.visible()) {
+                AA.router.annotationCollectionView.cursorMenu.hide ();
+            };
+        
+            $('.section1').removeClass('focused');
+
+            this.$el.addClass('focused');
+            
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
         },
         toggleEditMenu: function(e) {
             this.editMenu.toggle(e);
@@ -491,11 +509,11 @@ window.AA = window.AA || {};
                 }, {
                     duration: 2000,
                     easing: 'easeOutExpo',
-                    progress: function () { that.editMenu.redraw(); }
+                    //progress: function () { that.editMenu.redraw(); }
                 });
             };
             
-            this.editMenu.redraw ();
+            //this.editMenu.redraw ();
         },
         toggle: function() {
             if (this.editing) {
@@ -511,7 +529,7 @@ window.AA = window.AA || {};
         },
         deleteAnnotation: function(event) {
             if (window.confirm('This will permanently delete this annotation. Proceed?')) {
-                this.editMenu.destroy();
+                //this.editMenu.destroy();
                 this.model.destroy();
             };
             return false;
@@ -537,10 +555,32 @@ window.AA = window.AA || {};
         testSlider: function() {
             var that = this;
 
+            var currentZIndex = $(that.$el).zIndex();
+            console.log('z-index: ' + currentZIndex);
+
+            var elts = $('.section1').sortByZIndex();
+            var index = $(elts).index(this.$el);
+            console.log('position in list: ' + index);
+
+            var previousDistance;
+
             AA.widgets.slider(event, function(x, y) {
-                console.log(that);
-                $(that.$el).css('z-index', x);
+                var distance = Math.round(x / 30);
+
+                if (distance != previousDistance) {
+                    previousDistance = distance;
+
+                    console.log(distance);
+                    var newIndex = distance - index;
+                    newIndex = newIndex < 0 ? 0 : newIndex;
+                    newIndex = newIndex > elts.length ? elts.length : newIndex;
+                    console.log('newIndex: ' + newIndex);
+                }
+
+                //$(that.$el).css('z-index', x);
             }, function(x, y) {
+                console.log('final');
+                console.log(Math.round(x / 30));
             });
 
             return false;
@@ -549,6 +589,7 @@ window.AA = window.AA || {};
             var class_attr = $('<div>')
                 .attr('class', this.$el.attr('class'))
                 .toggleClass('collapsed')
+                //.removeClass(AA.NON_PERSISTANT_CLASSES)
                 .attr('class');
 
             this.model.set("klass", class_attr);
@@ -561,6 +602,7 @@ window.AA = window.AA || {};
             var class_attr = $('<div>')
                 .attr('class', this.$el.attr('class'))
                 .toggleClass('hidden')
+                //.removeClass(AA.NON_PERSISTANT_CLASSES)
                 .attr('class');
 
             this.model.set("klass", class_attr);
@@ -750,7 +792,6 @@ window.AA = window.AA || {};
             var that = this;
 
             if (this.editing) {
-
                 var foo = this.model.toJSON();
                 var body = foo['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
                 delete foo.body;
@@ -764,6 +805,8 @@ window.AA = window.AA || {};
                 output += "---\n\n";
                 output += body;
 
+                //this.$el.attr('style', this.model.get('style'));
+                //this.$el.attr('class', this.model.get('klass'));
 
                 this.$el
                 .html(this.templates.edit({body: output}))
@@ -805,6 +848,36 @@ window.AA = window.AA || {};
                     driver.currentTime(nextTime);
                     //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
                 });
+
+                this.$el.find('.menu-top').append([
+                    // Edit Annotation Button
+                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                        .on('click', this.toggle.bind(this)),
+                    // Delete Annotation Button
+                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                        .on('click', this.deleteAnnotation.bind(this)),
+                    // Export to Audacity Button
+                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                        .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                    // Import from Audacity Button
+                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                        .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+                    // Set About Value Button
+                    new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                        .on('click', this.setAbout.bind(this)),
+                ]);
+                this.$el.find('.menu-left').append([
+                    new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                        .on('click', this.setAsSlideshow.bind(this)),
+                    new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                        .on('click', this.setZIndex.bind(this)),
+                    new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                        .on('click', this.toggleVisibility.bind(this)),
+                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                        .on('click', this.toggleCollapsing.bind(this)),
+                    new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                        .on('mousedown', this.testSlider.bind(this)),
+                ]);
             } else {
                 var model = this.model;
                 // FIXME: typogrify throw an error on empty strings
@@ -861,7 +934,7 @@ window.AA = window.AA || {};
                         //$(this).css('cursor','move');
                     //},
                     drag: function (event, ui) {
-                        that.editMenu.redraw ();
+                        //that.editMenu.redraw ();
                         
                         if (event.ctrlKey) {
                             $("#canvas").addClass("grid");
@@ -875,7 +948,7 @@ window.AA = window.AA || {};
                         //$(this).css('cursor','auto');
                         $("#canvas").removeClass("grid");
 
-                        that.editMenu.redraw ();
+                        //that.editMenu.redraw ();
                         
                         model.set({
                             top: parseInt($(this).css('top')),
@@ -885,11 +958,47 @@ window.AA = window.AA || {};
                 })
                 .droppable({ 
                     accept: "#permalink",
+                    hoverClass: "drop-hover",
                     drop: function( event, ui ) {
-                        console.log(ui.draggable.attr('href'));
+                        var about = ui.draggable.attr('href');
+                        var answer = window.confirm("You are about to connect the annotation to " + about + ". Proceed?");
+
+                        if (answer) {
+                            that.model.set({'about': about}).save();
+                        };
                     }
                 })
                 .renderResources();
+
+                this.$el.find('.menu-top').append([
+                    // Edit Annotation Button
+                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                        .on('click', this.toggle.bind(this)),
+                    // Delete Annotation Button
+                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                        .on('click', this.deleteAnnotation.bind(this)),
+                    // Export to Audacity Button
+                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                        .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                    // Import from Audacity Button
+                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                        .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+                    // Set About Value Button
+                    new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                        .on('click', this.setAbout.bind(this)),
+                ]);
+                this.$el.find('.menu-left').append([
+                    new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                        .on('click', this.setAsSlideshow.bind(this)),
+                    new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                        .on('click', this.setZIndex.bind(this)),
+                    new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                        .on('click', this.toggleVisibility.bind(this)),
+                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                        .on('click', this.toggleCollapsing.bind(this)),
+                    new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                        .on('mousedown', this.testSlider.bind(this)),
+                ]);
 
                 if (this.isMedia()) {
                     this.$el.addClass("media");
@@ -928,20 +1037,22 @@ window.AA = window.AA || {};
 
     AA.AnnotationCollectionView = Backbone.View.extend({
         events: {
-            "dblclick"            : "showMenu",
-            "click"               : "hideMenu",
+            "click"            : "showMenu",
         },
         
         showMenu: function (e) {
+
             if (this.cursorMenu.visible()) {
                 this.cursorMenu.hide ();
+            } else {
+                var focused = $('.section1.focused').length;
+
+                if (focused) {
+                    $('.section1').removeClass('focused');
+                } else {
+                    this.cursorMenu.show (e);
+                };
             }
-            
-            this.cursorMenu.show (e);
-        },
-        
-        hideMenu: function (e) {
-            this.cursorMenu.hide ();
         },
         
         collection: new AA.AnnotationCollection(), 
