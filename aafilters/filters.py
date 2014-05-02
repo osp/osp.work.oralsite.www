@@ -54,8 +54,11 @@ class Bundle(object):
     def __init__(self, url=None, to_go=[], target_ext=None):
         self.url = url  # TODO: normalize the URL?
         self.url = re.sub(r'http:/([\w]+)', r'http://\1', self.url) # http:/about --> http://about
+        self.url = re.sub(r'https:/([\w]+)', r'https://\1', self.url) # https:/about --> https://about
+        
         self.to_go = to_go  # the remaining tasks
         self.target_ext = target_ext # the extension for the final file (as requested from the view)
+        
         self.mime = "application/octet-stream"  # A default mimetype
         self.consumed = []  # the tasks already performed
 
