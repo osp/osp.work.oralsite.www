@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
