@@ -128,7 +128,7 @@ def cache(bundle):
     full_path = bundle.url2path()
 
     if not os.path.exists(full_path):
-        r = requests.get(bundle.url, stream=True)
+        r = requests.get(bundle.url, stream=True, verify=False) # We don’t check the host’s certificate
         if r.status_code == 200:
             
             with open(full_path, 'wb') as f:
