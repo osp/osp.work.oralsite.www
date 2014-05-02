@@ -69,6 +69,7 @@ class Bundle(object):
         ret = self.to_go.pop()
         if ret:
             self.consumed.append(ret)
+            return ret
 
     def url2path(self):
         """
@@ -169,10 +170,37 @@ def thumb(bundle):
     image_file.save(bundle.url2path())
     return bundle
 
+def resize(bundle):
+    """
+    Resize to width (syntax: resize:640)
+    """
+    accepted_mimetypes = ["image/jpeg", "image/png"]
+
+    if bundle.mime not in accepted_mimetypes:
+        raise TypeError
+
+    image = Image.open(bundle.url2path())
+    
+    filter = bundle.consume() # the name of the current filter is popped, something like resize:640
+    # This is how we get the argument for now:
+    try:
+        width = int(filter.split(':')[1])
+    except IndexError:
+        raise TypeError("No argument found for resize width")
+    
+    ratio = width / float(image.size[0])
+    height = int( image.size[1] * ratio )
+
+    image = image.resize((width, height), Image.NEAREST)
+    
+    image.save(bundle.url2path())
+    return bundle
+
+
 
 register(bw)
 register(thumb)
-
+register(resize)
 
 def serialize(bundle):
     """
@@ -193,7 +221,8 @@ def process_pipeline(url=None, pipeline=[], target_ext=None, synchronous=False):
     filters = []
     filters.extend([populate_mime_type])
     filters.extend([cache])
-    filters.extend([registry[p] for p in pipeline])
+    filters.extend([registry[p.split(':')[0]] for p in pipeline])    # This removes the arguments as in resize:640 -> resize
+                                                                     # Could  be cleaner, but in that case should adapt the code in the resize filter to correspond
     filters.extend([serialize])
     
     bundle = Bundle(url=url, to_go=pipeline, target_ext=target_ext)
