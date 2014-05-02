@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
@@ -6,6 +8,7 @@ from __future__ import absolute_import
 
 
 import os
+import re
 import requests
 import uuid
 import mimetypes
@@ -50,8 +53,12 @@ class Bundle(object):
     """
     def __init__(self, url=None, to_go=[], target_ext=None):
         self.url = url  # TODO: normalize the URL?
+        self.url = re.sub(r'http:/([\w]+)', r'http://\1', self.url) # http:/about --> http://about
+        self.url = re.sub(r'https:/([\w]+)', r'https://\1', self.url) # https:/about --> https://about
+        
         self.to_go = to_go  # the remaining tasks
         self.target_ext = target_ext # the extension for the final file (as requested from the view)
+        
         self.mime = "application/octet-stream"  # A default mimetype
         self.consumed = []  # the tasks already performed
 
@@ -62,6 +69,7 @@ class Bundle(object):
         ret = self.to_go.pop()
         if ret:
             self.consumed.append(ret)
+            return ret
 
     def url2path(self):
         """
@@ -104,7 +112,7 @@ def populate_mime_type(bundle):
     """
     # TODO: use AACore Http sniffer instead to discover the mimetype
     print(u'try task populate mime type by sniffing %s' % bundle.url)
-    request = requests.get(bundle.url, stream=True)
+    request = requests.get(bundle.url, stream=True, verify=False)
     mime = magic.from_buffer(request.iter_content(1024).next(), mime=True)
     bundle.mime = mime
     print("write " + bundle.url2path())
@@ -121,7 +129,7 @@ def cache(bundle):
     full_path = bundle.url2path()
 
     if not os.path.exists(full_path):
-        r = requests.get(bundle.url, stream=True)
+        r = requests.get(bundle.url, stream=True, verify=False) # We don’t check the host’s certificate
         if r.status_code == 200:
             
             with open(full_path, 'wb') as f:
@@ -162,10 +170,37 @@ def thumb(bundle):
     image_file.save(bundle.url2path())
     return bundle
 
+def resize(bundle):
+    """
+    Resize to width (syntax: resize:640)
+    """
+    accepted_mimetypes = ["image/jpeg", "image/png"]
+
+    if bundle.mime not in accepted_mimetypes:
+        raise TypeError
+
+    image = Image.open(bundle.url2path())
+    
+    filter = bundle.consume() # the name of the current filter is popped, something like resize:640
+    # This is how we get the argument for now:
+    try:
+        width = int(filter.split(':')[1])
+    except IndexError:
+        raise TypeError("No argument found for resize width")
+    
+    ratio = width / float(image.size[0])
+    height = int( image.size[1] * ratio )
+
+    image = image.resize((width, height), Image.NEAREST)
+    
+    image.save(bundle.url2path())
+    return bundle
+
+
 
 register(bw)
 register(thumb)
-
+register(resize)
 
 def serialize(bundle):
     """
@@ -186,7 +221,8 @@ def process_pipeline(url=None, pipeline=[], target_ext=None, synchronous=False):
     filters = []
     filters.extend([populate_mime_type])
     filters.extend([cache])
-    filters.extend([registry[p] for p in pipeline])
+    filters.extend([registry[p.split(':')[0]] for p in pipeline])    # This removes the arguments as in resize:640 -> resize
+                                                                     # Could  be cleaner, but in that case should adapt the code in the resize filter to correspond
     filters.extend([serialize])
     
     bundle = Bundle(url=url, to_go=pipeline, target_ext=target_ext)

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
@@ -44,7 +46,7 @@ def process(request, pipeline_string):
     At this point, the file should have been generated,
     and the bundle will tell us its path.
 
-    We then serve it with Python-which is not the most efficient
+    We then serve it with Python—which is not the most efficient
     of strategies, but as long as we do it only once it should
     be fine.
     """
