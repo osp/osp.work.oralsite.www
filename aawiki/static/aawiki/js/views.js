@@ -229,6 +229,7 @@ window.AA = window.AA || {};
             this.drivers = {};
         },
         registerDriver : function(uri) {
+            var that = this;
             if (typeof(this.drivers[uri]) === 'undefined') {
                 
                 if (uri === document.location.origin + document.location.pathname) {
@@ -277,9 +278,11 @@ window.AA = window.AA || {};
                     // I’m not sure this is the right way to go about this:
                     var miniPlayerPlayUI = function() {
                         $('.mini-player[rel="' + uri + '"]').removeClass("paused").addClass("playing");
+                        that.playChildren(uri);
                     };
                     var miniPlayerPauseUI = function() {
                         $('.mini-player[rel="' + uri + '"]').removeClass("playing").addClass("paused");
+                        that.pauseChildren(uri);
                     };
                     this.drivers[uri].on("play", miniPlayerPlayUI).on("playing", miniPlayerPlayUI);
                     this.drivers[uri].on("pause", miniPlayerPauseUI).on("ended", miniPlayerPauseUI).on("abort", miniPlayerPauseUI);
@@ -288,6 +291,48 @@ window.AA = window.AA || {};
             } else {
                 // already registered, just return it
                 return this.drivers[uri];
+            }
+        },
+        findChildren: function(uri) {
+            return $('section[about="' + uri+ '"]');
+        },
+        findChildrenMedia: function(uri) {
+            var that = this;
+            var $childrenSections = this.findChildren(uri);
+            
+            var uris = [];
+
+            var $activeAnnotations = $childrenSections.find('section[typeof="aa:annotation"].active');
+            
+            $activeAnnotations.each(function(i, el) {
+                $(el).find(".embed.hosted").each(function(i, el) {
+                    uris.push( $(el).attr("data-uri") );
+                });
+                $(el).find("video[src],audio[src]").each(function(i, el) {
+                    uris.push( $(el).attr("src") );
+                });
+            });
+            
+            return uris;
+        },
+        pauseChildren: function(uri) {
+            var activeChildDriverUris = this.findChildrenMedia(uri);
+            
+            for (var i=0; i<activeChildDriverUris.length; i++) {
+                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                if (typeof driver !== "undefined" && !driver.paused()) {
+                    driver.pause();
+                }
+            }
+        },
+        playChildren: function(uri) {
+            var activeChildDriverUris = this.findChildrenMedia(uri);
+            
+            for (var i=0; i<activeChildDriverUris.length; i++) {
+                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                if (typeof driver !== "undefined" && driver.paused()) {
+                    driver.play();
+                }
             }
         }
     });
