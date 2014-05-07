@@ -1,6 +1,4 @@
-<% if (hasPlay) { %>
 <div class="controls">
-    <a class="play fa <% if (paused) { %>fa-play<% } else { %>fa-pause<% } %>"></a> <a class="previous fa fa-step-backward <% if (!previous) { %> disabled<% } %>"></a> <a class="next fa fa-step-forward <% if (!next) { %> disabled<% } %>"></a>
-    <span class="timer"><span class="current_time"><%= currentTime %></span> <span class="separator">/</span> <span class="duration"><%= duration %></span></span>
+    <a class="play fa fa-play"></a> <a class="previous fa fa-step-backward disabled"></a> <a class="next fa fa-step-forward disabled"></a>
+    <span class="timer"><span class="current_time">00:00:00,000</span> <span class="separator">/</span> <span class="duration">00:00:00,000</span></span>
 </div>
-<% } %>

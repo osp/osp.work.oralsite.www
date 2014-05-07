@@ -374,16 +374,32 @@ window.AA = window.AA || {};
             };
         },
         render: function() {
-            this.$el.html(
-                this.templates.view({
-                    hasPlay:     this.hasPlay(),
-                    paused:      this.driver.paused(),
-                    duration:    AA.utils.secondsToTimecode(this.duration()),
-                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
-                    next:        this.nextEvent(),
-                    previous:    this.previousEvent(),
-                })
-            );
+            // Once this view has first rendered, subsequent updates target specific dom elements.
+            //
+            // This is because the constant rerendering through timeupdate events made the
+            // controls unclickable.
+            var that = this;
+            if (this.hasPlay()) {
+                // do we already have the controls?
+                if (this.$el.find('.controls').length === 0) {
+                    this.$el.html(this.templates.view({}));
+                }
+
+                // if the driver is paused and there is still a pause button showing,
+                // we should make sure it becomes a play button (and vice versa):
+                var playButtonShowsPause = function() {
+                    return that.$el.find('.controls .fa-pause').length !== 0;
+                }
+                if (this.driver.paused() === playButtonShowsPause()) {
+                    this.$el.find('.play').toggleClass("fa-play fa-pause");
+                }
+                
+                // update time based values:
+                this.$el.find('.current_time').text(AA.utils.secondsToTimecode(this.driver.currentTime()));
+                this.$el.find('.duration').text(AA.utils.secondsToTimecode(this.duration()));
+                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
+                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            }
         },
     }).extend(AA.AbstractPlayer);
 
