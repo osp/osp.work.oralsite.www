@@ -818,9 +818,6 @@ window.AA = window.AA || {};
                 miniPlayerDriver.pause();
             }
         },
-        stopCurrentEvent: function() {
-            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
-        },
         nextEvent: function() {
             var currentTime = this.driver.currentTime();
             var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
@@ -830,7 +827,6 @@ window.AA = window.AA || {};
         next: function(e) {
             var nextEvent = this.nextEvent();
             if (nextEvent) {
-                this.stopCurrentEvent();
                 this.driver.currentTime(nextEvent.start);
                 this.renderPlayer();
             }
@@ -844,7 +840,6 @@ window.AA = window.AA || {};
         previous: function(e) {
             var previousEvent = this.previousEvent();
             if (previousEvent) {
-                this.stopCurrentEvent();
                 this.driver.currentTime(previousEvent.start);
                 this.renderPlayer();
             }
