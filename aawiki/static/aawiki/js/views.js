@@ -229,6 +229,7 @@ window.AA = window.AA || {};
             this.drivers = {};
         },
         registerDriver : function(uri) {
+            var that = this;
             if (typeof(this.drivers[uri]) === 'undefined') {
                 
                 if (uri === document.location.origin + document.location.pathname) {
@@ -277,9 +278,11 @@ window.AA = window.AA || {};
                     // I’m not sure this is the right way to go about this:
                     var miniPlayerPlayUI = function() {
                         $('.mini-player[rel="' + uri + '"]').removeClass("paused").addClass("playing");
+                        that.playChildren(uri);
                     };
                     var miniPlayerPauseUI = function() {
                         $('.mini-player[rel="' + uri + '"]').removeClass("playing").addClass("paused");
+                        that.pauseChildren(uri);
                     };
                     this.drivers[uri].on("play", miniPlayerPlayUI).on("playing", miniPlayerPlayUI);
                     this.drivers[uri].on("pause", miniPlayerPauseUI).on("ended", miniPlayerPauseUI).on("abort", miniPlayerPauseUI);
@@ -288,6 +291,48 @@ window.AA = window.AA || {};
             } else {
                 // already registered, just return it
                 return this.drivers[uri];
+            }
+        },
+        findChildren: function(uri) {
+            return $('section[about="' + uri+ '"]');
+        },
+        findChildrenMedia: function(uri) {
+            var that = this;
+            var $childrenSections = this.findChildren(uri);
+            
+            var uris = [];
+
+            var $activeAnnotations = $childrenSections.find('section[typeof="aa:annotation"].active');
+            
+            $activeAnnotations.each(function(i, el) {
+                $(el).find(".embed.hosted").each(function(i, el) {
+                    uris.push( $(el).attr("data-uri") );
+                });
+                $(el).find("video[src],audio[src]").each(function(i, el) {
+                    uris.push( $(el).attr("src") );
+                });
+            });
+            
+            return uris;
+        },
+        pauseChildren: function(uri) {
+            var activeChildDriverUris = this.findChildrenMedia(uri);
+            
+            for (var i=0; i<activeChildDriverUris.length; i++) {
+                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                if (typeof driver !== "undefined" && !driver.paused()) {
+                    driver.pause();
+                }
+            }
+        },
+        playChildren: function(uri) {
+            var activeChildDriverUris = this.findChildrenMedia(uri);
+            
+            for (var i=0; i<activeChildDriverUris.length; i++) {
+                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                if (typeof driver !== "undefined" && driver.paused()) {
+                    driver.play();
+                }
             }
         }
     });
@@ -374,16 +419,32 @@ window.AA = window.AA || {};
             };
         },
         render: function() {
-            this.$el.html(
-                this.templates.view({
-                    hasPlay:     this.hasPlay(),
-                    paused:      this.driver.paused(),
-                    duration:    AA.utils.secondsToTimecode(this.duration()),
-                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
-                    next:        this.nextEvent(),
-                    previous:    this.previousEvent(),
-                })
-            );
+            // Once this view has first rendered, subsequent updates target specific dom elements.
+            //
+            // This is because the constant rerendering through timeupdate events made the
+            // controls unclickable.
+            var that = this;
+            if (this.hasPlay()) {
+                // do we already have the controls?
+                if (this.$el.find('.controls').length === 0) {
+                    this.$el.html(this.templates.view({}));
+                }
+
+                // if the driver is paused and there is still a pause button showing,
+                // we should make sure it becomes a play button (and vice versa):
+                var playButtonShowsPause = function() {
+                    return that.$el.find('.controls .fa-pause').length !== 0;
+                }
+                if (this.driver.paused() === playButtonShowsPause()) {
+                    this.$el.find('.play').toggleClass("fa-play fa-pause");
+                }
+                
+                // update time based values:
+                this.$el.find('.current_time').text(AA.utils.secondsToTimecode(this.driver.currentTime()));
+                this.$el.find('.duration').text(AA.utils.secondsToTimecode(this.duration()));
+                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
+                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            }
         },
     }).extend(AA.AbstractPlayer);
 
