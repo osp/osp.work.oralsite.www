@@ -482,6 +482,32 @@ window.AA = window.AA || {};
         
             $('.section1').removeClass('focused');
 
+            var position = this.$el.position();
+
+            if (position.left < 45) {
+                this.$el.find('.menu-left').css({
+                    left: 'auto',
+                    right: -50
+                });
+            } else {
+                this.$el.find('.menu-left').css({
+                    right: 'auto',
+                    left: -45
+                });
+            };
+
+            if (position.top < 45) {
+                this.$el.find('.menu-top').css({
+                    top: 'auto',
+                    bottom: -50
+                });
+            } else {
+                this.$el.find('.menu-top').css({
+                    bottom: 'auto',
+                    top: -45
+                });
+            };
+
             this.$el.addClass('focused');
             
             e.cancelBubble = true;
@@ -518,10 +544,9 @@ window.AA = window.AA || {};
         toggle: function() {
             if (this.editing) {
                 jsFront(jsyaml);
-                var foo = jsyaml.loadFront($('textarea', this.$el).val(), 'body');
-                console.log(foo);
+                var data = jsyaml.loadFront($('textarea', this.$el).val(), 'body');
 
-                this.model.set(foo).save();
+                this.model.set(data).save();
             };
 
             this.editing = !this.editing;
@@ -552,36 +577,69 @@ window.AA = window.AA || {};
             this.renderPlayer();
             return false;
         },
+        //testSlider: function() {
+            //var that = this;
+
+            //var currentZIndex = $(that.$el).zIndex();
+            //console.log('z-index: ' + currentZIndex);
+
+            //var elts = $('.section1').sortByZIndex();
+            //var index = $(elts).index(this.$el);
+            //console.log('position in list: ' + index);
+
+            //var previousDistance;
+
+            //AA.widgets.slider(event, function(x, y) {
+                //var distance = Math.round(x / 30);
+
+                //if (distance != previousDistance) {
+                    //previousDistance = distance;
+
+                    //console.log(distance);
+                    //var newIndex = distance - index;
+                    //newIndex = newIndex < 0 ? 0 : newIndex;
+                    //newIndex = newIndex > elts.length ? elts.length : newIndex;
+                    //console.log('newIndex: ' + newIndex);
+                //}
+
+                ////$(that.$el).css('z-index', x);
+            //}, function(x, y) {
+                //console.log('final');
+                //console.log(Math.round(x / 30));
+            //});
+
+            //return false;
+        //},
         testSlider: function() {
-            var that = this;
-
-            var currentZIndex = $(that.$el).zIndex();
-            console.log('z-index: ' + currentZIndex);
-
-            var elts = $('.section1').sortByZIndex();
-            var index = $(elts).index(this.$el);
-            console.log('position in list: ' + index);
-
-            var previousDistance;
-
-            AA.widgets.slider(event, function(x, y) {
-                var distance = Math.round(x / 30);
-
-                if (distance != previousDistance) {
-                    previousDistance = distance;
-
-                    console.log(distance);
-                    var newIndex = distance - index;
-                    newIndex = newIndex < 0 ? 0 : newIndex;
-                    newIndex = newIndex > elts.length ? elts.length : newIndex;
-                    console.log('newIndex: ' + newIndex);
-                }
-
-                //$(that.$el).css('z-index', x);
-            }, function(x, y) {
-                console.log('final');
-                console.log(Math.round(x / 30));
+            console.log(this.model.collection);
+            var min = this.model.collection.min(function(model) {
+                return model.zIndex();
             });
+            var max = this.model.collection.max(function(model) {
+                return model.zIndex();
+            });
+            console.log(min.zIndex());
+            console.log(max.zIndex());
+            //var index_highest = 0;
+            //var index_lowest = 0;
+
+            //$('.section1').each(function() {
+                //// always use a radix when using parseInt
+                //var index_current = parseInt($(this).css("zIndex"), 10);
+
+                //if (index_current > index_highest) {
+                    //index_highest = index_current;
+                //} else if (index_current < index_lowest)
+            //});
+
+            //var that = this;
+
+            //var elts = $('.section1').sortByZIndex();
+            //console.log(elts);
+
+            //AA.widgets.slider(event, function(x, y) {
+            //}, function(x, y) {
+            //});
 
             return false;
         },
@@ -790,18 +848,19 @@ window.AA = window.AA || {};
         },
         render: function() {
             var that = this;
+            this.$el.attr('title', this.model.get('title'));
 
             if (this.editing) {
-                var foo = this.model.toJSON();
-                var body = foo['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
-                delete foo.body;
-                delete foo.page;
-                delete foo.resource_uri;
-                delete foo.id;
-                delete foo.pk;
+                var data = this.model.toJSON();
+                var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
+                delete data.body;
+                delete data.page;
+                delete data.resource_uri;
+                delete data.id;
+                delete data.pk;
 
                 var output = "---\n";
-                output += jsyaml.dump(foo, 4);
+                output += jsyaml.dump(data, 4);
                 output += "---\n\n";
                 output += body;
 
@@ -865,17 +924,23 @@ window.AA = window.AA || {};
                     new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
                         .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
                     // Set About Value Button
-                    new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                        .on('click', this.setAbout.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                        //.on('click', this.setAbout.bind(this)),
+                    // Set About Value Button
+                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon-target'})
+                        //.on('click', this.setAbout.bind(this)),
+                    new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
+                        .draggable({ helper: "clone" })
+                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4))
                 ]);
                 this.$el.find('.menu-left').append([
-                    new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                        .on('click', this.setAsSlideshow.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                        //.on('click', this.setAsSlideshow.bind(this)),
                     new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
                         .on('click', this.setZIndex.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
                         .on('click', this.toggleVisibility.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
                     new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
                         .on('mousedown', this.testSlider.bind(this)),
@@ -886,6 +951,7 @@ window.AA = window.AA || {};
                 //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
 
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
+                var title = this.model.get("title");
 
                 this.$el.attr('style', this.model.get('style'));
                 this.$el.attr('class', this.model.get('klass'));
@@ -893,6 +959,7 @@ window.AA = window.AA || {};
                 this.$el
                 .html(this.templates.view({
                     body:        body,
+                    title:       title,
                     about:       this.model.get('about'),
                     isSlideshow: this.isSlideshow(),
                     // isMedia:     this.isMedia() added this down below because the resources need to be rendered first
@@ -948,6 +1015,29 @@ window.AA = window.AA || {};
                         }
                     },
                     stop: function(event, ui) { 
+                        if (ui.position.left < 45) {
+                            that.$el.find('.menu-left').css({
+                                left: 'auto',
+                                right: -50
+                            });
+                        } else {
+                            that.$el.find('.menu-left').css({
+                                right: 'auto',
+                                left: -45
+                            });
+                        };
+
+                        if (ui.position.top < 45) {
+                            that.$el.find('.menu-top').css({
+                                top: 'auto',
+                                bottom: -50
+                            });
+                        } else {
+                            that.$el.find('.menu-top').css({
+                                bottom: 'auto',
+                                top: -45
+                            });
+                        };
                         //$(this).css('cursor','auto');
                         $("#canvas").removeClass("grid");
 
@@ -960,7 +1050,7 @@ window.AA = window.AA || {};
                     }
                 })
                 .droppable({ 
-                    accept: "#permalink",
+                    accept: ".icon-target",
                     hoverClass: "drop-hover",
                     drop: function( event, ui ) {
                         var about = ui.draggable.attr('href');
@@ -968,6 +1058,7 @@ window.AA = window.AA || {};
 
                         if (answer) {
                             that.model.set({'about': about}).save();
+                            that.render();
                         };
                     }
                 })
@@ -975,12 +1066,12 @@ window.AA = window.AA || {};
 
                 this.$el.find('.menu-top').append([
                     // Drag icon
-                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon1'}),
+                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
                     // Edit Annotation Button
-                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon-edit'})
                         .on('click', this.toggle.bind(this)),
                     // Delete Annotation Button
-                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
                         .on('click', this.deleteAnnotation.bind(this)),
                     // Export to Audacity Button
                     new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
@@ -989,19 +1080,23 @@ window.AA = window.AA || {};
                     new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
                         .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
                     // Set About Value Button
-                    new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                        .on('click', this.setAbout.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
+                        //.on('click', this.setAbout.bind(this)),
+                    //// Set About Value Button
+                    new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
+                        .draggable({ helper: "clone" })
+                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4))
                 ]);
                 this.$el.find('.menu-left').append([
-                    new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                        .on('click', this.setAsSlideshow.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                        //.on('click', this.setAsSlideshow.bind(this)),
                     new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
                         .on('click', this.setZIndex.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
                         .on('click', this.toggleVisibility.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
+                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
-                    new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                    new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
                         .on('mousedown', this.testSlider.bind(this)),
                 ]);
 
@@ -1088,20 +1183,41 @@ window.AA = window.AA || {};
             
             this.cursorMenu.register ([
                 // Create Annotation Button
-                new AA.widgets.MenuButton ({title: 'new annotation', class: 'icon5'})
+                new AA.widgets.MenuButton ({title: 'new annotation', class: 'icon-new'})
                     .on('click', this.addAnnotation.bind(this)),
 
                 // Create Toggle grid Button (doing nothing at the moment)
-                new AA.widgets.MenuButton ({title: 'toggle grid', class: 'icon2'})
+                new AA.widgets.MenuButton ({title: 'toggle grid', class: 'icon-layout'})
                     .on('click', function(event) { return false; }),
                     
                 // Create Change grid Button (doing nothing at the moment)
-                new AA.widgets.MenuButton ({title: 'change grid', class: 'icon3'})
+                new AA.widgets.MenuButton ({title: 'change grid', class: 'icon-ruler'})
                     .on('click', function(event) { return false; }),
 
                 // Create Organize annotations Button
-                new AA.widgets.MenuButton ({title: 'organize annotations', class: 'icon1'})
-                    .on('click', this.organizeAnnotations.bind(this))
+                new AA.widgets.MenuButton ({title: 'organize annotations', class: 'icon-pack'})
+                    .on('click', this.organizeAnnotations.bind(this)),
+
+                // Create Organize annotations Button
+                new AA.widgets.MenuButton ({title: 'take a snapshot', class: 'icon-star'})
+                    .on('click', AA.router.pageView.commit.bind(AA.router.pageView)),
+
+                // Create Organize annotations Button
+                new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})
+                    .on('click', this.organizeAnnotations.bind(this)),
+
+                // Create Organize annotations Button
+                new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})
+                    .on('click', this.organizeAnnotations.bind(this)),
+
+                // Create Organize annotations Button
+                new AA.widgets.MenuButton ({title: 'manage permissions', class: 'icon-ok'})
+                    .on('click', this.organizeAnnotations.bind(this)),
+                    // Set About Value Button
+
+                new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
+                    .draggable({ helper: "clone" })
+                    .attr('href', document.location.origin + document.location.pathname)
             ]);
             
             this.listenTo(this.collection, 'add', this.renderOne);

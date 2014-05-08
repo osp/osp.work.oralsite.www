@@ -94,6 +94,13 @@
             box-shadow: @arguments;
 }
 
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;  // for Opera 9 & 10
+    text-overflow: ellipsis;  // IE 6+, FF 7+, Op 11+, Saf 1.3+, Chr 1+
+}
+
 /* 
 See <http://jsfiddle.net/decx/sffs5/1/> for a generative version of it 
 <http://lea.verou.me/css3patterns/#blueprint-grid>
@@ -337,23 +344,25 @@ section.section1 {
         z-index: 999999999;
         display: none;
         position: absolute;
-
-        .icon {
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
     }
 
     .menu-left {
         top: 0;
         left: -45px;
+        height: 9999px;
+
+        .icon {
+            margin-bottom: 5px;
+        }
     }
 
     .menu-top {
         top: -45px;
         left: 0;
+        width: 9999px;
 
         .icon {
+            margin-right: 5px;
             display: inline-block;
         }
     }
@@ -377,22 +386,18 @@ section.section1 {
     }
 
     &.collapsed {
-        outline: 1px dashed #ccc;
-        height: 30px !important;
+        &:before {
+            padding: 5px;
+            display: block;
+            content: "\25B8  " attr(title);
+            .ellipsis();
+        }
 
-        /*overflow: hidden;*/
-    }
+        .wrapper {
+            display: none;
+        }
 
-
-    .annotation-handle {
-        background-color: paleGreen;
-        height: 20px;
-        position: absolute;
-        top: -20px;
-        left: 0;
-        right: 0;
-        display: none;
-        outline: 1px solid paleGreen;
+        height: auto !important;
     }
 
     &:hover {
@@ -458,7 +463,6 @@ section.section1 {
         height: 100%;
         .box-sizing(border-box);
         padding: 5px;
-        cursor: move;
     }
 
     section[typeof="aa:annotation"] {
@@ -487,17 +491,19 @@ section.section1 {
     .slideshow section[typeof="aa:annotation"]:first-child {
         visibility: visible;
     }
-    .cancelDraggable {
-        cursor: auto;
-    }
 }
 
 body {
    .user-select(none);
 }
 
-section {
-   .user-select(none);
+section.section1 .wrapper {
+   .user-select(text);
+}
+
+#page-meta hgroup,
+#tab-introduction {
+   .user-select(text);
 }
 
 .grid {
@@ -692,4 +698,97 @@ img {
 .notimecodes span[property="aa:begin"],
 .notimecodes span[property="aa:end"] {
     display: none;
+}
+
+
+.icon-layers {
+    background-image: url('/static/aawiki/png/icons/layers.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/layers-hover.png');
+    }
+}
+.icon-delete {
+    background-image: url('/static/aawiki/png/icons/delete.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/delete-hover.png');
+    }
+}
+.icon-drag {
+    background-image: url('/static/aawiki/png/icons/drag.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/drag-hover.png');
+    }
+}
+.icon-edit {
+    background-image: url('/static/aawiki/png/icons/edit.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/edit-hover.png');
+    }
+}
+.icon-star {
+    background-image: url('/static/aawiki/png/icons/star.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/star-hover.png');
+    }
+}
+.icon-new {
+    background-image: url('/static/aawiki/png/icons/new.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/new-hover.png');
+    }
+}
+.icon-layout {
+    background-image: url('/static/aawiki/png/icons/layout.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/layout-hover.png');
+    }
+}
+.icon-ruler {
+    background-image: url('/static/aawiki/png/icons/ruler.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/ruler-hover.png');
+    }
+}
+.icon-pack {
+    background-image: url('/static/aawiki/png/icons/pack.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/pack-hover.png');
+    }
+}
+.icon-ok {
+    background-image: url('/static/aawiki/png/icons/ok.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/ok-hover.png');
+    }
+}
+.icon-galaxy {
+    background-image: url('/static/aawiki/png/icons/galaxy.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/galaxy-hover.png');
+    }
+}
+.icon-target {
+    background-image: url('/static/aawiki/png/icons/target.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/target-hover.png');
+    }
+}
+.icon-styles {
+    background-image: url('/static/aawiki/png/icons/styles.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/styles-hover.png');
+    }
 }

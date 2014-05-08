@@ -18,11 +18,16 @@ window.AA = window.AA || {};
     AA.AnnotationModel = Backbone.AssociatedModel.extend({
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
+            title: "Untitled",
             body: "Nouvelle annotation",
             top: 10,
             left: 10,
             width: 300,
             height: 400,
+        },
+        zIndex: function() {
+            var zIndex = $('<div>').attr('style', this.get('style')).css('z-index');
+            return zIndex;
         },
         initialize: function() {
             // the annotation belongs to the current page
