@@ -3,12 +3,6 @@ window.AA = window.AA || {};
 (function(undefined) {
     'use strict';
 
-    //AA.NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
-        //'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
-        //'highlight', 'drop-hover', 'active', 'focused'].join(' ');
-    AA.NON_PERSISTANT_CLASSES = ['section1', 'ui-resizable', 'ui-draggable', 'ui-droppable', 'focused'].join(' ');
-
-
     Backbone.View.prototype.empty = function() {
         this.el.innerHTML = "";
         this.stopListening();
@@ -503,37 +497,6 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerChildrenAsDrivers, this);
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
 
-            // setup the contextual menu with editing options
-            //this.editMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'left', element: this.el});
-            //this.editMenu.register ([
-                //// Edit Annotation Button
-                //new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
-                    //.on('click', this.toggle.bind(this)),
-               //// Delete Annotation Button
-                //new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
-                    //.on('click', this.deleteAnnotation.bind(this)),
-                //// Export to Audacity Button
-                //new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
-                    //.on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                //// Import from Audacity Button
-                //new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
-                    //.on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-                //// Set About Value Button
-                //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                    //.on('click', this.setAbout.bind(this)),
-                //// Set as slideshow (changes about value)
-                //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                    //.on('click', this.setAsSlideshow.bind(this)),
-                //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                    //.on('click', this.setZIndex.bind(this)),
-                //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                    //.on('click', this.toggleVisibility.bind(this)),
-                //new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon3'})
-                    //.on('click', this.toggleCollapsing.bind(this)),
-                //new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
-                    //.on('mousedown', this.testSlider.bind(this)),
-            //]);
-
             this.render();
         },
         focus: function(e) {
@@ -672,59 +635,47 @@ window.AA = window.AA || {};
             //return false;
         //},
         testSlider: function() {
-            console.log(this.model.collection);
+            var that = this;
             var min = this.model.collection.min(function(model) {
                 return model.zIndex();
-            });
+            }).zIndex();
             var max = this.model.collection.max(function(model) {
                 return model.zIndex();
+            }).zIndex();
+
+            console.log(min);
+
+            AA.widgets.slider(event, function(x, y) {
+                console.log((x < 0) ? min - 1 : max + 1);
+                that.$el.css('z-index', (x < 0) ? min - 1 : max + 1);
+            }, function(x, y) {
+                var style_attr = $('<div>')
+                    .attr('style', that.$el.attr('style'))
+                    .css('z-index', (x < 0) ? min - 1 : max + 1)
+                    .attr('style');
+
+                that.model.set("style", style_attr);
+                that.model.save();
+                that.render();
             });
-            console.log(min.zIndex());
-            console.log(max.zIndex());
-            //var index_highest = 0;
-            //var index_lowest = 0;
-
-            //$('.section1').each(function() {
-                //// always use a radix when using parseInt
-                //var index_current = parseInt($(this).css("zIndex"), 10);
-
-                //if (index_current > index_highest) {
-                    //index_highest = index_current;
-                //} else if (index_current < index_lowest)
-            //});
-
-            //var that = this;
-
-            //var elts = $('.section1').sortByZIndex();
-            //console.log(elts);
-
-            //AA.widgets.slider(event, function(x, y) {
-            //}, function(x, y) {
-            //});
 
             return false;
         },
         toggleCollapsing: function() {
-            var class_attr = $('<div>')
-                .attr('class', this.$el.attr('class'))
-                .toggleClass('collapsed')
-                //.removeClass(AA.NON_PERSISTANT_CLASSES)
-                .attr('class');
+            var $tmp = $('<div>').attr('class', this.$el.attr('class'));
 
-            this.model.set("klass", class_attr);
-            this.model.save();
-            this.render();
+            if ($tmp.hasClass('collapsed') && $tmp.hasClass('hidden')) {
+                $tmp.removeClass('collapsed hidden');
+            } else if ($tmp.hasClass('collapsed')) {
+                $tmp.removeClass('collapsed');
+                $tmp.addClass('hidden');
+            } else if ($tmp.hasClass('hidden')) {
+                $tmp.removeClass('hidden');
+            } else {
+                $tmp.addClass('collapsed');
+            }
 
-            return false;
-        },
-        toggleVisibility: function() {
-            var class_attr = $('<div>')
-                .attr('class', this.$el.attr('class'))
-                .toggleClass('hidden')
-                //.removeClass(AA.NON_PERSISTANT_CLASSES)
-                .attr('class');
-
-            this.model.set("klass", class_attr);
+            this.model.set("klass", $tmp.attr('class'));
             this.model.save();
             this.render();
 
@@ -925,9 +876,6 @@ window.AA = window.AA || {};
                 output += "---\n\n";
                 output += body;
 
-                //this.$el.attr('style', this.model.get('style'));
-                //this.$el.attr('class', this.model.get('klass'));
-
                 this.$el
                 .html(this.templates.edit({body: output}))
                 .find('textarea')
@@ -971,12 +919,12 @@ window.AA = window.AA || {};
 
                 this.$el.find('.menu-top').append([
                     // Drag icon
-                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon1'}),
+                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
                     // Edit Annotation Button
-                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon7'})
+                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon-edit'})
                         .on('click', this.toggle.bind(this)),
                     // Delete Annotation Button
-                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon6'})
+                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
                         .on('click', this.deleteAnnotation.bind(this)),
                     // Export to Audacity Button
                     new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
@@ -992,18 +940,21 @@ window.AA = window.AA || {};
                         //.on('click', this.setAbout.bind(this)),
                     new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                         .draggable({ helper: "clone" })
+                        .on('mouseover', function(event) {
+                            console.log(that.model.attributes.about);
+                        })
                         .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4))
                 ]);
                 this.$el.find('.menu-left').append([
                     //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
                         //.on('click', this.setAsSlideshow.bind(this)),
-                    new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                        .on('click', this.setZIndex.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                        .on('click', this.toggleVisibility.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                        //.on('click', this.setZIndex.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                        //.on('click', this.toggleVisibility.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
-                    new AA.widgets.MenuButton({title: 'slider', class: 'icon4'})
+                    new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
                         .on('mousedown', this.testSlider.bind(this)),
                 ]);
             } else {
@@ -1055,15 +1006,11 @@ window.AA = window.AA || {};
                     }
                 })
                 .draggable({
-                    handle: '[title="drag annotation"]',
-                    //cancel: ".cancelDraggable, textarea",
+                    handle: '.icon-drag',
                     containment: "parent",
                     distance: 10,
                     scroll: true,
                     scrollSensitivity: 100,
-                    //start: function(event, ui) {
-                        //$(this).css('cursor','move');
-                    //},
                     drag: function (event, ui) {
                         //that.editMenu.redraw ();
                         
@@ -1099,11 +1046,8 @@ window.AA = window.AA || {};
                                 top: -45
                             });
                         };
-                        //$(this).css('cursor','auto');
                         $("#canvas").removeClass("grid");
 
-                        //that.editMenu.redraw ();
-                        
                         model.set({
                             top: parseInt($(this).css('top')),
                             left: parseInt($(this).css('left')),
@@ -1112,7 +1056,11 @@ window.AA = window.AA || {};
                 })
                 .droppable({ 
                     accept: ".icon-target",
+                    greedy: true,
                     hoverClass: "drop-hover",
+                    over: function( event, ui ) {
+                        event.stopImmediatePropagation();
+                    },
                     drop: function( event, ui ) {
                         var about = ui.draggable.attr('href');
                         var answer = window.confirm("You are about to connect the annotation to " + about + ". Proceed?");
@@ -1151,10 +1099,10 @@ window.AA = window.AA || {};
                 this.$el.find('.menu-left').append([
                     //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
                         //.on('click', this.setAsSlideshow.bind(this)),
-                    new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                        .on('click', this.setZIndex.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                        .on('click', this.toggleVisibility.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
+                        //.on('click', this.setZIndex.bind(this)),
+                    //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                        //.on('click', this.toggleVisibility.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
                     new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
@@ -1229,13 +1177,22 @@ window.AA = window.AA || {};
         },
         
         organizeAnnotations: function (event) {
-            this.collection.each(function(model, index) {
-                model.set({
-                    'left': 20 + (index * 20),
-                    'top': 20 + (index * 20),
-                }, {animate: true}).save();
-            });
-            
+            var proceed = window.confirm("This will rearrange your layout… Proceed?");
+
+            if (proceed) {
+                // sort the annotations by z-index;
+                var sorted = this.collection.sortBy(function(model) { 
+                    return model.zIndex() 
+                });
+
+                _.each(sorted, function(model, index) {
+                    model.set({
+                        'left': 20 + (index * 20),
+                        'top': 20 + (index * 20),
+                    }, {animate: true}).save();
+                });
+            }
+
             this.cursorMenu.hide();
         },
         
@@ -1247,35 +1204,27 @@ window.AA = window.AA || {};
                 new AA.widgets.MenuButton ({title: 'new annotation', class: 'icon-new'})
                     .on('click', this.addAnnotation.bind(this)),
 
-                // Create Toggle grid Button (doing nothing at the moment)
-                new AA.widgets.MenuButton ({title: 'toggle grid', class: 'icon-layout'})
-                    .on('click', function(event) { return false; }),
-                    
-                // Create Change grid Button (doing nothing at the moment)
-                new AA.widgets.MenuButton ({title: 'change grid', class: 'icon-ruler'})
-                    .on('click', function(event) { return false; }),
-
                 // Create Organize annotations Button
                 new AA.widgets.MenuButton ({title: 'organize annotations', class: 'icon-pack'})
                     .on('click', this.organizeAnnotations.bind(this)),
 
-                // Create Organize annotations Button
+                // Create Snapshot Button
                 new AA.widgets.MenuButton ({title: 'take a snapshot', class: 'icon-star'})
                     .on('click', AA.router.pageView.commit.bind(AA.router.pageView)),
 
-                // Create Organize annotations Button
+                // Create Browse history Button
                 new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})
-                    .on('click', this.organizeAnnotations.bind(this)),
+                    .on('click', function() { window.alert('Not implemented yet!') }),
 
-                // Create Organize annotations Button
+                // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})
-                    .on('click', this.organizeAnnotations.bind(this)),
+                    .on('click', function() { window.alert('Not implemented yet!') }),
 
-                // Create Organize annotations Button
+                // Create Manage permissions Button
                 new AA.widgets.MenuButton ({title: 'manage permissions', class: 'icon-ok'})
-                    .on('click', this.organizeAnnotations.bind(this)),
-                    // Set About Value Button
+                    .on('click', function() { window.alert('Not implemented yet!') }),
 
+                // Create Set About Value Button
                 new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                     .draggable({ helper: "clone" })
                     .attr('href', document.location.origin + document.location.pathname)

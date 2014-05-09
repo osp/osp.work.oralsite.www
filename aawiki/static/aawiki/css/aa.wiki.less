@@ -349,7 +349,6 @@ section.section1 {
     .menu-left {
         top: 0;
         left: -45px;
-        height: 9999px;
 
         .icon {
             margin-bottom: 5px;
@@ -359,12 +358,15 @@ section.section1 {
     .menu-top {
         top: -45px;
         left: 0;
-        width: 9999px;
 
         .icon {
             margin-right: 5px;
             display: inline-block;
         }
+    }
+
+    &.focused {
+        outline: 1px solid paleGreen;
     }
 
     &.focused .menu-top,
@@ -374,10 +376,8 @@ section.section1 {
 
 
     &.hidden {
-        .opacity(0.5);
-
-        &:hover {
-            /*.opacity(1);*/
+        .wrapper {
+            .opacity(0.5);
         }
 
         .anonymous & {
@@ -401,7 +401,7 @@ section.section1 {
     }
 
     &:hover {
-        outline: 1px solid paleGreen;
+        /*outline: 1px solid paleGreen;*/
 
         .annotation-handle {
             display: block;
@@ -417,26 +417,28 @@ section.section1 {
             cursor: pointer;
             color: blue;
         }
+    }
 
+    span[property="aa:begin"] {
         &:after {
             content: "\00A0\2192\00A0";
         }
-    }
-
-    span[property="aa:begin"]:last-child:after {
-        content: "\00A0\2192\00A0 ?";
+        
+        &:last-child:after {
+            content: "\00A0\2192\00A0 ?";
+        }
     }
 
     span[property="aa:end"] {
         &.deduced {
             &:after {
+                content: "(";
+            }
+
+            &:after {
                 content: ")";
             }
         }
-    }
-
-    span[property="aa:end"].deduced:before {
-        content: "(";
     }
 
     textarea {
@@ -474,22 +476,25 @@ section.section1 {
     .active {
         background-color: paleGreen;
     }
-    .slideshow .active {
-        background-color: inherit;
-    }
 
-    .slideshow section[typeof="aa:annotation"] {
-        position: absolute;
-        visibility: hidden;
-    }
+    .slideshow {
+        & .active {
+            background-color: inherit;
+        }
 
-    .slideshow section[typeof="aa:annotation"].active {
-        visibility: visible;
-        background-color: inherit;
-    }
+        & section[typeof="aa:annotation"] {
+            position: absolute;
+            visibility: hidden;
 
-    .slideshow section[typeof="aa:annotation"]:first-child {
-        visibility: visible;
+            &.active {
+                visibility: visible;
+                background-color: inherit;
+            }
+
+            &:first-child {
+                visibility: visible;
+            }
+        }
     }
 }
 

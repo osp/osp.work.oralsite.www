@@ -25,8 +25,25 @@ window.AA = window.AA || {};
             width: 300,
             height: 400,
         },
+        set: function(attributes, options) {
+            // Removes classes that should not be stored
+            var excluded = [
+                'section1', 
+                'ui-resizable', 
+                'ui-draggable', 
+                'ui-droppable', 
+                'focused'
+            ].join(' ');
+
+            attributes['klass'] = $('<div>')
+                .attr('class', attributes['klass'])
+                .removeClass(excluded)
+                .attr('class');
+
+            return Backbone.Model.prototype.set.call(this, attributes, options);
+        },
         zIndex: function() {
-            var zIndex = $('<div>').attr('style', this.get('style')).css('z-index');
+            var zIndex = parseInt($('<div>').attr('style', this.get('style')).css('z-index'), 10) || 0;
             return zIndex;
         },
         initialize: function() {
