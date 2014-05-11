@@ -434,7 +434,7 @@ window.AA = window.AA || {};
                 // we should make sure it becomes a play button (and vice versa):
                 var playButtonShowsPause = function() {
                     return that.$el.find('.controls .fa-pause').length !== 0;
-                }
+                };
                 if (this.driver.paused() === playButtonShowsPause()) {
                     this.$el.find('.play').toggleClass("fa-play fa-pause");
                 }

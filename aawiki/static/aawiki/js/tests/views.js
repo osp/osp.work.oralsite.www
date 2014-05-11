@@ -91,6 +91,26 @@ describe("The views", function() {
     AA.router = {};
     // To fake the fact that some views are normally bound to the router
 
+    describe("The Site view", function() {
+
+        var mockSiteHash = {
+            "domain" : "example.com",
+            "id" : 1,
+            "name" : "example.com",
+            "resource_uri" : "/pages/api/v1/site/1/"
+        };
+        
+        var mockSiteModel = new Backbone.Model(mockSiteHash);
+        AA.siteView = new AA.SiteView({
+            model : mockSiteModel
+        });
+
+        it("can be initialised", function() {
+            expect(AA.siteView).toBeDefined();
+        });
+
+    });
+
     describe("The User view", function() {
 
         var mockUserHash = {
@@ -152,8 +172,14 @@ describe("The views", function() {
             model : mockPageModel
         });
 
+        AA.router.pageView.render();
+
         it("can be initialised", function() {
             expect(AA.router.pageView).toBeDefined();
+        });
+
+        it("shows the right page-title", function() {
+            expect(document.title).toBe("example.com | test-page");
         });
 
     });
