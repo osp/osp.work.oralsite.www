@@ -321,7 +321,7 @@ blockquote {
     border: 1px solid black;
     position: fixed;
     top: 13px;
-    right: 13px;
+    left: 13px;
     padding: 13px;
     display: none;
 }
@@ -385,7 +385,7 @@ section.section1 {
         }
     }
 
-    &.collapsed {
+    &.collapsed:not(.editing) {
         &:before {
             padding: 5px;
             display: block;
@@ -424,14 +424,14 @@ section.section1 {
             content: "\00A0\2192\00A0";
         }
         
-        &:last-child:after {
+        &:nth-last-child(2):after {
             content: "\00A0\2192\00A0 ?";
         }
     }
 
     span[property="aa:end"] {
         &.deduced {
-            &:after {
+            &:before {
                 content: "(";
             }
 
@@ -442,9 +442,12 @@ section.section1 {
     }
 
     textarea {
+        resize: none;
         width: 100%;
         height: 100%;
         border: none;
+        padding: 5px;
+        .box-sizing();
     }
 
     .menu {
@@ -477,7 +480,7 @@ section.section1 {
         background-color: paleGreen;
     }
 
-    .slideshow {
+    &.foobar {
         & .active {
             background-color: inherit;
         }
@@ -705,6 +708,10 @@ img {
     display: none;
 }
 
+.icon {
+    width: 40px;
+    height: 40px;
+}
 
 .icon-layers {
     background-image: url('/static/aawiki/png/icons/layers.png');
@@ -795,5 +802,12 @@ img {
 
     &:hover {
         background-image: url('/static/aawiki/png/icons/styles-hover.png');
+    }
+}
+.icon-export {
+    background-image: url('/static/aawiki/png/icons/export.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/export-hover.png');
     }
 }

@@ -331,6 +331,7 @@ window.AA = window.AA || {};
         }
     });
 
+
     AA.AbstractPlayer = {
         playPause: function(e) {
             /**
@@ -388,11 +389,13 @@ window.AA = window.AA || {};
         }
     };
 
+
     AA.AbstractPlayerEvents = {
         "click .play":     "playPause",
         "click .next":     "next",
         "click .previous": "previous",
     };
+
 
     AA.TimelinePlayerView = Backbone.View.extend({
         el: '#timeline',
@@ -441,6 +444,7 @@ window.AA = window.AA || {};
             }
         },
     }).extend(AA.AbstractPlayer);
+
 
     AA.AnnotationView = Backbone.View.extend({
         /**
@@ -601,39 +605,6 @@ window.AA = window.AA || {};
             this.renderPlayer();
             return false;
         },
-        //testSlider: function() {
-            //var that = this;
-
-            //var currentZIndex = $(that.$el).zIndex();
-            //console.log('z-index: ' + currentZIndex);
-
-            //var elts = $('.section1').sortByZIndex();
-            //var index = $(elts).index(this.$el);
-            //console.log('position in list: ' + index);
-
-            //var previousDistance;
-
-            //AA.widgets.slider(event, function(x, y) {
-                //var distance = Math.round(x / 30);
-
-                //if (distance != previousDistance) {
-                    //previousDistance = distance;
-
-                    //console.log(distance);
-                    //var newIndex = distance - index;
-                    //newIndex = newIndex < 0 ? 0 : newIndex;
-                    //newIndex = newIndex > elts.length ? elts.length : newIndex;
-                    //console.log('newIndex: ' + newIndex);
-                //}
-
-                ////$(that.$el).css('z-index', x);
-            //}, function(x, y) {
-                //console.log('final');
-                //console.log(Math.round(x / 30));
-            //});
-
-            //return false;
-        //},
         testSlider: function() {
             var that = this;
             var min = this.model.collection.min(function(model) {
@@ -674,6 +645,17 @@ window.AA = window.AA || {};
             } else {
                 $tmp.addClass('collapsed');
             }
+
+            this.model.set("klass", $tmp.attr('class'));
+            this.model.save();
+            this.render();
+
+            return false;
+        },
+        toggleTransition: function() {
+            var $tmp = $('<div>').attr('class', this.$el.attr('class'));
+
+            $tmp.toggleClass('foobar');
 
             this.model.set("klass", $tmp.attr('class'));
             this.model.save();
@@ -877,6 +859,7 @@ window.AA = window.AA || {};
                 output += body;
 
                 this.$el
+                .addClass('editing')
                 .html(this.templates.edit({body: output}))
                 .find('textarea')
                 .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
@@ -927,10 +910,10 @@ window.AA = window.AA || {};
                     new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
                         .on('click', this.deleteAnnotation.bind(this)),
                     // Export to Audacity Button
-                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
                         .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
                     // Import from Audacity Button
-                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
                         .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
                     // Set About Value Button
                     //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
@@ -969,6 +952,7 @@ window.AA = window.AA || {};
                 this.$el.attr('class', this.model.get('klass'));
 
                 this.$el
+                .removeClass('editing')
                 .html(this.templates.view({
                     body:        body,
                     title:       title,
@@ -1083,10 +1067,10 @@ window.AA = window.AA || {};
                     new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
                         .on('click', this.deleteAnnotation.bind(this)),
                     // Export to Audacity Button
-                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon8'})
+                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
                         .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
                     // Import from Audacity Button
-                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon8'})
+                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
                         .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
                     // Set About Value Button
                     //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
@@ -1103,6 +1087,8 @@ window.AA = window.AA || {};
                         //.on('click', this.setZIndex.bind(this)),
                     //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
                         //.on('click', this.toggleVisibility.bind(this)),
+                    new AA.widgets.MenuButton({title: 'toggle transition', class: 'icon-styles'})
+                        .on('click', this.toggleTransition.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
                     new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
@@ -1166,6 +1152,10 @@ window.AA = window.AA || {};
         
         collection: new AA.AnnotationCollection(), 
         el: 'article#canvas',
+
+        commit: function(event) {
+            AA.router.pageView.commit.bind(AA.router.pageView);
+        },
         
         addAnnotation: function(event) {
             var offsetBtn = $(event.currentTarget).position();
@@ -1210,7 +1200,7 @@ window.AA = window.AA || {};
 
                 // Create Snapshot Button
                 new AA.widgets.MenuButton ({title: 'take a snapshot', class: 'icon-star'})
-                    .on('click', AA.router.pageView.commit.bind(AA.router.pageView)),
+                    .on('click', this.commit.bind(this)),
 
                 // Create Browse history Button
                 new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})

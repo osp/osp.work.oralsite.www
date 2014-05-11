@@ -52,7 +52,6 @@
 {{ block.super }}
 
 <!--<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery-ui/themes/base/minified/jquery-ui.min.css">-->
-<link rel="stylesheet" href="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}components/font-awesome/css/font-awesome.css">
 
 {% if debug %}
@@ -110,7 +109,7 @@
 lodash is a superset of underscore. We use it as it provides a couple of
 additional useful functions, and it is supposed to be faster. In case there is
 a bug with backbone (which relies on underscore), we can use lodash underscore
-compatble build. See <https://github.com/lodash/lodash/wiki/build-differences>
+compatible build. See <https://github.com/lodash/lodash/wiki/build-differences>
 -->
 <!--<script src="{{ STATIC_URL }}components/underscore/underscore.js"></script>-->
 <script src="{{ STATIC_URL }}components/lodash/dist/lodash.js"></script>
@@ -131,8 +130,6 @@ compatble build. See <https://github.com/lodash/lodash/wiki/build-differences>
 <script src="{{ STATIC_URL }}components/js-yaml/js-yaml.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/utils.js"></script>
-
-<script src="{{ STATIC_URL }}aawiki/js/plugins/aa.jquery.sortByZIndex.js"></script>
 
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.jquery.renderResources.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/markup/markdown.js"></script>
