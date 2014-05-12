@@ -19,6 +19,7 @@ window.AA = window.AA || {};
         urlRoot: "/pages/api/v1/annotation/",
         defaults: {
             title: "Untitled",
+            about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
             body: "Nouvelle annotation",
             top: 10,
             left: 10,
@@ -41,6 +42,23 @@ window.AA = window.AA || {};
                 .attr('class');
 
             return Backbone.Model.prototype.set.call(this, attributes, options);
+        },
+        toFrontMatter: function() {
+            var data = this.toJSON();
+            var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
+
+            delete data.body;
+            delete data.page;
+            delete data.resource_uri;
+            delete data.id;
+            delete data.pk;
+
+            var output = "---\n";
+            output += jsyaml.dump(data, 4);
+            output += "---\n\n";
+            output += body;
+
+            return output;
         },
         zIndex: function() {
             var zIndex = parseInt($('<div>').attr('style', this.get('style')).css('z-index'), 10) || 0;

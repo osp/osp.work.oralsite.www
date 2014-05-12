@@ -327,12 +327,12 @@ blockquote {
 }
 
 section.section1 {
-    background-color: white;
     position: absolute !important;
     top: 0;
     left: 0;
     width: 300px;
     height: 400px;
+    background-color: white;
     outline: 1px solid #ccc;
 
     &.drop-hover {
@@ -365,15 +365,92 @@ section.section1 {
         }
     }
 
+    > textarea {
+        top: 0;
+        left: 0;
+        position: absolute;
+        resize: none;
+        width: 100%;
+        height: 100%;
+        border: none;
+        padding: 5px;
+        .box-sizing(border-box);
+        outline: 1px solid #ccc;
+        outline-offset: 0;
+    }
+
+    > div.wrapper {
+        overflow-x: hidden;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        position: absolute;
+        .box-sizing(border-box);
+
+        padding: 5px;
+        background: inherit;
+        outline: inherit;
+
+        section[typeof="aa:annotation"] {
+            border-top: 1px solid whitesmoke;
+            margin-top: -1px;
+            padding-bottom: 16px;
+
+            &.active {
+                background-color: paleGreen;
+            }
+
+            span[property="aa:begin"],
+            span[property="aa:end"] {
+                color: gray;
+                font-size: smaller;
+
+                &:hover {
+                    cursor: pointer;
+                    color: blue;
+                }
+            }
+
+            span[property="aa:begin"] {
+                &:after {
+                    content: "\00A0\2192\00A0";
+                }
+                
+                &:nth-last-child(2):after {
+                    content: "\00A0\2192\00A0 ?";
+                }
+            }
+
+            span[property="aa:end"] {
+                &.deduced {
+                    &:before {
+                        content: "(";
+                    }
+
+                    &:after {
+                        content: ")";
+                    }
+                }
+            }
+        }
+    }
+
     &.focused {
-        outline: 1px solid paleGreen;
-    }
+        .menu-top,
+        .menu-left {
+            display: block;
+        }
 
-    &.focused .menu-top,
-    &.focused .menu-left {
-        display: block;
-    }
+        textarea,
+        .wrapper {
+            outline: 3px solid paleGreen;
+        }
 
+        textarea {
+            z-index: 999999;
+        }
+    }
 
     &.hidden {
         .wrapper {
@@ -386,6 +463,8 @@ section.section1 {
     }
 
     &.collapsed:not(.editing) {
+        height: auto !important;
+
         &:before {
             padding: 5px;
             display: block;
@@ -396,97 +475,14 @@ section.section1 {
         .wrapper {
             display: none;
         }
-
-        height: auto !important;
     }
 
-    &:hover {
-        /*outline: 1px solid paleGreen;*/
-
-        .annotation-handle {
-            display: block;
-        }
-    }
-
-    span[property="aa:begin"],
-    span[property="aa:end"] {
-        color: gray;
-        font-size: smaller;
-
-        &:hover {
-            cursor: pointer;
-            color: blue;
-        }
-    }
-
-    span[property="aa:begin"] {
-        &:after {
-            content: "\00A0\2192\00A0";
-        }
-        
-        &:nth-last-child(2):after {
-            content: "\00A0\2192\00A0 ?";
-        }
-    }
-
-    span[property="aa:end"] {
-        &.deduced {
-            &:before {
-                content: "(";
-            }
-
-            &:after {
-                content: ")";
-            }
-        }
-    }
-
-    textarea {
-        resize: none;
-        width: 100%;
-        height: 100%;
-        border: none;
-        padding: 5px;
-        .box-sizing();
-    }
-
-    .menu {
-        position: absolute;
-        height: 18px;
-        top: -19px;
-        left: 0;
-        width: 100%;
-        z-index: 99999999;
-        outline: 1px solid grey;
-        background-color: grey;
-        color: white;
-        display: none;
-    }
-
-    > div.wrapper {
-        overflow-x: hidden;
-        height: 100%;
-        .box-sizing(border-box);
-        padding: 5px;
-    }
-
-    section[typeof="aa:annotation"] {
-        border-top: 1px solid whitesmoke;
-        margin-top: -1px;
-        padding-bottom: 16px;
-    }
-
-    .active {
-        background-color: paleGreen;
-    }
-
-    &.foobar {
+    &.foobar > div.wrapper {
         & .active {
             background-color: inherit;
         }
 
         & section[typeof="aa:annotation"] {
-            position: absolute;
             visibility: hidden;
 
             &.active {
@@ -517,10 +513,6 @@ section.section1 .wrapper {
 .grid {
     .grid();
 }
-
-.ui-resizable-handle { z-index: auto !important; }
-/* No ugly jquery ui icon */
-.ui-resizable-se { background-image: none !important; }
 
 /* Video controls */
 
@@ -678,6 +670,10 @@ section.section1 .wrapper {
     } 
     
 }
+
+.ui-resizable-handle { z-index: auto !important; }
+/* No ugly jquery ui icon */
+.ui-resizable-se { background-image: none !important; }
 
 .ui-resizable { position: relative;}
 .ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}

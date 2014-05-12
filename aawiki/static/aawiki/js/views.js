@@ -479,16 +479,9 @@ window.AA = window.AA || {};
             "click .controls .play"     : "playPause",
             "click .next"               : "next",
             "click .previous"           : "previous",            
-            //"dblclick"                  : "toggleEditMenu",
             "click .mini-player"         : "playPauseMiniPlayer"
         },
         initialize: function() {
-            // if the driver is not specified, this annotation is about the current page
-            if (!this.model.get('about')) {
-                // this will give us the uri sans the #hash
-                this.model.set('about', document.location.origin + document.location.pathname);
-            }
-
             // references to timed annotations
             this.driverEventIDs = [];
 
@@ -541,12 +534,6 @@ window.AA = window.AA || {};
             e.cancelBubble = true;
             if (e.stopPropagation) e.stopPropagation();
         },
-        toggleEditMenu: function(e) {
-            this.editMenu.toggle(e);
-            
-            e.cancelBubble = true;
-            if (e.stopPropagation) e.stopPropagation();
-        },
         editing: false,
         onPositionChange: function(model, value, options) {
             var defaults = {
@@ -563,11 +550,8 @@ window.AA = window.AA || {};
                 }, {
                     duration: 2000,
                     easing: 'easeOutExpo',
-                    //progress: function () { that.editMenu.redraw(); }
                 });
             };
-            
-            //this.editMenu.redraw ();
         },
         toggle: function() {
             if (this.editing) {
@@ -582,7 +566,6 @@ window.AA = window.AA || {};
         },
         deleteAnnotation: function(event) {
             if (window.confirm('This will permanently delete this annotation. Proceed?')) {
-                //this.editMenu.destroy();
                 this.model.destroy();
             };
             return false;
@@ -597,14 +580,6 @@ window.AA = window.AA || {};
                 
             return false;
         },
-        setAbout: function() {
-            var aboutPrompt = prompt("The about value", this.model.get("about"));
-            this.model.set("about", aboutPrompt);
-            this.model.save();
-            this.render();
-            this.renderPlayer();
-            return false;
-        },
         testSlider: function() {
             var that = this;
             var min = this.model.collection.min(function(model) {
@@ -614,11 +589,8 @@ window.AA = window.AA || {};
                 return model.zIndex();
             }).zIndex();
 
-            console.log(min);
-
             AA.widgets.slider(event, function(x, y) {
-                console.log((x < 0) ? min - 1 : max + 1);
-                that.$el.css('z-index', (x < 0) ? min - 1 : max + 1);
+                $('.wrapper', that.$el).css('z-index', (x < 0) ? min - 1 : max + 1);
             }, function(x, y) {
                 var style_attr = $('<div>')
                     .attr('style', that.$el.attr('style'))
@@ -658,28 +630,6 @@ window.AA = window.AA || {};
             $tmp.toggleClass('foobar');
 
             this.model.set("klass", $tmp.attr('class'));
-            this.model.save();
-            this.render();
-
-            return false;
-        },
-        setZIndex: function() {
-            var index_highest = 0;   
-            
-            $(".section1").each(function() {
-                // always use a radix when using parseInt
-                var index_current = parseInt($(this).css("zIndex"), 10);
-                if(index_current > index_highest) {
-                    index_highest = index_current;
-                }
-            });
-
-            var style_attr = $('<div>')
-                .attr('style', this.$el.attr('style'))
-                .css('z-index', index_highest + 1)
-                .attr('style');
-
-            this.model.set("style", style_attr);
             this.model.save();
             this.render();
 
@@ -845,22 +795,9 @@ window.AA = window.AA || {};
             this.$el.attr('title', this.model.get('title'));
 
             if (this.editing) {
-                var data = this.model.toJSON();
-                var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
-                delete data.body;
-                delete data.page;
-                delete data.resource_uri;
-                delete data.id;
-                delete data.pk;
-
-                var output = "---\n";
-                output += jsyaml.dump(data, 4);
-                output += "---\n\n";
-                output += body;
-
                 this.$el
                 .addClass('editing')
-                .html(this.templates.edit({body: output}))
+                .html(this.templates.edit({body: this.model.toFrontMatter()}))
                 .find('textarea')
                 .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
                     event.preventDefault();
@@ -901,44 +838,9 @@ window.AA = window.AA || {};
                 });
 
                 this.$el.find('.menu-top').append([
-                    // Drag icon
-                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
                     // Edit Annotation Button
-                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon-edit'})
+                    new AA.widgets.MenuButton({title: 'save changes', class: 'icon-ok'})
                         .on('click', this.toggle.bind(this)),
-                    // Delete Annotation Button
-                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
-                        .on('click', this.deleteAnnotation.bind(this)),
-                    // Export to Audacity Button
-                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
-                        .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                    // Import from Audacity Button
-                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
-                        .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-                    // Set About Value Button
-                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                        //.on('click', this.setAbout.bind(this)),
-                    // Set About Value Button
-                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon-target'})
-                        //.on('click', this.setAbout.bind(this)),
-                    new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
-                        .draggable({ helper: "clone" })
-                        .on('mouseover', function(event) {
-                            console.log(that.model.attributes.about);
-                        })
-                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4))
-                ]);
-                this.$el.find('.menu-left').append([
-                    //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                        //.on('click', this.setAsSlideshow.bind(this)),
-                    //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                        //.on('click', this.setZIndex.bind(this)),
-                    //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                        //.on('click', this.toggleVisibility.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
-                        .on('click', this.toggleCollapsing.bind(this)),
-                    new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
-                        .on('mousedown', this.testSlider.bind(this)),
                 ]);
             } else {
                 var model = this.model;
@@ -1072,9 +974,6 @@ window.AA = window.AA || {};
                     // Import from Audacity Button
                     new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
                         .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-                    // Set About Value Button
-                    //new AA.widgets.MenuButton({title: 'set about value', class: 'icon8'})
-                        //.on('click', this.setAbout.bind(this)),
                     //// Set About Value Button
                     new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                         .draggable({ helper: "clone" })
@@ -1083,8 +982,6 @@ window.AA = window.AA || {};
                 this.$el.find('.menu-left').append([
                     //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
                         //.on('click', this.setAsSlideshow.bind(this)),
-                    //new AA.widgets.MenuButton({title: 'bring foreward', class: 'icon1'})
-                        //.on('click', this.setZIndex.bind(this)),
                     //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
                         //.on('click', this.toggleVisibility.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle transition', class: 'icon-styles'})
@@ -1103,6 +1000,19 @@ window.AA = window.AA || {};
                     this.updateAnnotationEvents();
                 }
             };
+
+            /*
+             * Transfers the z-index to the wrapper element. It is necessary
+             * that section.section1 elements have a z-index set to auto to
+             * allow for the .menu elements to be painted on top (it is not
+             * very handy otherwise to click button of an overlaping box with a
+             * lower z-index).
+             *
+             * See <http://jsfiddle.net/Fzn5T/3/> for a proff-of-concept.
+             */
+            var z = this.$el.css('z-index');
+            this.$el.css('z-index', 'auto');
+            $('.wrapper', this.$el).css('z-index', z);
 
             return this;
         },
@@ -1136,7 +1046,6 @@ window.AA = window.AA || {};
         },
         
         showMenu: function (e) {
-
             if (this.cursorMenu.visible()) {
                 this.cursorMenu.hide ();
             } else {
