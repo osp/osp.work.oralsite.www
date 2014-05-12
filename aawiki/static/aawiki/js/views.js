@@ -580,7 +580,7 @@ window.AA = window.AA || {};
                 
             return false;
         },
-        testSlider: function() {
+        changeZIndex: function() {
             var that = this;
             var min = this.model.collection.min(function(model) {
                 return model.zIndex();
@@ -618,7 +618,7 @@ window.AA = window.AA || {};
                 $tmp.addClass('collapsed');
             }
 
-            this.model.set("klass", $tmp.attr('class'));
+            this.model.set("class", $tmp.attr('class'));
             this.model.save();
             this.render();
 
@@ -629,7 +629,7 @@ window.AA = window.AA || {};
 
             $tmp.toggleClass('foobar');
 
-            this.model.set("klass", $tmp.attr('class'));
+            this.model.set("class", $tmp.attr('class'));
             this.model.save();
             this.render();
 
@@ -846,7 +846,7 @@ window.AA = window.AA || {};
                 var title = this.model.get("title");
 
                 this.$el.attr('style', this.model.get('style'));
-                this.$el.attr('class', this.model.get('klass'));
+                this.$el.attr('class', this.model.get('class'));
 
                 this.$el
                 .removeClass('editing')
@@ -860,12 +860,6 @@ window.AA = window.AA || {};
                 .addClass('section1')
                 .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
                 .attr('about', this.model.attributes.about)
-                .css({
-                    width: this.model.get("width"),
-                    height: this.model.get("height"),
-                    top: this.model.get("top"),
-                    left: this.model.get("left"),
-                })
                 .resizable({
                     resize: function (event, ui) {
                         if (event.ctrlKey) {
@@ -881,8 +875,7 @@ window.AA = window.AA || {};
                         $("html").removeClass("grid");
 
                         model.set({
-                            'width': ui.size.width,
-                            'height': ui.size.height,
+                            style: $(this).attr('style')
                         }).save();
                     }
                 })
@@ -893,7 +886,6 @@ window.AA = window.AA || {};
                     scroll: true,
                     scrollSensitivity: 100,
                     drag: function (event, ui) {
-                        //that.editMenu.redraw ();
                         
                         if (event.ctrlKey) {
                             $("#canvas").addClass("grid");
@@ -930,8 +922,7 @@ window.AA = window.AA || {};
                         $("#canvas").removeClass("grid");
 
                         model.set({
-                            top: parseInt($(this).css('top')),
-                            left: parseInt($(this).css('left')),
+                            style: $(this).attr('style')
                         }).save();
                     }
                 })
@@ -984,7 +975,7 @@ window.AA = window.AA || {};
                     new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
                     new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
-                        .on('mousedown', this.testSlider.bind(this)),
+                        .on('mousedown', this.changeZIndex.bind(this)),
                 ]);
 
                 if (this.isMedia()) {

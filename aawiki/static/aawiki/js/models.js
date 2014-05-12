@@ -26,6 +26,31 @@ window.AA = window.AA || {};
             width: 300,
             height: 400,
         },
+        parse: function(response) {
+            response.class = response.klass; 
+            delete response.klass;
+
+            return response; 
+        },
+        //toJSON: function() {  
+            //var attr = Backbone.Model.prototype.toJSON.call(this);  
+            //attr.klass = attr.class; 
+
+            //delete attr.class;
+
+            //return attr;
+        //},
+        toJSON: function(options) {  
+            var attr = Backbone.Model.prototype.toJSON.call(this);  
+            if(options && options.noalias) { 
+            } else {
+                attr.klass = attr.class
+
+                delete attr.class;
+            }; 
+            
+            return attr; 
+        },
         set: function(attributes, options) {
             // Removes classes that should not be stored
             var excluded = [
@@ -36,15 +61,15 @@ window.AA = window.AA || {};
                 'focused'
             ].join(' ');
 
-            attributes['klass'] = $('<div>')
-                .attr('class', attributes['klass'])
+            attributes['class'] = $('<div>')
+                .attr('class', attributes['class'])
                 .removeClass(excluded)
                 .attr('class');
 
             return Backbone.Model.prototype.set.call(this, attributes, options);
         },
         toFrontMatter: function() {
-            var data = this.toJSON();
+            var data = this.toJSON({noalias: true});
             var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
 
             delete data.body;
