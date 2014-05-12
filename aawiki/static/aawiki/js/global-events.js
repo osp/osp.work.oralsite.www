@@ -61,9 +61,12 @@ window.AA = window.AA || {};
          * fire.
          */
         $("article#canvas").on("start", "[typeof='aa:annotation']", function(e) {
+            // console.log("annotation was told to start");
+            $("[typeof='aa:annotation']").removeClass("active");
             $(this).addClass("active");
             playChildren($(this)); // play any audio/videos that are in this annotation
         }).on("end", "[typeof='aa:annotation']", function(e) {
+            //console.log("annotation was told to stop");
             $(this).removeClass("active");
         }).on("end", ".slideshow section[typeof='aa:annotation']", function(e) {
             /* If we are dealing with a slideshow, there’s no real end.
