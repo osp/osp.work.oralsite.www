@@ -140,9 +140,12 @@ window.AA = window.AA || {};
             view: _.template($('#page-view-template').html()),
         },
         events: {
-            "click #toggleDrawer"       : "toggleDrawer",
-            "click #commit"             : "commit",
-            "click #commit-list a"      : "wayback"
+            "click #toggleDrawer"               : "toggleDrawer",
+            "click #commit"                     : "commit",
+            "click #commit-list a"              : "wayback",
+            "change #permissions-visible"       : "updatePermissionsVisible",
+            //"change #permissions-editable"      : "updatePermissionsEditable",
+            //"change #permissions-administrated" : "updatePermissionsAdministrated",
         },
         toggleDrawer: function(event) {
             $('#sidebar, #canvas').toggleClass('hide');
@@ -166,6 +169,13 @@ window.AA = window.AA || {};
         setTitle: function() {
             document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
         },
+        publicUser: {
+            "current": false,
+            "id": -1,
+            "name": "AnonymousUser",
+            "type": "user",
+            "uri": "/pages/api/v1/user/-1/"
+        },
         isPublic: function() {
             // Is AnonymousUser (with id -1) part of the users with view permissions?
             // Then the page can be considered public
@@ -174,6 +184,20 @@ window.AA = window.AA || {};
                 return true;
             }
             return false;
+        },
+        updatePermissionsVisible: function() {
+            var permissions = this.model.get("permissions");
+            
+            if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
+                // add public user
+                permissions.view_page.push(this.publicUser);
+            } else {
+                // remove public user
+                permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
+            }
+            
+            this.model.set("permissions", permissions);
+            this.model.save();
         },
         render: function() {
             var context = this.model.toJSON();

@@ -27,7 +27,7 @@
     %>
 
     <div id="tab-permissions">
-        <fieldset>
+        <fieldset id="permissions-visible">
             <legend>Visible by</legend>
             <label>
                 <input type="radio" name="visibleBy" value="public"<% if (isPublic) { %> checked<% }; if (!admin) { %> disabled<% }%>>
@@ -46,7 +46,7 @@
                 <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
             </ul>
         </fieldset>
-        <fieldset>
+        <fieldset id="permissions-editable">
             <legend>Editable by</legend>
             <ul class="tags">
                 <% _.each(permissions.change_page, function(permitted) { %>
@@ -55,7 +55,7 @@
                 <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
             </ul>
         </fieldset>
-        <fieldset>
+        <fieldset id="permissions-administrated">
             <legend>Administrated by</legend>
             <ul class="tags">
                 <% _.each(permissions.administer_page, function(permitted) { %>

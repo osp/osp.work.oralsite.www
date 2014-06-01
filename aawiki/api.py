@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 
 from tastypie import fields
 from tastypie.authentication import SessionAuthentication
@@ -193,6 +193,15 @@ class PageResource(ModelResource):
         #print "new:", new
         #print "to remove:", old - new, "to add:", new - old
 
+
+        for user_id, permission in old - new:
+            user = User.objects.get(pk=user_id)
+            remove_perm(permission, user, bundle.obj)
+        
+        for user_id, permission in new - old:
+            user = User.objects.get(pk=user_id)
+            assign_perm(permission, user, bundle.obj)
+        
         # if there is the "message" field in the HTTP header it means we want
         # to commit
         msg = bundle.request.META.get('HTTP_MESSAGE')
