@@ -166,10 +166,20 @@ window.AA = window.AA || {};
         setTitle: function() {
             document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
         },
+        isPublic: function() {
+            // Is AnonymousUser (with id -1) part of the users with view permissions?
+            // Then the page can be considered public
+            var permissions = this.model.get("permissions");
+            if ( _.some(permissions.view_page, function(p) { return p.id === -1; }) ) {
+                return true;
+            }
+            return false;
+        },
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
-
+            context.isPublic = this.isPublic();
+            
             this.$el.html( this.templates.view( context ) )
                 .find('#permalink').draggable({ helper: "clone" })
                 .end()

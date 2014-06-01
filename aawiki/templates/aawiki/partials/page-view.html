@@ -20,12 +20,6 @@
 
     <% if (typeof permissions !== 'undefined') {
 
-    // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
-    var public = false;
-    if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
-        public = true;
-    }
-
     var admin = false;
     if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
         var admin = true;
@@ -36,11 +30,11 @@
         <fieldset>
             <legend>Visible by</legend>
             <label>
-                <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% }; if (!admin) { %> disabled<% }%>>
+                <input type="radio" name="visibleBy" value="public"<% if (isPublic) { %> checked<% }; if (!admin) { %> disabled<% }%>>
                 The public
             </label>
             <label>
-                <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
+                <input type="radio" name="visibleBy" value="selected"<% if (!isPublic) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
                 Selected:
             </label>
             <ul class="tags">
