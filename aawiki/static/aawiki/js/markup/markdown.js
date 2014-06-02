@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-04-22T13:38Z
+ * Date: 2014-06-02T20:46Z
  */
 
 (function(expose) {
@@ -160,17 +160,21 @@
     return md.toTree( source );
   };
 
+  /**
+   *  count_lines( str ) -> count
+   *  - str (String): String whose lines we want to count
+   *
+   *  Counts the number of linebreaks in `str`
+   **/
   function count_lines( str ) {
-    var n = 0,
-        i = -1;
-    while ( ( i = str.indexOf("\n", i + 1) ) !== -1 )
-      n++;
-    return n;
+    return str.split("\n").length - 1;
   }
 
   // Internal - split source into rough blocks
   Markdown.prototype.split_blocks = function splitBlocks( input ) {
-    input = input.replace(/(\r\n|\n|\r)/g, "\n");
+    // Normalize linebreaks to \n.
+    input = input.replace(/\r\n?/g, "\n");
+    // Match until the end of the string, a newline followed by #, or two or more newlines.
     // [\s\S] matches _anything_ (newline or space)
     // [^] is equivalent but doesn't work in IEs.
     var re = /([\s\S]+?)($|\n#|\n(?:\s*\n|$)+)/g,
@@ -229,10 +233,11 @@
       //D:this.debug( "Testing", ord[i] );
       var res = cbs[ ord[i] ].call( this, block, next );
       if ( res ) {
-        //D:this.debug("  matched");
-        if ( !isArray(res) || ( res.length > 0 && !( isArray(res[0]) ) ) )
-          this.debug(ord[i], "didn't return a proper array");
-        //D:this.debug( "" );
+
+        if ( !isArray(res) || ( res.length > 0 && !( isArray(res[0]) ) && ( typeof res[0] !== "string")) ) {
+          this.debug(ord[i], "didn't return proper JsonML");
+        }
+
         return res;
       }
     }
@@ -319,7 +324,7 @@
       // __foo__ is reserved and not a pattern
       if ( i.match( /^__.*__$/) )
         continue;
-      var l = i.replace( /([\\.*+?|()\[\]{}])/g, "\\$1" )
+      var l = i.replace( /([\\.*+?^$|()\[\]{}])/g, "\\$1" )
                .replace( /\n/, "\\n" );
       patterns.push( i.length === 1 ? l : "(?:" + l + ")" );
     }
@@ -643,7 +648,7 @@
 
       if ( consumed >= text.length ) {
         // No closing char found. Abort.
-        return null;
+        return [consumed, null, nodes];
       }
 
       var res = this.dialect.inline.__oneElement__.call(this, text.substr( consumed ) );
@@ -668,6 +673,9 @@
       mk_block = MarkdownHelpers.mk_block,
       isEmpty = MarkdownHelpers.isEmpty,
       inline_until_char = DialectHelpers.inline_until_char;
+
+  // A robust regexp for matching URLs. Thanks: https://gist.github.com/dperini/729294
+  var urlRegexp = /(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/i.source;
 
   /**
    * Gruber dialect
@@ -990,16 +998,24 @@
             } // tight_search
 
             if ( li_accumulate.length ) {
-              add( last_li, loose, this.processInline( li_accumulate ), nl );
 
-              // Let's not creating a trailing \n after content in the li
-              if(last_li[last_li.length-1] === "\n") {
-                last_li.pop();
+              var contents = this.processBlock(li_accumulate, []),
+                  firstBlock = contents[0];
+
+              if (firstBlock) {
+                firstBlock.shift();
+                contents.splice.apply(contents, [0, 1].concat(firstBlock));
+                add( last_li, loose, contents, nl );
+
+                // Let's not creating a trailing \n after content in the li
+                if(last_li[last_li.length-1] === "\n") {
+                  last_li.pop();
+                }
+
+                // Loose mode will have been dealt with. Reset it
+                loose = false;
+                li_accumulate = "";
               }
-
-              // Loose mode will have been dealt with. Reset it
-              loose = false;
-              li_accumulate = "";
             }
 
             // Look at the next block - we might have a loose list. Or an extra
@@ -1020,7 +1036,7 @@
               block = next.shift();
 
               // Check for an HR following a list: features/lists/hr_abutting
-              var hr = this.dialect.block.horizRule( block, next );
+              var hr = this.dialect.block.horizRule.call( this, block, next );
 
               if ( hr ) {
                 ret.push.apply(ret, hr);
@@ -1180,7 +1196,7 @@
         return out;
       },
 
-      // These characters are intersting elsewhere, so have rules for them so that
+      // These characters are interesting elsewhere, so have rules for them so that
       // chunks of plain text blocks don't include them
       "]": function () {},
       "}": function () {},
@@ -1199,6 +1215,9 @@
 
       "![": function image( text ) {
 
+        // Without this guard V8 crashes hard on the RegExp
+        if (text.indexOf('(') >= 0 && text.indexOf(')') === -1) { return; }
+
         // Unlike images, alt text is plain text only. no other elements are
         // allowed in there
 
@@ -1207,7 +1226,7 @@
         //
         // First attempt to use a strong URL regexp to catch things like parentheses. If it misses, use the
         // old one.
-        var m = text.match( /^!\[(.*?)][ \t]*\(((?:https?:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.])(?:[^\s()<>]+|\([^\s()<>]+\))+(?:\([^\s()<>]+\)|[^`!()\[\]{};:'".,<>?«»“”‘’\s]))\)([ \t])*(["'].*["'])?/ ) ||
+        var m = text.match(new RegExp("^!\\[(.*?)][ \\t]*\\((" + urlRegexp + ")\\)([ \\t])*([\"'].*[\"'])?")) ||
                 text.match( /^!\[(.*?)\][ \t]*\([ \t]*([^")]*?)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/ );
 
         if ( m ) {
@@ -1238,13 +1257,23 @@
 
       "[": function link( text ) {
 
+        var open = 1;
+        for (var i=0; i<text.length; i++) {
+          var c = text.charAt(i);
+          if (c === '[') { open++; }
+          if (c === ']') { open--; }
+
+          if (open > 3) { return [1, "["]; }
+        }
+
         var orig = String(text);
         // Inline content is possible inside `link text`
         var res = inline_until_char.call( this, text.substr(1), "]" );
 
         // No closing ']' found. Just consume the [
-        if ( !res )
-          return [ 1, "[" ];
+        if ( !res[1] ) {
+          return [ res[0] + 1, text.charAt(0) ].concat(res[2]);
+        }
 
         var consumed = 1 + res[ 0 ],
             children = res[ 1 ],
@@ -1298,10 +1327,16 @@
           return [ consumed, link ];
         }
 
+        m = text.match(new RegExp("^\\((" + urlRegexp + ")\\)"));
+        if (m && m[1]) {
+          consumed += m[0].length;
+          link = ["link", {href: m[1]}].concat(children);
+          return [consumed, link];
+        }
+
         // [Alt text][id]
         // [Alt text] [id]
         m = text.match( /^\s*\[(.*?)\]/ );
-
         if ( m ) {
 
           consumed += m[ 0 ].length;
@@ -1309,12 +1344,14 @@
           // [links][] uses links as its reference
           attrs = { ref: ( m[ 1 ] || String(children) ).toLowerCase(),  original: orig.substr( 0, consumed ) };
 
-          link = [ "link_ref", attrs ].concat( children );
+          if (children && children.length > 0) {
+            link = [ "link_ref", attrs ].concat( children );
 
-          // We can't check if the reference is known here as it likely wont be
-          // found till after. Check it in md tree->hmtl tree conversion.
-          // Store the original so that conversion can revert if the ref isn't found.
-          return [ consumed, link ];
+            // We can't check if the reference is known here as it likely wont be
+            // found till after. Check it in md tree->hmtl tree conversion.
+            // Store the original so that conversion can revert if the ref isn't found.
+            return [ consumed, link ];
+          }
         }
 
         // Another check for references
@@ -1392,7 +1429,7 @@
         //D:this.debug("closing", md);
         this[state_slot].shift();
 
-        // "Consume" everything to go back to the recrusion in the else-block below
+        // "Consume" everything to go back to the recursion in the else-block below
         return[ text.length, new CloseTag(text.length-md.length) ];
       }
       else {
@@ -1788,9 +1825,17 @@
   function ms2tc (ms) {
     var _, ms = ms, ss, mm, hh;
 
-    _ = divmod(ms, 1000); ss = _[0]; ms = _[1];
-    _ = divmod(ss, 3600); hh = _[0]; ss = _[1];
-    _ = divmod(ss, 60); mm = _[0]; ss = _[1];
+    _ = divmod(ms, 1000);
+    ss = _[0];
+    ms = _[1];
+    
+    _ = divmod(ss, 3600);
+    hh = _[0];
+    ss = _[1];
+
+    _ = divmod(ss, 60);
+    mm = _[0];
+    ss = _[1];
 
     ms = rpad(hh, 3);
     ss = lpad(ss, 2);
@@ -1834,9 +1879,9 @@
       end;
 
     // stops here if there is no match
-    if ( !m ) { 
-        return undefined 
-    };
+    if ( !m ) {
+      return undefined;
+    }
 
     // if not specified, sets the end of the previous timed section with the
     // current value for begin
@@ -1968,18 +2013,14 @@
       // Links like /pages/sherry_Turkle will not get wikified.
       // Links like http://example.com/sherry_turkle.ogv will not get wikified
       if (target.indexOf("/") === -1 && !target.match(/.*\.(\w+)$/)) {
-        var capitaliseFirstLetter = function(string) {
-          return string.charAt(0).toUpperCase() + string.slice(1);
-        };
-        var spaceToUnderscore = function(str) {
-            return str.replace(/\s+/g, '_');
-        };
         var parts = target.match(/([^#]*)#*([^#]*)/);
         var path = parts[1];
         var hash = parts[2];
-        
-        var uri = '../' + encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
-        
+        var capitaliseFirstLetter = function(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+        var path = capitaliseFirstLetter(path.replace(/\s+/g, '_'));
+        var uri = encodeURIComponent(path);
         if (hash) {
           // do not escape =, so we can have #t=3.5
           uri += '#' + encodeURIComponent(hash).replace('%3D', '=');
@@ -2062,6 +2103,7 @@
   expose.toHTML = Markdown.toHTML;
   expose.toHTMLTree = Markdown.toHTMLTree;
   expose.renderJsonML = Markdown.renderJsonML;
+  expose.DialectHelpers = DialectHelpers;
 
 })(function() {
   window.markdown = {};
