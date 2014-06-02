@@ -1,6 +1,5 @@
 <hgroup>
      <h1 property="dc:title"><%= name %></h1>
-     <!--<h2><%= rev %></h2>-->
 </hgroup>
 
 <i id="toggleDrawer" class="fa fa-bars"></i>
@@ -16,12 +15,6 @@
 
     <% if (typeof permissions !== 'undefined') {
 
-    // Is AnonymousUser (with id -1) part of the users with view permissions? Then the page can be considered public
-    var public = false;
-    if ( _.some(permissions.view_page, function(p) { return p.id === -1 }) ) {
-        public = true;
-    }
-
     var admin = false;
     if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
         var admin = true;
@@ -29,14 +22,14 @@
     %>
 
     <div id="tab-permissions">
-        <fieldset>
+        <fieldset id="permissions-visible">
             <legend>Visible by</legend>
             <label>
-                <input type="radio" name="visibleBy" value="public"<% if (public) { %> checked<% }; if (!admin) { %> disabled<% }%>>
+                <input type="radio" name="visibleBy" value="public"<% if (isPublic) { %> checked<% }; if (!admin) { %> disabled<% }%>>
                 The public
             </label>
             <label>
-                <input type="radio" name="visibleBy" value="selected"<% if (!public) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
+                <input type="radio" name="visibleBy" value="selected"<% if (!isPublic) { %>  checked<% }; if (!admin) { %> disabled<% }%>>
                 Selected:
             </label>
             <ul class="tags">
@@ -48,7 +41,7 @@
                 <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
             </ul>
         </fieldset>
-        <fieldset>
+        <fieldset id="permissions-editable">
             <legend>Editable by</legend>
             <ul class="tags">
                 <% _.each(permissions.change_page, function(permitted) { %>
@@ -57,7 +50,7 @@
                 <% if (admin) { %><li class="add">Add <span>+</span></li><% } %>
             </ul>
         </fieldset>
-        <fieldset>
+        <fieldset id="permissions-administrated">
             <legend>Administrated by</legend>
             <ul class="tags">
                 <% _.each(permissions.administer_page, function(permitted) { %>
