@@ -19,3 +19,8 @@ def deploy():
             run('python manage.py collectstatic --noinput')
 
     run('touch %s' % path_wsgi)
+
+
+def download():
+    """synchronizes the local db from the remote one"""
+    local('scp sarma@sarma.be:/srv/sarma_data01/www/db/be.oralsite/oralsite.db oralsite/')
