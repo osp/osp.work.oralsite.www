@@ -2,52 +2,36 @@ var mockPageHash = {
     "annotations" : [{
         "about" : document.location.origin + "/static/components/popcorn-js/test/trailer.ogv",
         "body" : "# Annotations\n\nThis is an introduction. This is how I imagine Camus when I read his diary, and this seems like a good model for living: you go to a swimming pool in Algiers, swim, dry in the sun, look at the beautiful boys and girls, think really hard, look at the beautiful boys and girls, think really hard, write a sentence, rewrite the sentence, swim, dry in the sun, rewrite the sentence, think really hard, rewrite the sentence, look at the beautiful boys and girls, rewrite the sentence.\n\nThe followingn are annotations to the video underneath.\n\n00:04,738 --> 00:16,867\n\nI hope that you'll go along with this rather unusual setting, and the fact that I remain seated when I get introduced, and the fact that I'm going to come to you mostly through this medium here for the rest of the show.\n\n00:16,867-->00:21,867\n\n And now we showthat sound files in comments get triggered automatically. This is an Italian song:\n\n [[ embed::" + document.location.origin + "/static/components/popcorn-js/test/italia.ogg ]]{: class='small' } \n\n  I should tell you that I'm backed up by quite a staff of people between here and Menlo Park [sp?], where Stanford research is located some thirty miles south of here.  If everyone does their job well, it's all go very interesting, I think.  [Laughs]\n\n00:42,867 --> 00:58,867\n\nThe research program that I'm going to describe to you is quickly characterizable by saying:  If in your office, you as an intellectual worker, were supplied with a computer display backed up by a computer that was alive for you all day, and was instantly responsible, responsive [laughs], instantly responsive to every action you had, how much value could you derive from that?  Well, this basically characterizes what we've been pursuing for many years, and what we we call The Augmentive Human Intellect Research Center at Standford Research Institute.\n",
-        "height" : 400,
         "id" : 2,
-        "left" : 10,
+        "style" : "left: 10px; top: 18px; width: 301; height: 400",
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/2/",
-        "top" : 18,
-        "width" : 301
     }, {
         "body" : "#A video\n\n\n00:00:01,000 --> 00:01:05,000\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
-        "height" : 400,
         "id" : 9,
-        "left" : 10,
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/9/",
-        "top" : 458,
-        "width" : 300
+        "style" : "left: 10px; top: 458px; width: 300px; height: 400px",
     }, {
         "body" : "#Youtube!\n\n[[ embed::http://www.youtube.com/watch?v=v-7kf7OZQtw  ]]\n\nThis is a video embedded from youtube. Look, there’s connected events:\n\n00:04 --> 00:08\n\nI kick in after 4 seconds\n\n\nAnd there’s Soundcloud too:\n\n[[ embed::http://soundcloud.com/redlightradio/subbacultcha-with-palms-trax ]]",
         "about" : "http://www.youtube.com/watch?v=v-7kf7OZQtw",
-        "height" : 400,
         "id" : 66,
-        "left" : 333,
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/66/",
-        "top" : 458,
-        "width" : 300
+        "style" : "left: 333px; top: 458px; width: 300px; height: 400px",
     }, {
         "body" : "#Filters\n\nFor now, OLGA knows three filters: `thumb`, `resize` and `bw`.\n\nThis image of Sherry Turkle is downloaded from wikipedia, grayscaled and thumbnailed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]\n\n`[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]`\n\nWith the order reversed:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||thumb|bw ]]\n\n`[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||bw|thumb ]]`\n\nJust a thumbnail (another image):\n\n[[ embed::https://farm8.staticflickr.com/7244/14035829911_e077859733_c.jpg||thumb ]]\n\n`[[ embed::https://farm8.staticflickr.com/7244/14035829911_e077859733_c.jpg||thumb ]]`\n\nAnd this is resizing. It has an argument for the width:\n\n[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||resize:256 ]]\n\n`[[ embed::http://upload.wikimedia.org/wikipedia/commons/4/43/Sherry_Turkle.jpg||resize:256 ]]`",
-        "about" : "",
-        "height" : 400,
         "id" : 69,
-        "left" : 333,
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/69/",
-        "top" : 868,
-        "width" : 300
+        "style" : "left: 333px; top: 868px; width: 300; height: 400",
     }, {
         "about" : document.location.origin + '/pages/Tests/#annotation-0024',
         "body" : "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n",
-        "height" : 400,
         "id" : 24,
-        "left" : 333,
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/24/",
-        "top" : 18,
-        "width" : 300
+        "style" : "left: 333px; top: 18px; width: 300; height: 400",
     }],
     "id" : 1,
     "introduction" : "",
