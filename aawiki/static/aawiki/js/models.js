@@ -87,6 +87,9 @@ window.AA = window.AA || {};
             if (!this.get('page')) {
                 this.set('page', AA.router.pageView.model.url());
             }
+            if (!this.get('about')) {
+                this.set("about", document.location.href);
+            }
         },
     });
     

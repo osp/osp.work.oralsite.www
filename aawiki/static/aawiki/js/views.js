@@ -1078,7 +1078,11 @@ window.AA = window.AA || {};
             };
         },
         renderPlayer: function() {
-            var duration = this.driver.duration();
+            if (this.driver) {
+                var duration = this.driver.duration();
+            } else {
+                return this;
+            }
             if (duration === 0) {
                 duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
             }
