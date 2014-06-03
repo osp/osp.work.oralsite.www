@@ -5,6 +5,9 @@ window.AA = window.AA || {};
     'use strict';
 
 
+    jsFront(jsyaml);
+
+
     AA.SiteModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/site/",
     });
@@ -26,23 +29,6 @@ window.AA = window.AA || {};
             width: 300,
             height: 400,
         },
-        parse: function(response) {
-            response.class = response.klass; 
-            delete response.klass;
-
-            return response; 
-        },
-        toJSON: function(options) {  
-            var attr = Backbone.Model.prototype.toJSON.call(this);  
-            if(options && options.noalias) { 
-            } else {
-                attr.klass = attr.class
-
-                delete attr.class;
-            }; 
-            
-            return attr; 
-        },
         set: function(attributes, options) {
             // Removes classes that should not be stored
             var excluded = [
@@ -53,16 +39,31 @@ window.AA = window.AA || {};
                 'focused'
             ].join(' ');
 
-            attributes['class'] = $('<div>')
-                .attr('class', attributes['class'])
+            attributes['klass'] = $('<div>')
+                .attr('class', attributes['klass'])
                 .removeClass(excluded)
                 .attr('class');
 
             return Backbone.Model.prototype.set.call(this, attributes, options);
         },
+        loadFront: function (src, name) {
+            name = name || '__content';
+
+            var data = jsyaml.loadFront(src, name);
+
+            data['klass'] = data['class'];
+            delete data['class'];
+
+            this.set(data);
+
+            return this;
+        },
         toFrontMatter: function() {
             var data = this.toJSON({noalias: true});
             var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
+
+            data['class'] = data.klass;
+            delete data.klass;
 
             delete data.body;
             delete data.page;
@@ -110,6 +111,9 @@ window.AA = window.AA || {};
             var data = this.toJSON();
             var introduction = data['introduction'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
 
+            data['class'] = data.klass;
+            delete data.klass;
+
             delete data.introduction;
             delete data.permissions;
             delete data.rev;
@@ -125,6 +129,18 @@ window.AA = window.AA || {};
             output += introduction;
 
             return output;
+        },
+        loadFront: function (src, name) {
+            name = name || '__content';
+
+            var data = jsyaml.loadFront(src, name);
+
+            data['klass'] = data['class'];
+            delete data['class'];
+
+            this.set(data);
+
+            return this;
         },
         prev_rev: function() {
             var current = this.get('rev');  

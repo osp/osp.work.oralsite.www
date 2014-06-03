@@ -45,10 +45,9 @@ window.AA = window.AA || {};
         submit: function (event){
             event.preventDefault();
 
-            jsFront(jsyaml);
-            var data = jsyaml.loadFront($('textarea[name="introduction"]', this.$el).val(), 'introduction');
-
-            this.model.set(data).save();
+            this.model
+                .loadFront($('textarea[name="introduction"]', this.$el).val(), 'introduction')
+                .save();
 
             this.remove();
         },
@@ -627,10 +626,9 @@ window.AA = window.AA || {};
         },
         toggle: function() {
             if (this.editing) {
-                jsFront(jsyaml);
-                var data = jsyaml.loadFront($('textarea', this.$el).val(), 'body');
-
-                this.model.set(data).save();
+                this.model
+                    .loadFront($('textarea', this.$el).val(), 'body')
+                    .save();
             };
 
             this.editing = !this.editing;
@@ -690,7 +688,7 @@ window.AA = window.AA || {};
                 $tmp.addClass('collapsed');
             }
 
-            this.model.set("class", $tmp.attr('class'));
+            this.model.set("klass", $tmp.attr('class'));
             this.model.save();
             this.render();
 
@@ -701,7 +699,7 @@ window.AA = window.AA || {};
 
             $tmp.toggleClass('foobar');
 
-            this.model.set("class", $tmp.attr('class'));
+            this.model.set("klass", $tmp.attr('class'));
             this.model.save();
             this.render();
 
@@ -918,7 +916,7 @@ window.AA = window.AA || {};
                 var title = this.model.get("title");
 
                 this.$el.attr('style', this.model.get('style'));
-                this.$el.attr('class', this.model.get('class'));
+                this.$el.attr('class', this.model.get('klass'));
 
                 this.$el
                 .removeClass('editing')
