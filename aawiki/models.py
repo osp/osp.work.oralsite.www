@@ -16,6 +16,7 @@ class Page(RCSModel):
     introduction = models.TextField(blank=True)
     style = models.TextField(blank=True)
     klass = models.TextField(blank=True)
+    stylesheet = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name

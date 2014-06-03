@@ -241,6 +241,16 @@ window.AA = window.AA || {};
             AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
             AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
 
+            $('#extra-stylesheet').remove();
+            var stylesheet = this.model.get('stylesheet');
+            if (stylesheet) {
+                $('<link>').attr({
+                    id: 'extra-stylesheet',
+                    rel: 'stylesheet',
+                    href: stylesheet
+                }).appendTo('head');
+            }
+
             // If the element is not yet part of the DOM:
             if ($('#page-meta').length === 0 ) {
                 $('#page-meta-container').prepend(this.el);
