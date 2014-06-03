@@ -14,6 +14,8 @@ class Page(RCSModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     introduction = models.TextField(blank=True)
+    style = models.TextField(blank=True)
+    klass = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name

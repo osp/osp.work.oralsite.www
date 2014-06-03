@@ -33,6 +33,41 @@ window.AA = window.AA || {};
     });
 
 
+    AA.EditIntroductionView = Backbone.View.extend({
+        tagName: 'div',
+        attributes: {class: 'popup-wrapper'},
+        events: {
+            'click input[value="cancel"]': 'remove', 
+            "submit"                     : 'submit',
+            "keypress input"             : "submitOnEnter",
+        },
+        template: _.template($('#edit-introduction-view-template').html()),
+        submit: function (event){
+            event.preventDefault();
+
+            jsFront(jsyaml);
+            var data = jsyaml.loadFront($('textarea[name="introduction"]', this.$el).val(), 'introduction');
+
+            this.model.set(data).save();
+
+            this.remove();
+        },
+        submitOnEnter: function(event) {
+            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.login(event);
+            }
+        },
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            this.$el.html(this.template({introduction: this.model.toFrontMatter()}))
+            $('body').append(this.$el);
+        },
+    });
+
+    
     AA.PopUpView = Backbone.View.extend({
         tagName: 'div',
         attributes: {class: 'popup-wrapper'},
@@ -203,6 +238,9 @@ window.AA = window.AA || {};
                 .end()
                 .find('#accordion').tabs() 
                 ;
+
+            AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
+            AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
 
             // If the element is not yet part of the DOM:
             if ($('#page-meta').length === 0 ) {
@@ -1137,7 +1175,14 @@ window.AA = window.AA || {};
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})
-                    .on('click', function() { window.alert('Not implemented yet!') }),
+                    //.on('click', function() { window.alert('Not implemented yet!') }),
+                    .on('click', function() { 
+                        if (AA.router.annotationCollectionView.cursorMenu.visible()) {
+                            AA.router.annotationCollectionView.cursorMenu.hide ();
+                        };
+
+                        new AA.EditIntroductionView({model: AA.router.pageModel }) 
+                    }),
 
                 // Create Manage permissions Button
                 new AA.widgets.MenuButton ({title: 'manage permissions', class: 'icon-ok'})
@@ -1170,6 +1215,7 @@ window.AA = window.AA || {};
         render: function() {
             var $el = this.$el;
             $el.empty();
+
             this.collection.each(function(annotation) {
                 var annotationView = new AA.AnnotationView({model: annotation});
                 $el.append(annotationView.el);

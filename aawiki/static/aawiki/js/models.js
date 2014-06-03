@@ -32,14 +32,6 @@ window.AA = window.AA || {};
 
             return response; 
         },
-        //toJSON: function() {  
-            //var attr = Backbone.Model.prototype.toJSON.call(this);  
-            //attr.klass = attr.class; 
-
-            //delete attr.class;
-
-            //return attr;
-        //},
         toJSON: function(options) {  
             var attr = Backbone.Model.prototype.toJSON.call(this);  
             if(options && options.noalias) { 
@@ -114,6 +106,26 @@ window.AA = window.AA || {};
                 includeInJSON: 'resource_uri'
             }
         }],
+        toFrontMatter: function() {
+            var data = this.toJSON();
+            var introduction = data['introduction'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
+
+            delete data.introduction;
+            delete data.permissions;
+            delete data.rev;
+            delete data.annotations;
+            delete data.id;
+            delete data.revisions;
+            delete data.resource_uri;
+            delete data.slug;
+
+            var output = "---\n";
+            output += jsyaml.dump(data, 4);
+            output += "---\n\n";
+            output += introduction;
+
+            return output;
+        },
         prev_rev: function() {
             var current = this.get('rev');  
             var all = this.get('revisions');  
