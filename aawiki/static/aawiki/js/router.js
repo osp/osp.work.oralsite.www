@@ -36,9 +36,7 @@ window.AA = window.AA || {};
                             name:         AA.utils.dewikify(AA.router.currentSlug),
                             introduction: ''
                         });
-                        console.log(AA.router.currentSlug);
-                        console.log(AA.utils.wikify(AA.router.currentSlug));
-                        console.log(model.attributes);
+
                         /* We save. The API returns the newly created object,
                          * which also contains the appropriate permissions,
                          * created on the server-side.
@@ -70,6 +68,9 @@ window.AA = window.AA || {};
             
             this.timelinePlayerView && this.timelinePlayerView.remove();
             this.timelinePlayerView = new AA.TimelinePlayerView();
+
+            this.userCollection = new AA.UserCollection();
+            this.userCollection.fetch();
         }
     });
     

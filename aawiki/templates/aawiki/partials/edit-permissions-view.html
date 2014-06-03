@@ -1,0 +1,48 @@
+<div class="popup">
+    <form>
+
+        <p>
+            <label for="visibleby">Visible by</label><br />
+            <select name="visitors" multiple="multiple">
+                <% visitors.each(function(user) { %>
+                <option value="<%= user.get('username') %>"
+                    <% if (user.get('selected')) { %> selected<% } %>
+                    >
+                    <%= user.get('username') %></option>
+                <% }); %>
+            </select>
+        </p>
+
+
+        <p>
+            <label for="editors">Editable by</label><br />
+            <select name="editors" multiple="multiple">
+                <% editors.each(function(user) { %>
+                <option value="<%= user.get('username') %>"
+                    <% if (user.get('selected')) { %> selected<% } %>
+                    >
+                    <%= user.get('username') %></option>
+                <% }); %>
+            </select>
+        </p>
+
+
+        <p>
+            <label for="visibleby">Administrated by</label><br />
+            <select name="administrators" multiple="multiple">
+                <% admins.each(function(user) { %>
+                <option value="<%= user.get('username') %>"
+                    <% if (user.get('selected')) { %> selected<% } %>
+                    >
+                    <%= user.get('username') %></option>
+                <% }); %>
+            </select>
+        </p>
+
+
+        <p>
+            <input type="button" value="cancel" name="cancel" />
+            <input type="submit" name="submit" />
+        </p>
+    </form>
+</div>

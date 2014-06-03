@@ -482,7 +482,7 @@ section.section1 {
         }
     }
 
-    &.foobar > div.wrapper {
+    &.active-only > div.wrapper {
         & .active {
             background-color: inherit;
         }
@@ -499,6 +499,10 @@ section.section1 {
                 visibility: visible;
             }
         }
+    }
+
+    &.hover-top:hover {
+        z-index: 9999999 !important; /* TODO: check if written correctly */
     }
 }
 
@@ -576,7 +580,7 @@ section.section1 .wrapper {
 }
 
 #revisions_browser_ctrl {
-    display: none;
+    /*display: none;*/
     font-family: 'News Cycle', sans;
     font-size: 15px;
     line-height: 20px;
@@ -715,6 +719,10 @@ img {
     display: none;
 }
 
+.nosubdivisions section {
+    border-top: none;
+}
+
 .icon {
     width: 40px;
     height: 40px;
@@ -816,5 +824,14 @@ img {
 
     &:hover {
         background-image: url('/static/aawiki/png/icons/export-hover.png');
+    }
+}
+
+section.section1 {
+    ul li:before {
+        content: "– ";
+    }
+    ol {
+        list-style: decimal inside;
     }
 }

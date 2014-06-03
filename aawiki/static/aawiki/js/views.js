@@ -33,6 +33,69 @@ window.AA = window.AA || {};
     });
 
 
+    AA.EditPermissionsView = Backbone.View.extend({
+        tagName: 'div',
+        attributes: {class: 'popup-wrapper'},
+        events: {
+            'click input[value="cancel"]': 'remove', 
+            "submit"                     : 'submit',
+            "keypress input"             : "submitOnEnter",
+        },
+        template: _.template($('#edit-permissions-view-template').html()),
+        submit: function (event){
+            event.preventDefault();
+
+            /* do something here */
+
+            this.remove();
+        },
+        submitOnEnter: function(event) {
+            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.login(event);
+            }
+        },
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            var permissions = this.model.get('permissions');
+
+            var ids = _.pluck(permissions.view_page, 'id')
+            var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            visitorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.change_page, 'id')
+            var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            editorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.administer_page, 'id')
+            var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
+            adminCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            this.$el.html(this.template({
+                visitors: visitorCollection,
+                editors: editorCollection,
+                admins: adminCollection
+            }));
+
+            $('body').append(this.$el);
+        },
+    });
+
+
     AA.EditIntroductionView = Backbone.View.extend({
         tagName: 'div',
         attributes: {class: 'popup-wrapper'},
@@ -61,7 +124,7 @@ window.AA = window.AA || {};
             this.render();
         },
         render: function() {
-            this.$el.html(this.template({introduction: this.model.toFrontMatter()}))
+            this.$el.html(this.template({introduction: this.model.toFrontMatter()}));
             $('body').append(this.$el);
         },
     });
@@ -707,7 +770,7 @@ window.AA = window.AA || {};
         toggleTransition: function() {
             var $tmp = $('<div>').attr('class', this.$el.attr('class'));
 
-            $tmp.toggleClass('foobar');
+            $tmp.toggleClass('active-only');
 
             this.model.set("klass", $tmp.attr('class'));
             this.model.save();
@@ -1183,18 +1246,23 @@ window.AA = window.AA || {};
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})
-                    //.on('click', function() { window.alert('Not implemented yet!') }),
                     .on('click', function() { 
                         if (AA.router.annotationCollectionView.cursorMenu.visible()) {
                             AA.router.annotationCollectionView.cursorMenu.hide ();
                         };
 
-                        new AA.EditIntroductionView({model: AA.router.pageModel }) 
+                        new AA.EditIntroductionView({model: AA.router.pageModel });
                     }),
 
                 // Create Manage permissions Button
                 new AA.widgets.MenuButton ({title: 'manage permissions', class: 'icon-ok'})
-                    .on('click', function() { window.alert('Not implemented yet!') }),
+                    .on('click', function() { 
+                        if (AA.router.annotationCollectionView.cursorMenu.visible()) {
+                            AA.router.annotationCollectionView.cursorMenu.hide ();
+                        };
+
+                        new AA.EditPermissionsView({model: AA.router.pageModel});
+                    }),
 
                 // Create Set About Value Button
                 new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
