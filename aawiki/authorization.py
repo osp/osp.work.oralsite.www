@@ -65,10 +65,10 @@ class PerUserAuthorization(Authorization):
         Only superusers can read the list of users
         (TODO: should be all users in the ‘editors’ group)
         """
-        if get_user(bundle).is_superuser:
+        if get_user(bundle).id != -1:
             return object_list
         else:
-            raise Unauthorized("Sorry, you can not see the other users")
+            raise Unauthorized("Sorry, no user list")
     
     def read_detail(self, object_list, bundle):
         """

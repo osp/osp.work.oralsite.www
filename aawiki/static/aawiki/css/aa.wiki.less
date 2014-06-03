@@ -388,14 +388,12 @@ section.section1 {
         overflow-x: hidden;
         height: 100%;
         width: 100%;
-        top: 0;
         left: 0;
         position: absolute;
         .box-sizing(border-box);
 
         padding: 5px;
         background: inherit;
-        outline: inherit;
 
         section[typeof="aa:annotation"] {
             border-top: 1px solid whitesmoke;
@@ -527,8 +525,11 @@ section.section1 .wrapper {
 
 .controls {
     line-height: 16px;
-    padding: 5px 5px 0px 5px;
-   
+
+    .controls-wrapper {
+        padding: 5px 5px 0px 5px;
+    }
+    
     a {
         color: #000;
         font-size: 16px;

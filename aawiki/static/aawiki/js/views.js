@@ -1117,7 +1117,7 @@ window.AA = window.AA || {};
                         .on('click', this.toggleTransition.bind(this)),
                     new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
                         .on('click', this.toggleCollapsing.bind(this)),
-                    new AA.widgets.MenuButton({title: 'slider', class: 'icon-layers'})
+                    new AA.widgets.MenuButton({title: 'set z-index', class: 'icon-layers'})
                         .on('mousedown', this.changeZIndex.bind(this)),
                 ]);
 
@@ -1151,7 +1151,11 @@ window.AA = window.AA || {};
             };
         },
         renderPlayer: function() {
-            var duration = this.driver.duration();
+            if (this.driver) {
+                var duration = this.driver.duration();
+            } else {
+                return this;
+            }
             if (duration === 0) {
                 duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
             }
