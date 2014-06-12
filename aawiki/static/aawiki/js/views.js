@@ -550,6 +550,7 @@ window.AA = window.AA || {};
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
+            this.render();
         },
         hasPlay: function() {
             return this.driver.getTrackEvents().length > 0;

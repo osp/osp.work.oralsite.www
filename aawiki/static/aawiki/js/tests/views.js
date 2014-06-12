@@ -268,7 +268,6 @@ describe("The views", function() {
 
     describe("The Timeline Player view", function() {
         AA.router.timelinePlayerView = new AA.TimelinePlayerView();
-        AA.router.timelinePlayerView.render();
 
         it("can be initialised", function() {
             expect(AA.router.timelinePlayerView).toBeDefined();
