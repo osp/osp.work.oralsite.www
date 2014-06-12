@@ -549,6 +549,7 @@ window.AA = window.AA || {};
         },
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
+            this.listenTo(AA.globalEvents, "aa:newDrivers", this.render, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
             this.render();
         },
