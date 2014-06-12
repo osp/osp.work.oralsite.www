@@ -483,10 +483,14 @@ section.section1 {
     &.active-only > div.wrapper {
         & .active {
             background-color: inherit;
+            height: inherit;
+            padding: inherit;
         }
 
         & section[typeof="aa:annotation"] {
             visibility: hidden;
+            height: 0px;
+            padding: 0px;
 
             &.active {
                 visibility: visible;
