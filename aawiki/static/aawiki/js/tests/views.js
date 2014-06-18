@@ -27,11 +27,12 @@ var mockPageHash = {
         "style" : "left: 333px; top: 868px; width: 300; height: 400",
     }, {
         "about" : document.location.origin + '/pages/Tests/#annotation-0024',
-        "body" : "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n",
+        "body" : "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n\n8<\n\nThird slide\n",
         "id" : 24,
         "page" : "/pages/api/v1/page/Tests/",
         "resource_uri" : "/pages/api/v1/annotation/24/",
         "style" : "left: 333px; top: 18px; width: 300; height: 400",
+        "klass" : "active-only",
     }],
     "id" : 1,
     "introduction" : "",
@@ -267,7 +268,6 @@ describe("The views", function() {
 
     describe("The Timeline Player view", function() {
         AA.router.timelinePlayerView = new AA.TimelinePlayerView();
-        AA.router.timelinePlayerView.render();
 
         it("can be initialised", function() {
             expect(AA.router.timelinePlayerView).toBeDefined();
