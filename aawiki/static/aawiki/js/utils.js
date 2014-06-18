@@ -365,7 +365,7 @@ window.AA = window.AA || {};
         _ = divmod(ss, 3600); hh = _[0]; ss = _[1];
         _ = divmod(ss, 60); mm = _[0]; ss = _[1];
 
-        ms = rpad(hh, 3);
+        ms = rpad(ms, 3);
         ss = lpad(ss, 2);
         mm = lpad(mm, 2);
         hh = lpad(hh, 2);
@@ -378,13 +378,6 @@ window.AA = window.AA || {};
     }
     
     AA.utils.secondsToTimecode = ss2tc;
-    //AA.utils.secondsToTimecode = function(seconds) {
-        //var d = Number(seconds);
-        //var h = Math.floor(d / 3600);
-        //var m = Math.floor(d % 3600 / 60);
-        //var s = Math.floor(d % 3600 % 60);
-        //return ((h > 0 ? h + ":" : "") + (m > 0 ? (h > 0 && m < 10 ? "0" : "") + m + ":" : "0:") + (s < 10 ? "0" : "") + s);
-    //};
 
     AA.utils.wikify = function(target) {
       // Links like 'sherry Turkle' will get wikified.

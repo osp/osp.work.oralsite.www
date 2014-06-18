@@ -838,9 +838,9 @@ window.AA = window.AA || {};
             this.deleteAnnotationEvents();
             this.$el.find("[typeof='aa:annotation']").each(function (i, el) {
                  var $annotation = $(el);
-                 var start = AA.utils.timecodeToSeconds($annotation.attr("data-begin"));
+                 var start = parseFloat($annotation.attr("data-begin"));
 
-                 var end   = AA.utils.timecodeToSeconds($annotation.attr("data-end"));
+                 var end   = parseFloat($annotation.attr("data-end"));
                  var p = that.driver.aa({
                      start: start,
                      end: end,
