@@ -602,8 +602,8 @@ window.AA = window.AA || {};
                 }
                 
                 // update time based values:
-                this.$el.find('.current_time').text(AA.utils.secondsToTimecode(this.driver.currentTime()));
-                this.$el.find('.duration').text(AA.utils.secondsToTimecode(this.duration()));
+                this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
+                this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
                 this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
                 this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
             }
@@ -801,7 +801,7 @@ window.AA = window.AA || {};
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
-                this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4) );
+                this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4) );
             }
             this.model.save();
             this.render();
@@ -963,7 +963,7 @@ window.AA = window.AA || {};
 
                     // FIXME: call that.driver instead
                     var driver = AA.router.multiplexView.drivers[that.model.get('about')];
-                    $(this).insertAtCaret('\n\n' + AA.utils.secondsToTimecode(driver.currentTime()) + ' -->\n\n');
+                    $(this).insertAtCaret('\n\n' + AA.utils.ss2tc(driver.currentTime()) + ' -->\n\n');
                 })
                 .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
                     event.preventDefault();
@@ -1022,7 +1022,7 @@ window.AA = window.AA || {};
                     // isMedia:     this.isMedia() added this down below because the resources need to be rendered first
                 }))
                 .addClass('section1')
-                .attr('id', 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4 )) // id="annotation-0004"
+                .attr('id', 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4 )) // id="annotation-0004"
                 .attr('about', this.model.attributes.about)
                 .resizable({
                     resize: function (event, ui) {
@@ -1127,7 +1127,7 @@ window.AA = window.AA || {};
                     //// Set About Value Button
                     new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                         .draggable({ helper: "clone" })
-                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.zeropad( this.model.attributes.id, 4))
+                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4))
                 ]);
                 this.$el.find('.menu-left').append([
                     //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
@@ -1184,8 +1184,8 @@ window.AA = window.AA || {};
                 .html(this.templates.player({
                     hasPlay:     this.hasPlay(),
                     paused:      this.driver.paused(),
-                    duration:    AA.utils.secondsToTimecode(duration),
-                    currentTime: AA.utils.secondsToTimecode(this.driver.currentTime()),
+                    duration:    AA.utils.ss2tc(duration),
+                    currentTime: AA.utils.ss2tc(this.driver.currentTime()),
                     next:        this.nextEvent(),
                     previous:    this.previousEvent(),
                 }));

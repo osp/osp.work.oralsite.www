@@ -1,3 +1,8 @@
+/*
+ * Depends on https://github.com/aleray/markdown-js/tree/aa
+ */
+
+
 window.AA = window.AA || {};
 
 (function(undefined) {
@@ -301,83 +306,8 @@ window.AA = window.AA || {};
         return hash;
     };
     
-    AA.utils.zeropad = function (n, toplaces) {
-        var ret = "" + n;
-        var foo = toplaces - ret.length;
-        for (var i = 0; i < foo; i++) { ret = "0" + ret; }
-        return ret;
-    };
-    
-    AA.utils._timecodeToSecsPat = /^(?:(\d\d):)?(\d\d):(\d\d)(,(\d{1,3}))?$/;
-    
-    /**
-     * Converts a timecode to seconds (float).  Seeks and returns first timecode pattern
-     * and returns it in secs nb:.  Timecode can appear anywhere in string, will
-     * only convert first match.  
-     * @private
-     * @param {String} tcstr A string containing a timecode pattern.
-     * @returns A timecode in secs nb.
-     */
-    AA.utils.timecodeToSeconds = function (tcstr) {
-        var r = tcstr.match(AA.utils._timecodeToSecsPat);
-        if (r) {
-            var seconds = 0;
-            if (r[1]) {
-                // hours
-                // Note that the parseInt(f, 10):avoids "09" being seen as octal (and throws an error)
-                seconds += 3600 * parseInt(r[1], 10);
-            }
-            // minutes
-            seconds += 60 * parseInt(r[2], 10);
-            // seconds
-            seconds += parseInt(r[3], 10);
-            // fraction of second
-            if (r[5]) {
-                seconds = parseFloat(seconds + "." + r[5]);
-            }
-            return seconds;
-        } else {
-            return null;
-        }
-    };
-
-    // FIXME: namespace and export the functions below
-    function rpad (n, width, z) {
-        z = z || '0';
-        n = n + '';
-        return n.length >= width ? n : n + new Array(width - n.length + 1).join(z);
-    }
-
-    function lpad (n, width, z) {
-        z = z || '0';
-        n = n + '';
-        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-    }
-
-    function divmod (a, b) {
-        return [ Math.floor(a / b), a % b ];
-    }
-
-    function ms2tc (ms) {
-        var _, ms = ms, ss, mm, hh;
-
-        _ = divmod(ms, 1000); ss = _[0]; ms = _[1];
-        _ = divmod(ss, 3600); hh = _[0]; ss = _[1];
-        _ = divmod(ss, 60); mm = _[0]; ss = _[1];
-
-        ms = rpad(ms, 3);
-        ss = lpad(ss, 2);
-        mm = lpad(mm, 2);
-        hh = lpad(hh, 2);
-
-        return hh + ':' + mm + ':' + ss + ',' + ms;
-    }
-
-    function ss2tc (ss) {
-        return ms2tc(ss * 1000);
-    }
-    
-    AA.utils.secondsToTimecode = ss2tc;
+    AA.utils.ss2tc = markdown.Markdown.dialects.Aa.utils.ss2tc;
+    AA.utils.lpad = markdown.Markdown.dialects.Aa.utils.lpad;
 
     AA.utils.wikify = function(target) {
       // Links like 'sherry Turkle' will get wikified.

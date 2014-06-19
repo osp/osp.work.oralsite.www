@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-06-18T21:07Z
+ * Date: 2014-06-19T15:38Z
  */
 
 (function(expose) {
@@ -1837,6 +1837,8 @@
     mm = _[0];
     ss = _[1];
 
+    ms = parseInt(ms, 10);
+
     ms = rpad(ms, 3);
     ss = lpad(ss, 2);
     mm = lpad(mm, 2);
@@ -2096,6 +2098,15 @@
     // Just consume the '[['
     return [ 2, "%%" ];
   };
+
+  // Exposes the various utils because they might be useful elsewhere
+  Aa.utils = Aa.utils || {};
+  Aa.utils.rpad = rpad;
+  Aa.utils.lpad = lpad;
+  Aa.utils.divmod = divmod;
+  Aa.utils.ms2tc = ms2tc;
+  Aa.utils.ss2tc = ss2tc;
+  Aa.utils.tc2ss = tc2ss;
 
   Markdown.dialects.Aa = Aa;
   Markdown.buildBlockOrder ( Markdown.dialects.Aa.block );
