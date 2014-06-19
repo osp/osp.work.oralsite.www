@@ -4,23 +4,24 @@
         <p>
             <label for="visibleby">Visible by</label><br />
             <select name="visitors" multiple="multiple">
-                <% visitors.each(function(user) { %>
-                <option value="<%= user.get('username') %>"
-                    <% if (user.get('selected')) { %> selected<% } %>
+                <% users.each(function(user) { %>
+                <option value="<%= user.get('id') %>"
+                    <% if (_.contains(can_view_ids, user.get('id'))) { %> selected<% } %>
                     >
+                    <%= user.get('selected') %>
                     <%= user.get('username') %></option>
                 <% }); %>
             </select>
         </p>
-
 
         <p>
             <label for="editors">Editable by</label><br />
             <select name="editors" multiple="multiple">
-                <% editors.each(function(user) { %>
-                <option value="<%= user.get('username') %>"
-                    <% if (user.get('selected')) { %> selected<% } %>
+                <% users.each(function(user) { %>
+                <option value="<%= user.get('id') %>"
+                    <% if (_.contains(can_change_ids, user.get('id'))) { %> selected<% } %>
                     >
+                    <%= user.get('selected') %>
                     <%= user.get('username') %></option>
                 <% }); %>
             </select>
@@ -28,17 +29,17 @@
 
 
         <p>
-            <label for="visibleby">Administrated by</label><br />
+            <label for="administrators">Administrated by</label><br />
             <select name="administrators" multiple="multiple">
-                <% admins.each(function(user) { %>
-                <option value="<%= user.get('username') %>"
-                    <% if (user.get('selected')) { %> selected<% } %>
+                <% users.each(function(user) { %>
+                <option value="<%= user.get('id') %>"
+                    <% if (_.contains(can_administer_ids, user.get('id'))) { %> selected<% } %>
                     >
+                    <%= user.get('selected') %>
                     <%= user.get('username') %></option>
                 <% }); %>
             </select>
         </p>
-
 
         <p>
             <input type="button" value="cancel" name="cancel" />

@@ -43,16 +43,58 @@ window.AA = window.AA || {};
         },
         template: _.template($('#edit-permissions-view-template').html()),
         submit: function (event){
+            var getPermissionEntries = function($elt) {
+                var ids = _.map($elt.val(), function(val) { return parseInt(val); });
+                
+                var users = AA.router.userCollection.filter(function(model) { 
+                    return _.contains(ids, model.get('id')); 
+                });
+
+                return _.map(users, function(user) { 
+                    var name = user.get('first_name');
+                    name = name ? name : user.get('username');
+                    var id = user.get('id');
+
+                    return {
+                        'current': (id === current_user_id),
+                        'type' : 'user',
+                        'id'   : id,
+                        'name' : name,
+                        'uri'  : '/pages/api/v1/user/' + id + '/'
+                    }
+                });
+            }
+
             event.preventDefault();
 
-            /* do something here */
+            this.$el.find('select, input').prop('disabled', true);
 
-            this.remove();
+            var current_user_id = AA.userView.model.get('id');
+
+            var permissions = this.model.get('permissions')
+
+            permissions.view_page = getPermissionEntries(this.$el.find('[name="visitors"]'));
+            permissions.change_page = getPermissionEntries(this.$el.find('[name="editors"]'));
+            permissions.administer_page = getPermissionEntries(this.$el.find('[name="administrators"]'));
+
+            var that = this;
+
+            this.model.set('permissions', permissions);
+            this.model.save(null, {
+                error: function() {
+                    console.log("there was an error");
+                    this.$el.find('select, input').prop('disabled', false);
+                },
+                success: function() {
+                    that.remove();
+                }
+            });
+
         },
         submitOnEnter: function(event) {
             // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
             if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(event);
+                this.submit(event);
             }
         },
         initialize: function() {
@@ -61,34 +103,11 @@ window.AA = window.AA || {};
         render: function() {
             var permissions = this.model.get('permissions');
 
-            var ids = _.pluck(permissions.view_page, 'id')
-            var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
-            visitorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
-            ids = _.pluck(permissions.change_page, 'id')
-            var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
-            editorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
-            ids = _.pluck(permissions.administer_page, 'id')
-            var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
-            adminCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
             this.$el.html(this.template({
-                visitors: visitorCollection,
-                editors: editorCollection,
-                admins: adminCollection
+                users: AA.router.userCollection,
+                can_view_ids: _.pluck(permissions.view_page, 'id'),
+                can_change_ids: _.pluck(permissions.change_page, 'id'),
+                can_administer_ids: _.pluck(permissions.administer_page, 'id')
             }));
 
             $('body').append(this.$el);

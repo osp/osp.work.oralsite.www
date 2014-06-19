@@ -18,7 +18,7 @@ from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.utils import trailing_slash
 
 from aawiki.models import Annotation, Page
-from aawiki.authorization import *
+from aawiki.authorization import get_user, get_serialized_perms, extract_perms_for_comparison, PerUserAuthorization, PerPageAuthorization, PerAnnotationAuthorization
 from django.http import HttpResponse
 
 import json
