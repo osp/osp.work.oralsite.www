@@ -15,6 +15,9 @@ window.AA = window.AA || {};
     
     AA.UserModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/user/",
+        loggedIn: function() {
+            return this.get("id") !== -1 && this.get("id") !== 'me'; // it’s `me` when the app first tries to find out who the user is: the backend returns the real id
+        },
     });
     
     
@@ -24,27 +27,7 @@ window.AA = window.AA || {};
             title: "Untitled",
             about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
             body: "Nouvelle annotation",
-            top: 10,
-            left: 10,
-            width: 300,
-            height: 400,
-        },
-        set: function(attributes, options) {
-            // Removes classes that should not be stored
-            var excluded = [
-                'section1', 
-                'ui-resizable', 
-                'ui-draggable', 
-                'ui-droppable', 
-                'focused'
-            ].join(' ');
-
-            attributes['klass'] = $('<div>')
-                .attr('class', attributes['klass'])
-                .removeClass(excluded)
-                .attr('class');
-
-            return Backbone.Model.prototype.set.call(this, attributes, options);
+            style: 'width: 300px; height: 400px; top: 10px; left: 10px;'
         },
         loadFront: function (src, name) {
             name = name || '__content';
@@ -151,7 +134,7 @@ window.AA = window.AA || {};
             var prev = null;
 
             if (current !== null) {
-                var index = _.findIndex(all, {id: current})
+                var index = _.findIndex(all, {id: current});
 
                 if (index + 1 < all.length) {
                     prev = all[index + 1];
@@ -171,7 +154,7 @@ window.AA = window.AA || {};
 
             // We are not looking an old revision so there is no next revision
             if (current !== null) {
-                var index = _.findIndex(all, {id: current})
+                var index = _.findIndex(all, {id: current});
 
                 if (index - 1 >= 0) {
                     next = all[index - 1];
@@ -187,7 +170,7 @@ window.AA = window.AA || {};
 
             // We are not looking an old revision so there is no next revision
             if (current !== null) {
-                rev = _.findWhere(all, {id: current})
+                rev = _.findWhere(all, {id: current});
             }
 
             return rev;

@@ -101,7 +101,7 @@ describe("The views", function() {
         var mockUserHash = {
             id : 'me'
         };
-        var mockUserModel = new Backbone.Model(mockUserHash);
+        var mockUserModel = new AA.UserModel(mockUserHash);
         AA.userView = new AA.UserView({
             model : mockUserModel
         });

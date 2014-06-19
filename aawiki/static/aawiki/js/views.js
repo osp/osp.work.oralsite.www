@@ -103,6 +103,30 @@ window.AA = window.AA || {};
         render: function() {
             var permissions = this.model.get('permissions');
 
+            var ids = _.pluck(permissions.view_page, 'id');
+            var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            visitorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.change_page, 'id');
+            var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            editorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.administer_page, 'id');
+            var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
+            adminCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
             this.$el.html(this.template({
                 users: AA.router.userCollection,
                 can_view_ids: _.pluck(permissions.view_page, 'id'),
@@ -286,15 +310,6 @@ window.AA = window.AA || {};
             "type": "user",
             "uri": "/pages/api/v1/user/-1/"
         },
-        isPublic: function() {
-            // Is AnonymousUser (with id -1) part of the users with view permissions?
-            // Then the page can be considered public
-            var permissions = this.model.get("permissions");
-            if ( _.some(permissions.view_page, function(p) { return p.id === -1; }) ) {
-                return true;
-            }
-            return false;
-        },
         updatePermissionsVisible: function() {
             var permissions = this.model.get("permissions");
             
@@ -312,7 +327,6 @@ window.AA = window.AA || {};
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
-            context.isPublic = this.isPublic();
             
             this.$el.html( this.templates.view( context ) )
                 .find('#permalink').draggable({ helper: "clone" })
@@ -652,7 +666,8 @@ window.AA = window.AA || {};
 
             // local events
             this.listenTo(this.model, 'destroy', this.remove);
-            this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
+            // FIXME these properties are not used anymore 
+            // this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
 
             // global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
@@ -700,7 +715,7 @@ window.AA = window.AA || {};
             if (e.stopPropagation) e.stopPropagation();
         },
         editing: false,
-        onPositionChange: function(model, value, options) {
+        onPositionChange: function(model, value, options) { // FIXME this code should allow for animations but is not called right now
             var defaults = {
                 animate: false
             };
@@ -769,7 +784,7 @@ window.AA = window.AA || {};
             return false;
         },
         toggleCollapsing: function() {
-            var $tmp = $('<div>').attr('class', this.$el.attr('class'));
+            var $tmp = $('<div>').attr('class', this.model.get('klass'));
 
             if ($tmp.hasClass('collapsed') && $tmp.hasClass('hidden')) {
                 $tmp.removeClass('collapsed hidden');
@@ -789,7 +804,7 @@ window.AA = window.AA || {};
             return false;
         },
         toggleTransition: function() {
-            var $tmp = $('<div>').attr('class', this.$el.attr('class'));
+            var $tmp = $('<div>').attr('class', this.model.get('klass'));
 
             $tmp.toggleClass('active-only');
 
@@ -804,7 +819,6 @@ window.AA = window.AA || {};
                 this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4) );
             }
             this.model.save();
-            this.render();
             this.renderPlayer();
             return false;
         },
@@ -1003,8 +1017,7 @@ window.AA = window.AA || {};
                 ]);
             } else {
                 var model = this.model;
-                // FIXME: typogrify throw an error on empty strings
-                //var body = typogr.typogrify(markdown.toHTML(this.model.get("body"), "Aa"));
+                var that = this;
 
                 var body = markdown.toHTML(this.model.get("body"), "Aa");
                 var title = this.model.get("title");
@@ -1109,38 +1122,47 @@ window.AA = window.AA || {};
                 })
                 .renderResources();
 
-                this.$el.find('.menu-top').append([
-                    // Drag icon
-                    new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
-                    // Edit Annotation Button
-                    new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon-edit'})
-                        .on('click', this.toggle.bind(this)),
-                    // Delete Annotation Button
-                    new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
-                        .on('click', this.deleteAnnotation.bind(this)),
-                    // Export to Audacity Button
-                    new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
-                        .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                    // Import from Audacity Button
-                    new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
-                        .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
-                    //// Set About Value Button
-                    new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
-                        .draggable({ helper: "clone" })
-                        .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4))
-                ]);
-                this.$el.find('.menu-left').append([
-                    //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
-                        //.on('click', this.setAsSlideshow.bind(this)),
-                    //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
-                        //.on('click', this.toggleVisibility.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle transition', class: 'icon-styles'})
-                        .on('click', this.toggleTransition.bind(this)),
-                    new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
-                        .on('click', this.toggleCollapsing.bind(this)),
-                    new AA.widgets.MenuButton({title: 'set z-index', class: 'icon-layers'})
-                        .on('mousedown', this.changeZIndex.bind(this)),
-                ]);
+                if (AA.userView.model.loggedIn()) {
+                    this.$el.find('.menu-top').append([
+                        // Drag icon
+                        new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
+                        // Edit Annotation Button
+                        new AA.widgets.MenuButton({title: 'edit annotation', class: 'icon-edit'})
+                            .on('click', this.toggle.bind(this)),
+                        // Delete Annotation Button
+                        new AA.widgets.MenuButton({title: 'delete annotation', class: 'icon-delete'})
+                            .on('click', this.deleteAnnotation.bind(this)),
+                        // Export to Audacity Button
+                        new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
+                            .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
+                        // Import from Audacity Button
+                        new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
+                            .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
+                        //// Set About Value Button
+                        new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
+                            .draggable({ helper: "clone" })
+                            .attr('href', document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4))
+                    ]);
+                    this.$el.find('.menu-left').append([
+                        //new AA.widgets.MenuButton({title: 'set as slideshow', class: 'icon8'})
+                            //.on('click', this.setAsSlideshow.bind(this)),
+                        //new AA.widgets.MenuButton({title: 'toggle visibility', class: 'icon2'})
+                            //.on('click', this.toggleVisibility.bind(this)),
+                        new AA.widgets.MenuButton({title: 'toggle transition', class: 'icon-styles'})
+                            .on('click', this.toggleTransition.bind(this)),
+                        new AA.widgets.MenuButton({title: 'toggle collapsing', class: 'icon-styles'})
+                            .on('click', this.toggleCollapsing.bind(this)),
+                        new AA.widgets.MenuButton({title: 'set z-index', class: 'icon-layers'})
+                            .on('mousedown', this.changeZIndex.bind(this)),
+                    ]);
+
+                } else {
+                    this.$el.find('.menu-top').append([
+                        // Drag icon
+                        new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
+                        // Edit Annotation Button
+                        ]);
+                }
 
                 if (this.isMedia()) {
                     this.$el.addClass("media");
@@ -1235,7 +1257,7 @@ window.AA = window.AA || {};
             if (proceed) {
                 // sort the annotations by z-index;
                 var sorted = this.collection.sortBy(function(model) { 
-                    return model.zIndex() 
+                    return model.zIndex();
                 });
 
                 _.each(sorted, function(model, index) {
@@ -1267,7 +1289,7 @@ window.AA = window.AA || {};
 
                 // Create Browse history Button
                 new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})
-                    .on('click', function() { window.alert('Not implemented yet!') }),
+                    .on('click', function() { window.alert('Not implemented yet!'); }),
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})

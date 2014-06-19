@@ -19,6 +19,12 @@
     if ( _.find(permissions.administer_page, function(admin) { return admin.current == true }) ) {
         var admin = true;
     }
+    
+    var public = false;
+    if ( _.some(permissions.view_page, function(p) { return p.id === -1; }) ) {
+        var isPublic = true;
+    }
+    
     %>
 
     <div id="tab-permissions">
