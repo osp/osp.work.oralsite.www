@@ -19,6 +19,13 @@ window.AA = window.AA || {};
          */
         AA.userView && AA.userView.remove();
         AA.userView = new AA.UserView({ model : new AA.UserModel({id : 'me' }) });
+        AA.userView.model.fetch({ 
+            success: function() {
+                // re-render all the annotations: because the logged-out users see
+                // different icons then the logged-in user, for example.
+                AA.router.annotationCollectionView.render();
+            }
+        }); // triggers a re-render of the User View
         AA.router.pageView.model.unset('permissions');
         AA.router.pageView.model.fetch();
     });
