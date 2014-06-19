@@ -61,7 +61,7 @@ window.AA = window.AA || {};
         render: function() {
             var permissions = this.model.get('permissions');
 
-            var ids = _.pluck(permissions.view_page, 'id')
+            var ids = _.pluck(permissions.view_page, 'id');
             var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
             visitorCollection.each(function(user) {
                 if (_.indexOf(ids, user.get("id"))) { 
@@ -69,7 +69,7 @@ window.AA = window.AA || {};
                 }   
             });
 
-            ids = _.pluck(permissions.change_page, 'id')
+            ids = _.pluck(permissions.change_page, 'id');
             var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
             editorCollection.each(function(user) {
                 if (_.indexOf(ids, user.get("id"))) { 
@@ -77,7 +77,7 @@ window.AA = window.AA || {};
                 }   
             });
 
-            ids = _.pluck(permissions.administer_page, 'id')
+            ids = _.pluck(permissions.administer_page, 'id');
             var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
             adminCollection.each(function(user) {
                 if (_.indexOf(ids, user.get("id"))) { 
@@ -1216,7 +1216,7 @@ window.AA = window.AA || {};
             if (proceed) {
                 // sort the annotations by z-index;
                 var sorted = this.collection.sortBy(function(model) { 
-                    return model.zIndex() 
+                    return model.zIndex();
                 });
 
                 _.each(sorted, function(model, index) {
@@ -1248,7 +1248,7 @@ window.AA = window.AA || {};
 
                 // Create Browse history Button
                 new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})
-                    .on('click', function() { window.alert('Not implemented yet!') }),
+                    .on('click', function() { window.alert('Not implemented yet!'); }),
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})

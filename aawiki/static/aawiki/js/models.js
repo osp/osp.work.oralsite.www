@@ -151,7 +151,7 @@ window.AA = window.AA || {};
             var prev = null;
 
             if (current !== null) {
-                var index = _.findIndex(all, {id: current})
+                var index = _.findIndex(all, {id: current});
 
                 if (index + 1 < all.length) {
                     prev = all[index + 1];
@@ -171,7 +171,7 @@ window.AA = window.AA || {};
 
             // We are not looking an old revision so there is no next revision
             if (current !== null) {
-                var index = _.findIndex(all, {id: current})
+                var index = _.findIndex(all, {id: current});
 
                 if (index - 1 >= 0) {
                     next = all[index - 1];
@@ -187,7 +187,7 @@ window.AA = window.AA || {};
 
             // We are not looking an old revision so there is no next revision
             if (current !== null) {
-                rev = _.findWhere(all, {id: current})
+                rev = _.findWhere(all, {id: current});
             }
 
             return rev;
