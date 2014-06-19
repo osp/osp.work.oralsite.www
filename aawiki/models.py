@@ -36,10 +36,6 @@ class Annotation(RCSModel):
     """Represent an annotation"""
     page = models.ForeignKey(Page)
     about = models.URLField(blank=True)
-    top = models.IntegerField(default=10)
-    left = models.IntegerField(default=10)
-    width = models.IntegerField(default=300)
-    height = models.IntegerField(default=400)
     body = models.TextField(blank=True)
     style = models.TextField(blank=True)
     klass = models.TextField(blank=True)

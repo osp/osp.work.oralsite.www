@@ -27,27 +27,7 @@ window.AA = window.AA || {};
             title: "Untitled",
             about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
             body: "Nouvelle annotation",
-            top: 10,
-            left: 10,
-            width: 300,
-            height: 400,
-        },
-        set: function(attributes, options) {
-            // Removes classes that should not be stored
-            var excluded = [
-                'section1', 
-                'ui-resizable', 
-                'ui-draggable', 
-                'ui-droppable', 
-                'focused'
-            ].join(' ');
-
-            attributes['klass'] = $('<div>')
-                .attr('class', attributes['klass'])
-                .removeClass(excluded)
-                .attr('class');
-
-            return Backbone.Model.prototype.set.call(this, attributes, options);
+            style: 'width: 300px; height: 400px; top: 10px; left: 10px;'
         },
         loadFront: function (src, name) {
             name = name || '__content';
