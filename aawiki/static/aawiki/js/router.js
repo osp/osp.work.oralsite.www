@@ -64,13 +64,17 @@ window.AA = window.AA || {};
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
 
             this.revisionView && this.revisionView.empty();
-            this.revisionView = new AA.RevisionView({ model: this.pageModel });
-            
+            if(AA.userView.model.loggedIn()) {
+                this.revisionView = new AA.RevisionView({ model: this.pageModel });
+            }
             this.timelinePlayerView && this.timelinePlayerView.remove();
             this.timelinePlayerView = new AA.TimelinePlayerView();
 
-            this.userCollection = new AA.UserCollection();
-            this.userCollection.fetch();
+            this.userCollection && this.userCollection.remove();
+            if(AA.userView.model.loggedIn()) {
+                this.userCollection = new AA.UserCollection();
+                this.userCollection.fetch();
+            }
         }
     });
     

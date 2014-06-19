@@ -15,6 +15,9 @@ window.AA = window.AA || {};
     
     AA.UserModel = Backbone.Model.extend({
         urlRoot: "/pages/api/v1/user/",
+        loggedIn: function() {
+            return this.get("id") !== -1 && this.get("id") !== 'me'; // it’s `me` when the app first tries to find out who the user is: the backend returns the real id
+        },
     });
     
     

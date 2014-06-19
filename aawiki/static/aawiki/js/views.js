@@ -293,7 +293,10 @@ window.AA = window.AA || {};
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
-            context.isPublic = this.isPublic();
+            
+            if (context.permissions) { // this function only makes sense when you have the permissions visible
+                context.isPublic = this.isPublic();
+            }
             
             this.$el.html( this.templates.view( context ) )
                 .find('#permalink').draggable({ helper: "clone" })
