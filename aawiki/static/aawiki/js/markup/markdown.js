@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-06-20T09:42Z
+ * Date: 2014-06-20T23:49Z
  */
 
 (function(expose) {
@@ -437,6 +437,10 @@
     // basic case
     if ( typeof jsonml === "string" )
       return escapeHTML( jsonml );
+
+    if ( jsonml[0] === "__RAW" ) {
+      return jsonml[1];
+    }
 
     var tag = jsonml.shift(),
         attributes = {},
@@ -1965,9 +1969,10 @@
     // until an other timed section is found, or the end of the source text is
     // reached.
     var inner = [];
+    var found;
 
     while (next.length) {
-      var found = next[0].match(re);
+      found = next[0].match(re);
 
       if ( found ) { break; }
 
@@ -1980,15 +1985,46 @@
     
     section.push([ "span", {"property": "aa:begin", "content": "" + begin, "datatype": "xsd:float"}, ss2tc(begin) ]);
 
-    // sets the end only if the group was matched
     if (end) {
+      // sets the end if the group was matched
       attrs["data-end"] = "" + end;
       section.push([ "span", {"property": "aa:end", "content": "" + end, "datatype": "xsd:float"}, ss2tc(end) ]);
+    } else if (!found) {
+      // if there is no subsequent timed section, and the end time has not been
+      // set, it inherits from the begin time
+      end = begin;
+      attrs["data-end"] = "" + end;
+      section.push([ "span", {"property": "aa:end", "content": "" + end, "datatype": "xsd:float", "class": "deduced"}, ss2tc(end) ]);
     }
 
     section.push(this.toTree(inner, [ "div", {"property": "aa:content"} ]));
 
     return [ section ];
+  };
+
+  Aa.block['htmlBlock'] = function htmlBlock( block, next ) {
+    if ( block.match( /^<\w/ ) && block.match( /\/>\s*$|<\/\s*\w+\s*>\s*$/ ) ) {
+      return [["__RAW", block.toString()]];
+    }
+  };
+
+  Aa.inline['<'] = function htmlOrAutoLink( text ) {
+    var m;
+
+    if ( ( m = text.match( /^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\.[a-zA-Z]+))>/ ) ) !== null ) {
+      if ( m[3] )
+        return [ m[0].length, [ "link", { href: "mailto:" + m[3] }, m[3] ] ];
+      else if ( m[2] === "mailto" )
+        return [ m[0].length, [ "link", { href: m[1] }, m[1].substr("mailto:".length ) ] ];
+      else
+        return [ m[0].length, [ "link", { href: m[1] }, m[1] ] ];
+    }
+
+    if ( text.match( /^<\w/ ) && text.match( /\/>\s*$|<\/\s*\w+\s*>/ ) ) {
+      return [ text.length, ["__RAW", text]];
+    }
+
+    return [ 1, "<" ];
   };
 
   /**
