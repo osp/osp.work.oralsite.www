@@ -9,12 +9,26 @@ window.AA = window.AA || {};
 
 
     AA.SiteModel = Backbone.Model.extend({
-        urlRoot: "/pages/api/v1/site/",
+        urlRoot: "/api/v1/site/",
     });
 
     
     AA.UserModel = Backbone.Model.extend({
-        urlRoot: "/pages/api/v1/user/",
+        urlRoot: "/api/v1/user/",
+        defaults: {
+            id: "me"
+        },
+        initialize: function() {
+            this.listenTo(AA.globalEvents, 'aa:changeUser', this.onChangeUser);
+        },
+        reset: function() {
+            this.clear().set(this.defaults);
+
+            return this;
+        },
+        onChangeUser: function() {
+            this.reset().fetch()
+        },
         loggedIn: function() {
             return this.get("id") !== -1 && this.get("id") !== 'me'; // it’s `me` when the app first tries to find out who the user is: the backend returns the real id
         },
@@ -22,7 +36,7 @@ window.AA = window.AA || {};
     
     
     AA.AnnotationModel = Backbone.AssociatedModel.extend({
-        urlRoot: "/pages/api/v1/annotation/",
+        urlRoot: "/api/v1/annotation/",
         defaults: {
             title: "Untitled",
             about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
@@ -78,10 +92,11 @@ window.AA = window.AA || {};
     
     
     AA.PageModel = Backbone.AssociatedModel.extend({
-        urlRoot: "/pages/api/v1/page/",
+        urlRoot: "/api/v1/page/",
         defaults: {
             revisions: [],
-            annotations: []
+            annotations: [],
+            introduction: ""
         },
         relations: [{
             type: Backbone.Many,
@@ -93,6 +108,38 @@ window.AA = window.AA || {};
                 includeInJSON: 'resource_uri'
             }
         }],
+        initialize: function() {
+            this.on('error', this.onError);
+        },
+        onError: function(model, response, options) {
+            // Redirects to the current version if a wrong revision is passed
+            if (response.status === 404 && this.get('rev')) {
+                AA.router.navigate('/' + AA.router.currentSlug + '/');
+            } else if (response.status === 404) {
+                AA.alertView.set('Creating a new page', '');
+                /* Unset the id so that Backbone will not try to post to
+                    * the post url, but instead to the API endpoint.
+                    * 
+                    * Pass silent to not trigger a redraw */
+                model.unset('id', { silent: true });
+                /* We set the model’s name and slug based on the page’s uri
+                    * */
+                model.set({
+                    slug:         AA.router.currentSlug,
+                    name:         AA.utils.dewikify(AA.router.currentSlug),
+                });
+
+                /* We save. The API returns the newly created object,
+                    * which also contains the appropriate permissions,
+                    * created on the server-side.
+                    * 
+                    * Backbone automagically synchronises.
+                    * 
+                    * TODO: defer page creation to moment the first annotation is created (not easy)
+                    */
+                model.save(); 
+            }
+        },
         toFrontMatter: function() {
             var data = this.toJSON();
             var introduction = data['introduction'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
@@ -127,6 +174,16 @@ window.AA = window.AA || {};
             this.set(data);
 
             return this;
+        },
+        commit: function(msg) {
+            // for now just saves the full model
+            // This could be interesting:
+            // http://stackoverflow.com/questions/20668911/backbone-js-saving-a-model-with-header-params
+            this.save(null, {
+                headers: {
+                    Message: msg
+                }
+            });
         },
         prev_rev: function() {
             var current = this.get('rev');  
