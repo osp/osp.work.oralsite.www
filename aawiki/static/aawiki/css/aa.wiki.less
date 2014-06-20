@@ -211,10 +211,13 @@ body {
 
 /* Styles {{{ */
 
+@base-line-height: 19px;
+@base-font-size: 13px;
+
 body {
     font-family: 'Charis', sans;
-    font-size: 13px;
-    line-height: 19px;
+    font-size: @base-font-size;
+    line-height: @base-line-height;
 }
 
 strong {
@@ -225,8 +228,8 @@ em {
     font-style: italic;
 }
 
-p + p {
-    margin-top: 19px;
+p, ol, ul, blockquote {
+    margin-bottom: @base-line-height;
 }
 
 pre, code {
@@ -234,23 +237,40 @@ pre, code {
 }
 
 h1 {
-    font-size: 38px;
-    line-height: 38px;
+    font-size: 2 * @base-font-size;
+    line-height: 2 * @base-line-height;
 }
 
 h2 {
-    font-size: 26px;
-    line-height: 38px;
+    font-size: 1.5 * @base-font-size;
+    line-height: 2 * @base-line-height;
 }
 
 h3 {
-    font-size: 19px;
-    line-height: 19px;
+    font-size: 1.17 * @base-font-size;
+    line-height: @base-line-height;
 }
 
-blockquote {
-    margin-left: 38px;
+h4 {
+    font-size: @base-font-size;
+    line-height: @base-line-height;
 }
+
+h5 {
+    font-size: 0.83 * @base-font-size;
+    line-height: @base-line-height;
+}
+
+h6 {
+    font-size: 0.75 * @base-font-size;
+    line-height: @base-line-height;
+}
+blockquote {
+    margin-left: 2 * @base-line-height;
+}
+
+
+/** The Sidebar **/
 
 #sidebar {
     font-family: 'News Cycle', sans;
@@ -319,6 +339,7 @@ blockquote {
     }
 }
 
+/* The Error Box */
 
 .error {
     width: 207px;
@@ -329,6 +350,8 @@ blockquote {
     padding: 13px;
     display: none;
 }
+
+/** The Annotation Box **/
 
 section.section1 {
     position: absolute !important;
@@ -382,6 +405,13 @@ section.section1 {
         .box-sizing(border-box);
         outline: 1px solid #ccc;
         outline-offset: 0;
+    }
+
+    ul li:before {
+        content: "– ";
+    }
+    ol {
+        list-style: decimal inside;
     }
 
     > div.wrapper {
@@ -455,6 +485,8 @@ section.section1 {
         }
     }
 
+    /** This is triggered by the ‘hidden’ class: the annotation box will be invisible to those not logged in.
+     *  Logged in users will see a semi-opaque box. **/
     &.hidden {
         .wrapper {
             .opacity(0.5);
@@ -480,6 +512,8 @@ section.section1 {
         }
     }
 
+
+    /** This is triggered by the ‘active-only’ class: only the currently active annotations will be visible **/
     &.active-only > div.wrapper {
         & .active {
             background-color: inherit;
@@ -503,7 +537,7 @@ section.section1 {
         }
     }
 
-    &.hover-top:hover {
+    &:hover {
         z-index: 9999999 !important; /* TODO: check if written correctly */
     }
 }
@@ -832,11 +866,4 @@ img {
     }
 }
 
-section.section1 {
-    ul li:before {
-        content: "– ";
-    }
-    ol {
-        list-style: decimal inside;
-    }
-}
+
