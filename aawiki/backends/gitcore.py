@@ -55,7 +55,7 @@ class GitBackend(BaseBackend):
                 tree = tree/bit
             return tree.data
         except:
-            return ''
+            return None
 
     def commit(self, key, data, message='auto commit from django'):
         """
