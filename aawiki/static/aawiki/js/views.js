@@ -10,30 +10,7 @@ window.AA = window.AA || {};
     };
 
 
-    AA.SiteView = Backbone.View.extend({
-        id: 'site-meta', // <div id="user-meta"></div>
-        templates: {
-            view: _.template($('#site-view-template').html()),
-        },
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-            // if we want to already render the template, without the values fetched: this.render();
-        },
-        render: function() {
-            var context = this.model.toJSON();
-            this.$el.html( this.templates.view( context ) );
-
-            // If the element is not yet part of the DOM:
-            if ($('#site-meta').length === 0 ) {
-                $('#site-meta-container').prepend(this.el);
-            }
-
-            return this;
-        },
-    });
-
-
-    AA.EditPermissionsView = Backbone.View.extend({
+    AA.PopUpView = Backbone.View.extend({
         tagName: 'div',
         attributes: {class: 'popup-wrapper'},
         events: {
@@ -41,6 +18,20 @@ window.AA = window.AA || {};
             "submit"                     : 'submit',
             "keypress input"             : "submitOnEnter",
         },
+        //template: _.template($('#popup-view-template').html()),
+        submitOnEnter: function(event) {
+            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.submit(event);
+            }
+        },
+        initialize: function() {
+            this.render();
+        },
+    });
+
+
+    AA.EditPermissionsView = AA.PopUpView.extend({
         template: _.template($('#edit-permissions-view-template').html()),
         submit: function (event){
             var getPermissionEntries = function($elt) {
@@ -60,7 +51,7 @@ window.AA = window.AA || {};
                         'type' : 'user',
                         'id'   : id,
                         'name' : name,
-                        'uri'  : '/pages/api/v1/user/' + id + '/'
+                        'uri'  : '/api/v1/user/' + id + '/'
                     }
                 });
             }
@@ -90,15 +81,6 @@ window.AA = window.AA || {};
                 }
             });
 
-        },
-        submitOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.submit(event);
-            }
-        },
-        initialize: function() {
-            this.render();
         },
         render: function() {
             var permissions = this.model.get('permissions');
@@ -139,14 +121,7 @@ window.AA = window.AA || {};
     });
 
 
-    AA.EditIntroductionView = Backbone.View.extend({
-        tagName: 'div',
-        attributes: {class: 'popup-wrapper'},
-        events: {
-            'click input[value="cancel"]': 'remove', 
-            "submit"                     : 'submit',
-            "keypress input"             : "submitOnEnter",
-        },
+    AA.EditIntroductionView = AA.PopUpView.extend({
         template: _.template($('#edit-introduction-view-template').html()),
         submit: function (event){
             event.preventDefault();
@@ -157,15 +132,6 @@ window.AA = window.AA || {};
 
             this.remove();
         },
-        submitOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(event);
-            }
-        },
-        initialize: function() {
-            this.render();
-        },
         render: function() {
             this.$el.html(this.template({introduction: this.model.toFrontMatter()}));
             $('body').append(this.$el);
@@ -173,16 +139,9 @@ window.AA = window.AA || {};
     });
 
     
-    AA.PopUpView = Backbone.View.extend({
-        tagName: 'div',
-        attributes: {class: 'popup-wrapper'},
-        events: {
-            'click input[value="cancel"]': 'remove', 
-            "submit"                     : 'login',
-            "keypress input"             : "loginOnEnter",
-        },
-        template: _.template($('#popup-view-template').html()),
-        login: function (event){
+    AA.LoginView = AA.PopUpView.extend({
+        template: _.template($('#login-view-template').html()),
+        submit: function (event){
             var that = this;
             event.preventDefault();
 
@@ -192,7 +151,7 @@ window.AA = window.AA || {};
             });
 
             $.ajax({
-                url: '/pages/api/v1/user/login/',
+                url: '/api/v1/user/login/',
                 type: 'POST',
                 contentType: 'application/json',
                 data: data,
@@ -204,18 +163,32 @@ window.AA = window.AA || {};
                 },
             });
         },
-        loginOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(event);
-            }
-        },
-        initialize: function() {
-            this.render();
-        },
         render: function() {
             this.$el.html( this.template( {} ) );
             $('body').append(this.$el);
+        },
+    });
+
+
+    AA.SiteView = Backbone.View.extend({
+        id: 'site-meta', // <div id="user-meta"></div>
+        templates: {
+            view: _.template($('#site-view-template').html()),
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            // if we want to already render the template, without the values fetched: this.render();
+        },
+        render: function() {
+            var context = this.model.toJSON();
+            this.$el.html( this.templates.view( context ) );
+
+            // If the element is not yet part of the DOM:
+            if ($('#site-meta').length === 0 ) {
+                $('#site-meta-container').prepend(this.el);
+            }
+
+            return this;
         },
     });
 
@@ -230,6 +203,7 @@ window.AA = window.AA || {};
             "click #logout-link"        : "logout",
         },
         render: function() {
+            console.log('rerender user view');
             // Adds an anonymous class if not connected so we can "unpublish"
             // wip annotations using css
             var id = this.model.get('id');
@@ -247,16 +221,21 @@ window.AA = window.AA || {};
             return this;
         },
         initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
+            //this.listenTo(this.model, 'all', function(e) {
+                //console.log(e);
+            //});
+            this.listenTo(this.model, 'sync', this.render);
+
+            //this.render();
         },
         login: function(e) {
             e.preventDefault();
-            new AA.PopUpView();
+            new AA.LoginView();
         },
         logout: function(e) {
             e.preventDefault();
             $.ajax({
-                url: '/pages/api/v1/user/logout/',
+                url: '/api/v1/user/logout/',
                 type: 'GET',
                 contentType: 'application/json',
                 processData: false,
@@ -275,7 +254,6 @@ window.AA = window.AA || {};
         },
         events: {
             "click #toggleDrawer"               : "toggleDrawer",
-            "click #commit"                     : "commit",
             "click #commit-list a"              : "wayback",
             "change #permissions-visible"       : "updatePermissionsVisible",
             //"change #permissions-editable"      : "updatePermissionsEditable",
@@ -289,17 +267,6 @@ window.AA = window.AA || {};
             var href = $(event.currentTarget).attr('href');
             AA.router.navigate(href.substring(6), {trigger: true});
         },
-        commit: function(event) {
-            var msg = prompt("Commit message", "My modifications");
-            // for now just saves the full model
-            // This could be interesting:
-            // http://stackoverflow.com/questions/20668911/backbone-js-saving-a-model-with-header-params
-            this.model.save(null, {
-                headers: {
-                    Message: msg
-                }
-            });
-        },
         setTitle: function() {
             document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
         },
@@ -308,7 +275,7 @@ window.AA = window.AA || {};
             "id": -1,
             "name": "AnonymousUser",
             "type": "user",
-            "uri": "/pages/api/v1/user/-1/"
+            "uri": "/api/v1/user/-1/"
         },
         updatePermissionsVisible: function() {
             var permissions = this.model.get("permissions");
@@ -334,8 +301,8 @@ window.AA = window.AA || {};
                 .find('#accordion').tabs() 
                 ;
 
-            AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
-            AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
+            //AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
+            //AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
 
             $('#extra-stylesheet').remove();
             var stylesheet = this.model.get('stylesheet');
@@ -666,8 +633,7 @@ window.AA = window.AA || {};
 
             // local events
             this.listenTo(this.model, 'destroy', this.remove);
-            // FIXME these properties are not used anymore 
-            // this.listenTo(this.model, 'change:top change:left', this.onPositionChange);
+            this.listenTo(this.model, 'change', this.render);
 
             // global events
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.registerDriver, this);
@@ -1122,7 +1088,7 @@ window.AA = window.AA || {};
                 })
                 .renderResources();
 
-                if (AA.userView.model.loggedIn()) {
+                if (AA.userModel.loggedIn()) {
                     this.$el.find('.menu-top').append([
                         // Drag icon
                         new AA.widgets.MenuButton({title: 'drag annotation', class: 'icon-drag'}),
@@ -1239,7 +1205,13 @@ window.AA = window.AA || {};
         el: 'article#canvas',
 
         commit: function(event) {
-            AA.router.pageView.commit.bind(AA.router.pageView);
+            this.cursorMenu.hide();
+
+            var msg = prompt("Commit message", "My modifications");
+
+            if (msg) {
+                AA.router.pageModel.commit(msg);
+            }
         },
         
         addAnnotation: function(event) {
@@ -1247,7 +1219,7 @@ window.AA = window.AA || {};
             var offsetCanvas = this.$el.position();
             var top = offsetBtn.top - offsetCanvas.top;
             var left = offsetBtn.left - offsetCanvas.left;
-            this.collection.create({top: top, left: left});
+            this.collection.create({style: 'top: ' + top + 'px; left: ' + left + 'px'});
             this.cursorMenu.hide();
         },
         
@@ -1261,14 +1233,26 @@ window.AA = window.AA || {};
                 });
 
                 _.each(sorted, function(model, index) {
-                    model.set({
-                        'left': 20 + (index * 20),
-                        'top': 20 + (index * 20),
-                    }, {animate: true}).save();
+                    var $tmp = $('<div>')
+                        .attr('style', model.get('style'))
+                        .css({
+                            top: 20 + (index * 20) + 'px',
+                            left: 20 + (index * 20) + 'px'
+                        });
+
+                    model.set({style: $tmp.attr('style')}, {animate: false}).save();
                 });
             }
 
             this.cursorMenu.hide();
+        },
+        
+        editPermissions: function (event) {
+            if (this.cursorMenu.visible()) {
+                this.cursorMenu.hide();
+            };
+
+            new AA.EditPermissionsView({ model: AA.router.pageModel });
         },
         
         initialize: function() {
@@ -1303,18 +1287,18 @@ window.AA = window.AA || {};
 
                 // Create Manage permissions Button
                 new AA.widgets.MenuButton ({title: 'manage permissions', class: 'icon-ok'})
-                    .on('click', function() { 
-                        if (AA.router.annotationCollectionView.cursorMenu.visible()) {
-                            AA.router.annotationCollectionView.cursorMenu.hide ();
-                        };
-
-                        new AA.EditPermissionsView({model: AA.router.pageModel});
-                    }),
+                    .on('click', this.editPermissions.bind(this)),
 
                 // Create Set About Value Button
                 new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                     .draggable({ helper: "clone" })
-                    .attr('href', document.location.origin + document.location.pathname)
+                    .attr('href', document.location.origin + document.location.pathname),
+
+                // Delete Page Button
+                new AA.widgets.MenuButton({title: 'delete page', class: 'icon-delete'})
+                    .on('click', function() {
+                    
+                    })
             ]);
             
             this.listenTo(this.collection, 'add', this.renderOne);

@@ -12,7 +12,7 @@ class RCSModel(models.Model):
 class Page(RCSModel):
     """Represents a wiki page"""
     name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255)
+    slug = models.SlugField(max_length=255, primary_key=True)
     introduction = models.TextField(blank=True)
     style = models.TextField(blank=True)
     klass = models.TextField(blank=True)

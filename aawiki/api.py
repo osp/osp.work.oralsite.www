@@ -12,7 +12,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from tastypie import fields
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
-from tastypie.http import HttpUnauthorized, HttpForbidden
+from tastypie.http import HttpUnauthorized, HttpForbidden, HttpNotFound
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from tastypie.utils import trailing_slash
@@ -253,6 +253,9 @@ class PageResource(ModelResource):
             # TODO: implement caching, as done in the super get_detail method
             filename = 'aawiki/Page/%s.json' % kwargs['slug']
             data = backend.fetch(filename, rev)
+            if not data:
+                return HttpNotFound('Could not find revision %s' % rev)
+
             data = json.loads(data)
             data['revisions'] = backend.get_verbose_revisions(filename)
             return HttpResponse(json.dumps(data), content_type="application/json")

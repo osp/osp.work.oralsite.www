@@ -12,8 +12,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^djcelery/', include('djcelery.urls')),
     url(r'^filters/', include('aafilters.urls')),
-    url(r'^pages/', include('aawiki.urls')),
-    url(r'^$', RedirectView.as_view(url='/pages/')),
+    url(r'^', include('aawiki.urls')),
 )
 
 

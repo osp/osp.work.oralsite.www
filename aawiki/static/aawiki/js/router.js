@@ -7,51 +7,44 @@ window.AA = window.AA || {};
         currentSlug: '',
         routes: {
             ":slug/(:rev/)": "page",
+            "": "index",
+        },
+        initialize: function() {
+            // page-to-page navigation independant code
+
+            AA.siteModel = new AA.SiteModel({ id : 1 });
+            AA.siteView = new AA.SiteView({ model: AA.siteModel });
+            AA.siteView.model.fetch();
+            
+            AA.alertView = new AA.AlertView();
+
+            AA.userModel = new AA.UserModel({ id : 'me' });
+            AA.userView = new AA.UserView({ model : AA.userModel });
+            AA.userView.model.fetch();
+        },
+        index: function() {
+            AA.router.navigate('/Index/', {trigger: true});
         },
         page: function(slug, rev) {
+            console.log('change page');
+
+            // Makes sure the page slug is indeed a Wiki name
+            var wiki_name = AA.utils.wikify(slug);
+            if (slug !== wiki_name) {
+                AA.router.navigate('/' + wiki_name + '/', { trigger: true });
+            }
+
             var that = this;
             this.currentSlug = slug;
-            this.pageModel = this.pageModel || new AA.PageModel();
+
+            //this.pageModel = this.pageModel || new AA.PageModel(); /* FIXME: this was for browsing revisions
+            this.pageModel = new AA.PageModel();
             this.pageModel.set({id : slug, rev: rev});
 
             // Some more info on Backbone and ‘cleaning up after yourself’: http://mikeygee.com/blog/backbone.html
             this.pageView && this.pageView.remove();
             this.pageView = new AA.PageView({ model: this.pageModel });
-            this.pageView.model.fetch({
-                data: {
-                    rev: rev
-                },
-                error: function(model, response, options) {
-                    if (response.status === 404) {
-                        AA.alertView.set('Creating a new page', '');
-                        /* Unset the id so that Backbone will not try to post to
-                         * the post url, but instead to the API endpoint.
-                         * 
-                         * Pass silent to not trigger a redraw */
-                        model.unset('id', { silent: true });
-                        /* We set the model’s name and slug based on the page’s uri
-                         * */
-                        model.set({
-                            slug:         AA.utils.wikify(AA.router.currentSlug),
-                            name:         AA.utils.dewikify(AA.router.currentSlug),
-                            introduction: ''
-                        });
-
-                        /* We save. The API returns the newly created object,
-                         * which also contains the appropriate permissions,
-                         * created on the server-side.
-                         * 
-                         * Backbone automagically synchronises.
-                         * 
-                         * TODO: defer page creation to moment the first annotation is created (not easy)
-                         */
-                        model.save(); 
-                    }
-                },
-                success : function() {
-                    //console.log(that.pageModel)
-                }
-            });
+            this.pageView.model.fetch({ data: { rev: rev } });
 
             this.multiplexView && this.multiplexView.remove();
             this.multiplexView = new AA.MultiplexView();
@@ -61,21 +54,21 @@ window.AA = window.AA || {};
             this.annotationCollectionView && this.annotationCollectionView.empty();
             // Since we are using backbone-associations.js, An annotation
             // collection is created as a property of the page view model.
-            this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
+            this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageModel.get('annotations')});
 
-            this.revisionView && this.revisionView.empty();
-            if(AA.userView.model.loggedIn()) {
-                this.revisionView = new AA.RevisionView({ model: this.pageModel });
-            }
+            //this.revisionView && this.revisionView.empty();
+            //if(AA.userModel.loggedIn()) {
+                //this.revisionView = new AA.RevisionView({ model: this.pageModel });
+            //}
+
             this.timelinePlayerView && this.timelinePlayerView.remove();
             this.timelinePlayerView = new AA.TimelinePlayerView();
 
             this.userCollection && this.userCollection.remove();
-            if(AA.userView.model.loggedIn()) {
+            //if(AA.userModel.loggedIn()) { // FIXME: as we are dealing with Async requests, it seems like the user is not set yet when this test happens
                 this.userCollection = new AA.UserCollection();
                 this.userCollection.fetch();
-            }
+            //}
         }
     });
-    
 })();  // end of the namespace AA
