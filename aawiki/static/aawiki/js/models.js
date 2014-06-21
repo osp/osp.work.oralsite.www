@@ -8,6 +8,13 @@ window.AA = window.AA || {};
     jsFront(jsyaml);
 
 
+    Backbone.Model.prototype.reset = function() {
+        this.clear().set(this.defaults);
+
+        return this;
+    };
+
+
     AA.SiteModel = Backbone.Model.extend({
         urlRoot: "/api/v1/site/",
     });
@@ -20,11 +27,6 @@ window.AA = window.AA || {};
         },
         initialize: function() {
             this.listenTo(AA.globalEvents, 'aa:changeUser', this.onChangeUser);
-        },
-        reset: function() {
-            this.clear().set(this.defaults);
-
-            return this;
         },
         onChangeUser: function() {
             this.reset().fetch()

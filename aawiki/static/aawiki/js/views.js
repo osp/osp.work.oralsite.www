@@ -10,30 +10,7 @@ window.AA = window.AA || {};
     };
 
 
-    AA.SiteView = Backbone.View.extend({
-        id: 'site-meta', // <div id="user-meta"></div>
-        templates: {
-            view: _.template($('#site-view-template').html()),
-        },
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-            // if we want to already render the template, without the values fetched: this.render();
-        },
-        render: function() {
-            var context = this.model.toJSON();
-            this.$el.html( this.templates.view( context ) );
-
-            // If the element is not yet part of the DOM:
-            if ($('#site-meta').length === 0 ) {
-                $('#site-meta-container').prepend(this.el);
-            }
-
-            return this;
-        },
-    });
-
-
-    AA.EditPermissionsView = Backbone.View.extend({
+    AA.PopUpView = Backbone.View.extend({
         tagName: 'div',
         attributes: {class: 'popup-wrapper'},
         events: {
@@ -41,6 +18,20 @@ window.AA = window.AA || {};
             "submit"                     : 'submit',
             "keypress input"             : "submitOnEnter",
         },
+        //template: _.template($('#popup-view-template').html()),
+        submitOnEnter: function(event) {
+            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
+            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
+                this.submit(event);
+            }
+        },
+        initialize: function() {
+            this.render();
+        },
+    });
+
+
+    AA.EditPermissionsView = AA.PopUpView.extend({
         template: _.template($('#edit-permissions-view-template').html()),
         submit: function (event){
             var getPermissionEntries = function($elt) {
@@ -91,15 +82,6 @@ window.AA = window.AA || {};
             });
 
         },
-        submitOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.submit(event);
-            }
-        },
-        initialize: function() {
-            this.render();
-        },
         render: function() {
             var permissions = this.model.get('permissions');
 
@@ -139,14 +121,7 @@ window.AA = window.AA || {};
     });
 
 
-    AA.EditIntroductionView = Backbone.View.extend({
-        tagName: 'div',
-        attributes: {class: 'popup-wrapper'},
-        events: {
-            'click input[value="cancel"]': 'remove', 
-            "submit"                     : 'submit',
-            "keypress input"             : "submitOnEnter",
-        },
+    AA.EditIntroductionView = AA.PopUpView.extend({
         template: _.template($('#edit-introduction-view-template').html()),
         submit: function (event){
             event.preventDefault();
@@ -157,15 +132,6 @@ window.AA = window.AA || {};
 
             this.remove();
         },
-        submitOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(event);
-            }
-        },
-        initialize: function() {
-            this.render();
-        },
         render: function() {
             this.$el.html(this.template({introduction: this.model.toFrontMatter()}));
             $('body').append(this.$el);
@@ -173,16 +139,9 @@ window.AA = window.AA || {};
     });
 
     
-    AA.PopUpView = Backbone.View.extend({
-        tagName: 'div',
-        attributes: {class: 'popup-wrapper'},
-        events: {
-            'click input[value="cancel"]': 'remove', 
-            "submit"                     : 'login',
-            "keypress input"             : "loginOnEnter",
-        },
-        template: _.template($('#popup-view-template').html()),
-        login: function (event){
+    AA.LoginView = AA.PopUpView.extend({
+        template: _.template($('#login-view-template').html()),
+        submit: function (event){
             var that = this;
             event.preventDefault();
 
@@ -204,18 +163,32 @@ window.AA = window.AA || {};
                 },
             });
         },
-        loginOnEnter: function(event) {
-            // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
-            if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
-                this.login(event);
-            }
-        },
-        initialize: function() {
-            this.render();
-        },
         render: function() {
             this.$el.html( this.template( {} ) );
             $('body').append(this.$el);
+        },
+    });
+
+
+    AA.SiteView = Backbone.View.extend({
+        id: 'site-meta', // <div id="user-meta"></div>
+        templates: {
+            view: _.template($('#site-view-template').html()),
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+            // if we want to already render the template, without the values fetched: this.render();
+        },
+        render: function() {
+            var context = this.model.toJSON();
+            this.$el.html( this.templates.view( context ) );
+
+            // If the element is not yet part of the DOM:
+            if ($('#site-meta').length === 0 ) {
+                $('#site-meta-container').prepend(this.el);
+            }
+
+            return this;
         },
     });
 
@@ -257,7 +230,7 @@ window.AA = window.AA || {};
         },
         login: function(e) {
             e.preventDefault();
-            new AA.PopUpView();
+            new AA.LoginView();
         },
         logout: function(e) {
             e.preventDefault();
