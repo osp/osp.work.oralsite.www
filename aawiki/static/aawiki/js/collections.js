@@ -6,6 +6,14 @@ window.AA = window.AA || {};
     AA.UserCollection = Backbone.Collection.extend({
         model: AA.UserModel,
         urlRoot: "/api/v1/user/",
+        initialize: function() {
+            this.listenTo(AA.userView.model, 'sync', this.fetchConditionally);
+        },
+        fetchConditionally: function() {
+            if (AA.userView.model.loggedIn()) {
+                this.fetch();
+            }
+        }
     });
 
     

@@ -65,10 +65,7 @@ window.AA = window.AA || {};
             this.timelinePlayerView = new AA.TimelinePlayerView();
 
             this.userCollection && this.userCollection.remove();
-            //if(AA.userModel.loggedIn()) { // FIXME: as we are dealing with Async requests, it seems like the user is not set yet when this test happens
-                this.userCollection = new AA.UserCollection();
-                this.userCollection.fetch();
-            //}
+            this.userCollection = new AA.UserCollection();
         }
     });
 })();  // end of the namespace AA

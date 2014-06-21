@@ -52,9 +52,9 @@ window.AA = window.AA || {};
                         'id'   : id,
                         'name' : name,
                         'uri'  : '/api/v1/user/' + id + '/'
-                    }
+                    };
                 });
-            }
+            };
 
             event.preventDefault();
 
@@ -62,7 +62,7 @@ window.AA = window.AA || {};
 
             var current_user_id = AA.userView.model.get('id');
 
-            var permissions = this.model.get('permissions')
+            var permissions = this.model.get('permissions');
 
             permissions.view_page = getPermissionEntries(this.$el.find('[name="visitors"]'));
             permissions.change_page = getPermissionEntries(this.$el.find('[name="editors"]'));
