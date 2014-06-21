@@ -15,5 +15,5 @@ urlpatterns = patterns('',
     url(r'^api/v1/user/me/', 'aawiki.api.me'),
     url(r'^api/', include(v1_api.urls)),
     url(r'^tests/$', TemplateView.as_view(template_name='aawiki/tests.html'), name='tests'),
-    url(r'^pages/', TemplateView.as_view(template_name='aawiki/page_detail.html'), name='page-detail'),
+    url(r'^pages/[^/]+/$', TemplateView.as_view(template_name='aawiki/page_detail.html'), name='page-detail'),
 )
