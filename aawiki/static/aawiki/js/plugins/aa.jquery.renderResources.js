@@ -5,7 +5,7 @@
     
         var templates = {
             img:           _.template('<img src="<%= uri %>" />'),
-            html5video:    _.template('<video class="player" nocontrols preload src="<%= uri %>" />'),
+            html5video:    _.template('<video class="player" controls="true" preload src="<%= uri %>" />'),
             html5audio:    _.template('<% if (options.small) { %><div class="mini-player paused" rel="<%= uri %>" style="width:50px;height:50px" /></div><audio class="player" src="<%= uri %>" /><% } else { %><audio class="player" controls src="<%= uri %>" /><% } %>'),
             iframe:        _.template('<iframe src="<%= uri %>"></iframe>'),
             externalEmbed: _.template('<div id="<%= options.uid %>" class="embed hosted" data-uri="<%= uri %>"></div>'),
