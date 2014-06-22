@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-06-20T23:49Z
+ * Date: 2014-06-22T20:35Z
  */
 
 (function(expose) {
@@ -2060,12 +2060,15 @@
         var path = parts[1];
         var hash = parts[2];
         
-        var uri = '../' + encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
+        // FIXME We should probably not be adding the ../ in the first place— can we change our wikilinks syntax to be
+        // /pages/slug instead of /pages/slug/ ? 
+        var uri =  (path ? '../' : '') + encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
         
         if (hash) {
           // do not escape =, so we can have #t=3.5
           uri += '#' + encodeURIComponent(hash).replace('%3D', '=');
         }
+        
         return uri;
       }
       return target;
