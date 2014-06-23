@@ -142,12 +142,13 @@ window.AA = window.AA || {};
     AA.LoginView = AA.PopUpView.extend({
         template: _.template($('#login-view-template').html()),
         submit: function (event){
-            var that = this;
             event.preventDefault();
 
+            var that = this;
+
             var data = JSON.stringify({
-                username: $("input[name=username]").val(),
-                password: $("input[name=password]").val()
+                username: $("input[name=username]", this.$el).val(),
+                password: $("input[name=password]", this.$el).val()
             });
 
             $.ajax({
@@ -159,34 +160,27 @@ window.AA = window.AA || {};
                 processData: false,
                 success: function(data) { 
                     AA.globalEvents.trigger('aa:changeUser');
+
                     that.remove();
                 },
             });
         },
         render: function() {
             this.$el.html( this.template( {} ) );
-            $('body').append(this.$el);
-        },
+
+            $('body').append( this.$el );
+        }
     });
 
 
     AA.SiteView = Backbone.View.extend({
-        id: 'site-meta', // <div id="user-meta"></div>
-        templates: {
-            view: _.template($('#site-view-template').html()),
-        },
+        el: '#site-meta-container', // <div id="user-meta"></div>
+        template: _.template($('#site-view-template').html()),
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
-            // if we want to already render the template, without the values fetched: this.render();
         },
         render: function() {
-            var context = this.model.toJSON();
-            this.$el.html( this.templates.view( context ) );
-
-            // If the element is not yet part of the DOM:
-            if ($('#site-meta').length === 0 ) {
-                $('#site-meta-container').prepend(this.el);
-            }
+            this.$el.html( this.template( this.model.toJSON() ) );
 
             return this;
         },
@@ -194,30 +188,25 @@ window.AA = window.AA || {};
 
     
     AA.UserView = Backbone.View.extend({
-        id: 'user-meta', // <div id="user-meta"></div>
-        templates: {
-            view: _.template($('#user-view-template').html()),
-        },
+        el: '#user-meta-container',
+        template: _.template($('#user-view-template').html()),
         events: {
             "click #login-link"         : "login",
             "click #logout-link"        : "logout",
         },
         render: function() {
-            console.log('rerender user view');
             // Adds an anonymous class if not connected so we can "unpublish"
             // wip annotations using css
             var id = this.model.get('id');
-            if (typeof id === "undefined" | id === -1) {
+
+            if (typeof id === "undefined" || id === -1) {
                 $('#canvas').addClass('anonymous');
             } else {
                 $('#canvas').removeClass('anonymous');
             }
 
-            this.$el.html( this.templates.view( this.model.toJSON() ) );
-            // If the element is not yet part of the DOM:
-            if ($('#user-meta').length === 0 ) {
-                $('#user-meta-container').prepend(this.el);
-            }
+            this.$el.html( this.template( this.model.toJSON() ) );
+
             return this;
         },
         initialize: function() {
@@ -225,10 +214,12 @@ window.AA = window.AA || {};
         },
         login: function(e) {
             e.preventDefault();
+
             new AA.LoginView();
         },
         logout: function(e) {
             e.preventDefault();
+
             $.ajax({
                 url: '/api/v1/user/logout/',
                 type: 'GET',
@@ -243,10 +234,8 @@ window.AA = window.AA || {};
 
 
     AA.PageView = Backbone.View.extend({
-        id: 'page-meta', // <div id="page-meta"></div>
-        templates: {
-            view: _.template($('#page-view-template').html()),
-        },
+        el: '#page-meta-container',
+        template: _.template($('#page-view-template').html()),
         events: {
             "click #toggleDrawer"               : "toggleDrawer",
             "click #commit-list a"              : "wayback",
@@ -290,9 +279,7 @@ window.AA = window.AA || {};
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             
-            this.$el.html( this.templates.view( context ) )
-                .find('#permalink').draggable({ helper: "clone" })
-                .end()
+            this.$el.html( this.template( context ) )
                 .find('#accordion').tabs() 
                 ;
 
@@ -302,24 +289,18 @@ window.AA = window.AA || {};
             $('#extra-stylesheet').remove();
             var stylesheet = this.model.get('stylesheet');
             if (stylesheet) {
-                $('<link>').attr({
+                $('<link>', {
                     id: 'extra-stylesheet',
                     rel: 'stylesheet',
                     href: stylesheet
                 }).appendTo('head');
             }
 
-            // If the element is not yet part of the DOM:
-            if ($('#page-meta').length === 0 ) {
-                $('#page-meta-container').prepend(this.el);
-            }
-            
             this.setTitle();
             return this;
         },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
-            // if we want to already render the template, without the values fetched: this.render();
         },
     });
 
@@ -1151,7 +1132,7 @@ window.AA = window.AA || {};
         },
         
         collection: new AA.AnnotationCollection(), 
-        el: 'article#canvas',
+        el: '#canvas',
 
         commit: function(event) {
             this.cursorMenu.hide();

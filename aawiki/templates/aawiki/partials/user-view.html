@@ -2,7 +2,7 @@
     <% if (typeof id === "undefined" | id === -1) { %>
         Welcome, <span class="user self">Anonymous</span>.
         <a title="login" id="login-link">Login</a>
-    <% } else {%>
+    <% } else { %>
         Welcome, <span class="user self"><%= first_name ? first_name : username %></span>.
         <a title="Logout" id="logout-link">Logout</a>
     <% } %>
