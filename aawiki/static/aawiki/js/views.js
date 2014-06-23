@@ -525,6 +525,32 @@ window.AA = window.AA || {};
                 return _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
             }
             return duration;
+        },
+        renderPlayer: function() {
+            var that = this;
+            if (typeof this.hasPlay === "undefined") { return null; }
+            
+            if (this.hasPlay()) {
+                this.$el.find(".controls").removeClass("hidden");
+
+                // if the driver is paused and there is still a pause button showing,
+                // we should make sure it becomes a play button (and vice versa):
+                var playButtonShowsPause = function() {
+                    return that.$el.find('.controls .fa-pause').length !== 0;
+                };
+                if (this.driver.paused() === playButtonShowsPause()) {
+                    this.$el.find('.play').toggleClass("fa-play fa-pause");
+                }
+                
+                // update time based values:
+                this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
+                this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
+                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
+                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            } else {
+                this.$el.find(".controls").addClass("hidden");
+            }
+            return this;
         }
     };
 
@@ -568,27 +594,11 @@ window.AA = window.AA || {};
             // This is because the constant rerendering through timeupdate events made the
             // controls unclickable.
             var that = this;
-            if (this.hasPlay()) {
-                // do we already have the controls?
-                if (this.$el.find('.controls').length === 0) {
-                    this.$el.html(this.templates.player({}));
-                }
-
-                // if the driver is paused and there is still a pause button showing,
-                // we should make sure it becomes a play button (and vice versa):
-                var playButtonShowsPause = function() {
-                    return that.$el.find('.controls .fa-pause').length !== 0;
-                };
-                if (this.driver.paused() === playButtonShowsPause()) {
-                    this.$el.find('.play').toggleClass("fa-play fa-pause");
-                }
-                
-                // update time based values:
-                this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
-                this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
-                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
-                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            // do we already have the controls?
+            if (this.$el.find('.controls').length === 0) {
+                this.$el.html(this.templates.player({}));
             }
+            return this.renderPlayer();
         },
     }).extend(AA.AbstractPlayer);
 
@@ -1132,26 +1142,6 @@ window.AA = window.AA || {};
             if (uri === this.model.get("about")) {
                 this.renderPlayer();
             };
-        },
-        renderPlayer: function() {
-            if (this.driver) {
-                var duration = this.driver.duration();
-            } else {
-                return this;
-            }
-            if (duration === 0) {
-                duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
-            }
-            this.$el.find(".controls")
-                .html(this.templates.player({
-                    hasPlay:     this.hasPlay(),
-                    paused:      this.driver.paused(),
-                    duration:    AA.utils.ss2tc(duration),
-                    currentTime: AA.utils.ss2tc(this.driver.currentTime()),
-                    next:        this.nextEvent(),
-                    previous:    this.previousEvent(),
-                }));
-            return this;
         }
     }).extend(AA.AbstractPlayer);
 
