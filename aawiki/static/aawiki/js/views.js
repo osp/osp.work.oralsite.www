@@ -526,6 +526,23 @@ window.AA = window.AA || {};
             }
             return duration;
         },
+        renderPlayerConditionally: function(uri) {
+            if (this.model) {
+               if (uri !== this.model.get("about")) { // annotation player
+                   return;
+               }
+            } else { // timeline player
+                if (uri !== document.location.origin + document.location.pathname) {
+                    return;
+                }
+            }
+            var duration = this.duration();
+            if (this.driver.currentTime() > duration) {
+                this.driver.pause();
+                this.driver.currentTime(duration);
+            }
+            this.renderPlayer();
+        },
         renderPlayer: function() {
             var that = this;
             if (typeof this.hasPlay === "undefined") { return null; }
@@ -569,7 +586,7 @@ window.AA = window.AA || {};
             player: _.template($('#timeline-player-template').html()),
         },
         initialize: function() {
-            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
+            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.render, this);
             this.listenTo(AA.globalEvents, "aa:updateAnnotationEvents", this.render, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
@@ -577,16 +594,6 @@ window.AA = window.AA || {};
         },
         hasPlay: function() {
             return this.driver.getTrackEvents().length > 0;
-        },
-        renderConditionally: function(uri) {
-            if (uri === document.location.origin + document.location.pathname) {
-                var duration = this.duration();
-                if (this.driver.currentTime() > duration) {
-                    this.driver.pause();
-                    this.driver.currentTime(duration);
-                }
-                this.render();
-            };
         },
         render: function() {
             // Once this view has first rendered, subsequent updates target specific dom elements.
@@ -1137,11 +1144,6 @@ window.AA = window.AA || {};
             $('.wrapper', this.$el).css('z-index', z);
 
             return this;
-        },
-        renderPlayerConditionally: function(uri) {
-            if (uri === this.model.get("about")) {
-                this.renderPlayer();
-            };
         }
     }).extend(AA.AbstractPlayer);
 
