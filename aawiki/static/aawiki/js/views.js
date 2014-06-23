@@ -559,6 +559,11 @@ window.AA = window.AA || {};
         },
         renderConditionally: function(uri) {
             if (uri === document.location.origin + document.location.pathname) {
+                var duration = this.duration();
+                if (this.driver.currentTime() > duration) {
+                    this.driver.pause();
+                    this.driver.currentTime(duration);
+                }
                 this.render();
             };
         },
