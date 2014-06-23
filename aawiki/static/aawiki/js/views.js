@@ -501,6 +501,49 @@ window.AA = window.AA || {};
                 return _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
             }
             return duration;
+        },
+        renderPlayerConditionally: function(uri) {
+            if (this.model) {
+               if (uri !== this.model.get("about")) { // annotation player
+                   return;
+               }
+            } else { // timeline player
+                if (uri !== document.location.origin + document.location.pathname) {
+                    return;
+                }
+            }
+            var duration = this.duration();
+            if (this.driver.currentTime() > duration) {
+                this.driver.pause();
+                this.driver.currentTime(duration);
+            }
+            this.renderPlayer();
+        },
+        renderPlayer: function() {
+            var that = this;
+            if (typeof this.hasPlay === "undefined") { return null; }
+            
+            if (this.hasPlay()) {
+                this.$el.find(".controls").removeClass("hidden");
+
+                // if the driver is paused and there is still a pause button showing,
+                // we should make sure it becomes a play button (and vice versa):
+                var playButtonShowsPause = function() {
+                    return that.$el.find('.controls .fa-pause').length !== 0;
+                };
+                if (this.driver.paused() === playButtonShowsPause()) {
+                    this.$el.find('.play').toggleClass("fa-play fa-pause");
+                }
+                
+                // update time based values:
+                this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
+                this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
+                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
+                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            } else {
+                this.$el.find(".controls").addClass("hidden");
+            }
+            return this;
         }
     };
 
@@ -519,7 +562,7 @@ window.AA = window.AA || {};
             player: _.template($('#timeline-player-template').html()),
         },
         initialize: function() {
-            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
+            this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.render, this);
             this.listenTo(AA.globalEvents, "aa:updateAnnotationEvents", this.render, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
@@ -528,43 +571,17 @@ window.AA = window.AA || {};
         hasPlay: function() {
             return this.driver.getTrackEvents().length > 0;
         },
-        renderConditionally: function(uri) {
-            if (uri === document.location.origin + document.location.pathname) {
-                var duration = this.duration();
-                if (this.driver.currentTime() > duration) {
-                    this.driver.pause();
-                    this.driver.currentTime(duration);
-                }
-                this.render();
-            };
-        },
         render: function() {
             // Once this view has first rendered, subsequent updates target specific dom elements.
             //
             // This is because the constant rerendering through timeupdate events made the
             // controls unclickable.
             var that = this;
-            if (this.hasPlay()) {
-                // do we already have the controls?
-                if (this.$el.find('.controls').length === 0) {
-                    this.$el.html(this.templates.player({}));
-                }
-
-                // if the driver is paused and there is still a pause button showing,
-                // we should make sure it becomes a play button (and vice versa):
-                var playButtonShowsPause = function() {
-                    return that.$el.find('.controls .fa-pause').length !== 0;
-                };
-                if (this.driver.paused() === playButtonShowsPause()) {
-                    this.$el.find('.play').toggleClass("fa-play fa-pause");
-                }
-                
-                // update time based values:
-                this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
-                this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
-                this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
-                this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+            // do we already have the controls?
+            if (this.$el.find('.controls').length === 0) {
+                this.$el.html(this.templates.player({}));
             }
+            return this.renderPlayer();
         },
     }).extend(AA.AbstractPlayer);
 
@@ -603,7 +620,7 @@ window.AA = window.AA || {};
             "click .next"               : "next",
             "click .previous"           : "previous",            
             "click .mini-player"        : "playPauseMiniPlayer",
-            "click video,audio,.mini-player" : function(e) { e.stopPropagation(); }
+            "click video,audio,.mini-player,.controls" : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
@@ -1082,31 +1099,6 @@ window.AA = window.AA || {};
             this.$el.css('z-index', 'auto');
             $('.wrapper', this.$el).css('z-index', z);
 
-            return this;
-        },
-        renderPlayerConditionally: function(uri) {
-            if (uri === this.model.get("about")) {
-                this.renderPlayer();
-            };
-        },
-        renderPlayer: function() {
-            if (this.driver) {
-                var duration = this.driver.duration();
-            } else {
-                return this;
-            }
-            if (duration === 0) {
-                duration = _.max( _.pluck(this.driver.getTrackEvents(), 'end') );
-            }
-            this.$el.find(".controls")
-                .html(this.templates.player({
-                    hasPlay:     this.hasPlay(),
-                    paused:      this.driver.paused(),
-                    duration:    AA.utils.ss2tc(duration),
-                    currentTime: AA.utils.ss2tc(this.driver.currentTime()),
-                    next:        this.nextEvent(),
-                    previous:    this.previousEvent(),
-                }));
             return this;
         }
     }).extend(AA.AbstractPlayer);

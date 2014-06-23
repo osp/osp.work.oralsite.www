@@ -217,7 +217,7 @@ describe("The views", function() {
         });
 
         it("except when the annotation is about the page itself", function() {
-            expect($("article > section:nth-child(2) .play")).not.toExist();
+            expect($("article > section:nth-child(2) .play")).toBeHidden();
         });
 
         it("the slideshow has a forward button enabled, and a backwards button disabled", function() {
