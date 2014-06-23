@@ -716,7 +716,21 @@ window.AA = window.AA || {};
             return false;
         },
         exportAnnotationToAudacityMarkers: function(event) {
-            window.open(this.model.id + '?format=audacity');
+            function utf8_to_b64( str ) {
+                return window.btoa(encodeURIComponent( escape( str )));
+            }
+
+            var audacity = markdown.Markdown.dialects.AaTiny.toAudacity(this.model.get('body'));
+            var encoded = window.btoa(audacity);
+            //var encoded = utf8_to_b64(audacity);
+            //window.open("data:text/plain;charset=utf-8;base64," + encoded);
+            window.open("data:application/octet-stream;charset=utf-8;base64," + encoded);
+
+            //$('<a>', {
+                //"download": "annotation-" + AA.utils.lpad( this.model.attributes.id, 4 ) + ".txt",
+                //"href": "data:text/plain;charset=utf-8;base64," + encoded,
+                //"id": "exportDataID"
+            //}).appendTo("body")[0].click().remove();
 
             return false;
         },
