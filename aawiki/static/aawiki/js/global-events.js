@@ -70,8 +70,12 @@ window.AA = window.AA || {};
         $("article#canvas").on("start", "[typeof='aa:annotation']", function(e) {
             // console.log("annotation was told to start");
             $("[typeof='aa:annotation']").removeClass("active");
-            $(this).addClass("active");
-            playChildren($(this)); // play any audio/videos that are in this annotation
+            var $el = $(this);
+            $el.addClass("active");
+            $el.closest(".wrapper").animate({
+                scrollTop: $el.offset().top
+            }, 600);
+            playChildren($el); // play any audio/videos that are in this annotation
         }).on("end", "[typeof='aa:annotation']", function(e) {
             //console.log("annotation was told to stop");
             $(this).removeClass("active");
