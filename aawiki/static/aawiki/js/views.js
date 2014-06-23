@@ -487,9 +487,6 @@ window.AA = window.AA || {};
             }
             this.render();
         },
-        stopCurrentEvent: function() {
-            this.$el.find("*[typeof='aa:annotation'].active").trigger("end");
-        },
         nextEvent: function() {
             var currentTime = this.driver.currentTime();
             var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
@@ -499,7 +496,6 @@ window.AA = window.AA || {};
         next: function(e) {
             var nextEvent = this.nextEvent();
             if (nextEvent) {
-                this.stopCurrentEvent();
                 this.driver.currentTime(nextEvent.start);
                 this.render();
             }
@@ -514,7 +510,6 @@ window.AA = window.AA || {};
         previous: function(e) {
             var previousEvent = this.previousEvent();
             if (previousEvent) {
-                this.stopCurrentEvent();
                 this.driver.currentTime(previousEvent.start);
                 this.render();
             }
@@ -540,7 +535,7 @@ window.AA = window.AA || {};
         el: '#timeline',
         events: AA.AbstractPlayerEvents,
         templates: {
-            view: _.template($('#timeline-player-template').html()),
+            player: _.template($('#timeline-player-template').html()),
         },
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
@@ -571,7 +566,7 @@ window.AA = window.AA || {};
             if (this.hasPlay()) {
                 // do we already have the controls?
                 if (this.$el.find('.controls').length === 0) {
-                    this.$el.html(this.templates.view({}));
+                    this.$el.html(this.templates.player({}));
                 }
 
                 // if the driver is paused and there is still a pause button showing,
@@ -878,55 +873,12 @@ window.AA = window.AA || {};
             }
             return true;
         },
-        playPause: function(e) {
-            /**
-             * Sends a ‘play’ event to the annotation’s driver.
-             *
-             * We should implement a full HTML5 player interface.
-             *
-             * (The Popcorn instance wraps the HTML5 audio/video player,
-             *  so it shares the same base methods)
-             *  */
-            if (this.driver.paused()) {
-                this.driver.play();
-                this.renderPlayer();
-            } else {
-                this.driver.pause();
-                this.renderPlayer();
-            }
-        },
         playPauseMiniPlayer: function(e) {
             var miniPlayerDriver = AA.router.multiplexView.drivers[$(e.target).attr("rel")];
             if (miniPlayerDriver.paused()) {
                 miniPlayerDriver.play();
             } else {
                 miniPlayerDriver.pause();
-            }
-        },
-        nextEvent: function() {
-            var currentTime = this.driver.currentTime();
-            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "start");
-            // returns undefined if no such element encountered:
-            return _.find(sortedEvents, function(event){ return currentTime < event.start; });
-        },
-        next: function(e) {
-            var nextEvent = this.nextEvent();
-            if (nextEvent) {
-                this.driver.currentTime(nextEvent.start);
-                this.renderPlayer();
-            }
-        },
-        previousEvent: function() {
-            var currentTime = this.driver.currentTime();
-            var sortedEvents = _.sortBy(this.driver.getTrackEvents(), "end");
-            // returns undefined if no such element encountered:
-            return _.find(sortedEvents, function(event){ return currentTime > event.start; });
-        },
-        previous: function(e) {
-            var previousEvent = this.previousEvent();
-            if (previousEvent) {
-                this.driver.currentTime(previousEvent.start);
-                this.renderPlayer();
             }
         },
         render: function() {
@@ -1176,7 +1128,7 @@ window.AA = window.AA || {};
                 }));
             return this;
         }
-    });
+    }).extend(AA.AbstractPlayer);
 
 
     AA.AnnotationCollectionView = Backbone.View.extend({
