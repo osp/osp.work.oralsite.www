@@ -550,6 +550,7 @@ window.AA = window.AA || {};
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderConditionally, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.render, this);
+            this.listenTo(AA.globalEvents, "aa:updateAnnotationEvents", this.render, this);
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
             this.render();
         },
@@ -863,6 +864,7 @@ window.AA = window.AA || {};
                  });
                  that.driverEventIDs.push(p.getLastTrackEventId());
              });
+             AA.globalEvents.trigger('aa:updateAnnotationEvents');
              this.renderPlayer();
         },
         hasPlay : function() {
