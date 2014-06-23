@@ -644,7 +644,7 @@ window.AA = window.AA || {};
             "click .next"               : "next",
             "click .previous"           : "previous",            
             "click .mini-player"        : "playPauseMiniPlayer",
-            "click video,audio,.mini-player" : function(e) { e.stopPropagation(); }
+            "click video,audio,.mini-player,.controls" : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
