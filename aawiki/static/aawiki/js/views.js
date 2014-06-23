@@ -221,12 +221,7 @@ window.AA = window.AA || {};
             return this;
         },
         initialize: function() {
-            //this.listenTo(this.model, 'all', function(e) {
-                //console.log(e);
-            //});
             this.listenTo(this.model, 'sync', this.render);
-
-            //this.render();
         },
         login: function(e) {
             e.preventDefault();
@@ -723,27 +718,10 @@ window.AA = window.AA || {};
             return false;
         },
         exportAnnotationToAudacityMarkers: function(event) {
-            function utf8_to_b64( str ) {
-                return window.btoa(encodeURIComponent( escape( str )));
-            }
-
             var audacity = markdown.Markdown.dialects.AaTiny.toAudacity(this.model.get('body'));
             var encoded = window.btoa(audacity);
-            //var encoded = utf8_to_b64(audacity);
-            //window.open("data:text/plain;charset=utf-8;base64," + encoded);
             window.open("data:application/octet-stream;charset=utf-8;base64," + encoded);
 
-            //$('<a>', {
-                //"download": "annotation-" + AA.utils.lpad( this.model.attributes.id, 4 ) + ".txt",
-                //"href": "data:text/plain;charset=utf-8;base64," + encoded,
-                //"id": "exportDataID"
-            //}).appendTo("body")[0].click().remove();
-
-            return false;
-        },
-        importAnnotationFromAudacityMarkers: function(event) {
-            window.open('/annotations/' + this.model.get('id') + '/update/', '', "status=yes, height=500; width=500; resizeable=0");
-                
             return false;
         },
         changeZIndex: function() {
@@ -1123,9 +1101,6 @@ window.AA = window.AA || {};
                         // Export to Audacity Button
                         new AA.widgets.MenuButton({title: 'export annotation to audacity markers', class: 'icon-export'})
                             .on('click', this.exportAnnotationToAudacityMarkers.bind(this)),
-                        // Import from Audacity Button
-                        new AA.widgets.MenuButton({title: 'import annotation from audacity markers', class: 'icon-export'})
-                            .on('click', this.importAnnotationFromAudacityMarkers.bind(this)),
                         //// Set About Value Button
                         new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
                             .draggable({ helper: "clone" })
