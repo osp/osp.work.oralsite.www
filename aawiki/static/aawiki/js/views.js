@@ -526,6 +526,12 @@ window.AA = window.AA || {};
             }
             return duration;
         },
+        seek: function(e) {
+           if (!this.driver.paused()) {
+                this.driver.pause();
+            }
+            this.driver.currentTime( this.duration() * e.target.valueAsNumber / 100 );
+        },
         renderPlayerConditionally: function(uri) {
             if (this.model) {
                if (uri !== this.model.get("about")) { // annotation player
@@ -564,6 +570,7 @@ window.AA = window.AA || {};
                 this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
                 this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
                 this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+                this.$el.find('#seek-bar').val( 100 / this.duration()  * this.driver.currentTime() );
             } else {
                 this.$el.find(".controls").addClass("hidden");
             }
@@ -576,6 +583,7 @@ window.AA = window.AA || {};
         "click .play":     "playPause",
         "click .next":     "next",
         "click .previous": "previous",
+        "input #seek-bar": "seek", // continuously emit; bind to `change #seek-bar` to only update when mouse is released
     };
 
 
