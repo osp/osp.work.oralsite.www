@@ -647,12 +647,13 @@ window.AA = window.AA || {};
             player: _.template($('#annotation-player-template').html())
         },
         events: {
-            "click"                     : "focus",
-            "click .controls .play"     : "playPause",
-            "click .next"               : "next",
-            "click .previous"           : "previous",            
-            "click .mini-player"        : "playPauseMiniPlayer",
-            "click video,audio,.mini-player,.controls" : function(e) { e.stopPropagation(); }
+            "click"                                                   : "focus",
+            'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
+            "click .controls .play"                                   : "playPause",
+            "click .next"                                             : "next",
+            "click .previous"                                         : "previous",
+            "click .mini-player"                                      : "playPauseMiniPlayer",
+            'click span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
@@ -820,6 +821,9 @@ window.AA = window.AA || {};
             this.render();
 
             return false;
+        },
+        jumpToAnnotation: function(e) {
+            this.driver.currentTime(e.target.getAttribute("content"));
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
