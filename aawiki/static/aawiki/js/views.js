@@ -506,6 +506,12 @@ window.AA = window.AA || {};
             }
             return duration;
         },
+        seek: function(e) {
+           if (!this.driver.paused()) {
+                this.driver.pause();
+            }
+            this.driver.currentTime( this.duration() * e.target.valueAsNumber / 100 );
+        },
         renderPlayerConditionally: function(uri) {
             if (this.model) {
                if (uri !== this.model.get("about")) { // annotation player
@@ -544,6 +550,7 @@ window.AA = window.AA || {};
                 this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
                 this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
                 this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
+                this.$el.find('#seek-bar').val( 100 / this.duration()  * this.driver.currentTime() );
             } else {
                 this.$el.find(".controls").addClass("hidden");
             }
@@ -556,6 +563,7 @@ window.AA = window.AA || {};
         "click .play":     "playPause",
         "click .next":     "next",
         "click .previous": "previous",
+        "input #seek-bar": "seek", // continuously emit; bind to `change #seek-bar` to only update when mouse is released
     };
 
 
@@ -616,7 +624,6 @@ window.AA = window.AA || {};
         templates: {
             view: _.template($('#annotation-view-template').html()),
             edit: _.template($('#annotation-edit-template').html()),
-            //player: _.template($('#annotation-player-template').html())
         },
         events: {
             "click"                     : "focus",
@@ -632,8 +639,8 @@ window.AA = window.AA || {};
             "click .next"               : "next",
             "click .previous"           : "previous",            
             "click .mini-player"        : "playPauseMiniPlayer",
-            "click video,audio,.mini-player,.controls" : function(e) { e.stopPropagation(); },
-            //"click .ui-resizable-handle" : function(e) { console.og("ok")}
+            'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
+            'click span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
@@ -769,6 +776,9 @@ window.AA = window.AA || {};
             this.render();
 
             return false;
+        },
+        jumpToAnnotation: function(e) {
+            this.driver.currentTime(e.target.getAttribute("content"));
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
