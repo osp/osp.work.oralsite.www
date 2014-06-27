@@ -9,27 +9,7 @@ window.AA = window.AA || {};
     
     AA.globalEvents = _.extend({}, Backbone.Events);
     
-    AA.globalEvents.on('aa:changeUser', function() {
-        /*
-         * On login and logout we recreate the userview.
-         * 
-         * We also need to adapt the Page permissions
-         * 
-         * TODO: annotations might also have to change
-         */
-        //AA.userModel.reset();
 
-        //AA.userView.model.fetch({ 
-            //success: function() {
-                //// re-render all the annotations: because the logged-out users see
-                //// different icons then the logged-in user, for example.
-                //AA.router.annotationCollectionView.render();
-            //}
-        //}); // triggers a re-render of the User View
-        //AA.router.pageView.model.unset('permissions');
-        //AA.router.pageView.model.fetch();
-    });
-    
     var playChildren = function($annotEl) {
         /**
          * Given an annotation element, play the media elements contained in there.

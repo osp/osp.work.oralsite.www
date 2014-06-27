@@ -1,9 +1,32 @@
 <div class="controls hidden">
-    <a class="play fa fa-play"></a> <a class="previous fa fa-step-backward disabled"></a> <a class="next fa fa-step-forward disabled"></a>
-    <span class="timer"><span class="current_time">00:00:00,000</span> <span class="separator">/</span> <span class="duration">00:00:00,000</span></span>
+    <a class="play fa fa-play"></a>
+    <a class="previous fa fa-step-backward disabled"></a>
+    <a class="next fa fa-step-forward disabled"></a>
+    <span class="timer">
+        <span class="current_time">00:00:00,000</span>
+        <span class="separator">/</span>
+        <span class="duration">00:00:00,000</span>
+    </span>
 </div>
-<div class="menu-top"></div>
-<div class="menu-left"></div>
+
+<div class="menu-top top">
+    <div draggable="false" title="drag annotation" class="icon icon-drag"></div>
+    <% if (loggedIn) { %>
+    <div draggable="false" title="edit annotation" class="icon icon-edit"></div>
+    <div draggable="false" title="delete annotation" class="icon icon-delete"></div>
+    <div draggable="false" title="export annotation to audacity markers" class="icon icon-export"></div>
+    <div draggable="false" title="Drag to connect" class="icon icon-target"></div>
+    <% } %>
+</div>
+
+<% if (loggedIn) { %>
+<div class="menu-left left">
+    <div draggable="false" title="toggle transition" class="icon icon-transition"></div>
+    <div draggable="false" title="toggle collapsing" class="icon icon-visibility"></div>
+    <div draggable="false" title="set z-index" class="icon icon-layers"></div>
+</div>
+<% } %>
+
 <div class="wrapper <% if (isSlideshow) { %>slideshow<% } %> <% /* if (isMedia) { %>media<% } */ %>">
     <%= body %>
 </div>

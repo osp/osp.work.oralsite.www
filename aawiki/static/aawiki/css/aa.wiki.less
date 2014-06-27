@@ -232,9 +232,9 @@ p, ol, ul, blockquote {
     margin-bottom: @base-line-height;
 }
 
-p + p {
-    text-indent: .5 * @base-line-height;
-}
+/*p + p {*/
+    /*text-indent: .5 * @base-line-height;*/
+/*}*/
 
 pre, code {
     font-family: monospace, 'NotCourierSans';
@@ -357,14 +357,10 @@ blockquote {
 
 /** The Annotation Box **/
 
-section.section1 {
+#canvas > section {
     position: absolute !important;
     top: 20px;
     left: 20px;
-    width: 300px;
-    height: 400px;
-    background-color: white;
-    outline: 1px solid #ccc;
 
     &.drop-hover {
         .box-shadow(0px 0px 3px 3px yellow);
@@ -379,7 +375,14 @@ section.section1 {
 
     .menu-left {
         top: 0;
-        left: -45px;
+
+        &.left {
+            left: -45px;
+        }
+
+        &.right {
+            right: -50px;
+        }
 
         .icon {
             margin-bottom: 5px;
@@ -387,9 +390,16 @@ section.section1 {
     }
 
     .menu-top {
-        top: -45px;
         left: 0;
         white-space: nowrap;
+
+        &.top {
+            top: -45px;
+        }
+
+        &.bottom {
+            bottom: -50px;
+        }
 
         .icon {
             margin-right: 5px;
@@ -398,34 +408,35 @@ section.section1 {
     }
 
     > textarea {
-        top: 0;
-        left: 0;
-        position: absolute;
-        resize: none;
-        width: 100%;
-        height: 100%;
-        border: none;
-        padding: 5px;
+        position: relative;
         .box-sizing(border-box);
+        width: 300px;
+        height: 400px;
+        border: none;
         outline: 1px solid #ccc;
         outline-offset: 0;
-    }
-
-    ul li:before {
-        content: "– ";
-    }
-    ol {
-        list-style: decimal inside;
-    }
-
-    > div.wrapper {
-        overflow-x: hidden;
-        height: 100%;
-        width: 100%;
-        .box-sizing(border-box);
-
         padding: 5px;
-        background: inherit;
+        resize: none;
+    }
+
+    > .wrapper {
+        // if set to absolute the section element does not get a size and the
+        // layout of the menu gets broken
+        position: relative !important; 
+
+        // I'd like to use border-box but there is a bug with jquery ui
+        // resizable. See <http://bugs.jqueryui.com/ticket/8932>
+        // maybe this can help?
+        // <http://blog.jquery.com/2012/08/16/jquery-1-8-box-sizing-width-csswidth-and-outerwidth/>
+        .box-sizing(padding-box); 
+        top: 0 !important;
+        left: 0 !important;
+        width: 300px;
+        height: 400px;
+        overflow: auto;
+        background-color: white;
+        outline: 1px solid #ccc;
+        padding: 5px;
 
         section[typeof="aa:annotation"] {
             border-top: 1px solid whitesmoke;
@@ -479,7 +490,7 @@ section.section1 {
 
         textarea,
         .wrapper {
-            outline: 3px solid paleGreen;
+            outline: 3px solid paleGreen!important;
         }
 
         textarea {
@@ -539,8 +550,12 @@ section.section1 {
         }
     }
 
-    &:hover {
-        z-index: 9999999 !important; /* TODO: check if written correctly */
+    ul li:before {
+        content: "– ";
+    }
+
+    ol {
+        list-style: decimal inside;
     }
 }
 
@@ -548,7 +563,13 @@ body {
    .user-select(none);
 }
 
-section.section1 .wrapper {
+.icon {
+   .user-select(none);
+}
+
+
+
+#canvas > section .wrapper {
    .user-select(text);
 }
 
@@ -738,14 +759,14 @@ section.section1 .wrapper {
 .ui-resizable { position: relative;}
 .ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
 .ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
-.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
-.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
-.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
-.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
-.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
-.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
-.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
-.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+/*.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }*/
+.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: 0px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 7px; right: 0px; top: 0; height: 100%; }
+/*.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }*/
+.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 0px; bottom: 0px; }
+/*.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }*/
+/*.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }*/
+/*.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}*/
 
 
 video,
@@ -843,6 +864,13 @@ img {
         background-image: url('/static/aawiki/png/icons/ok-hover.png');
     }
 }
+.icon-cancel {
+    background-image: url('/static/aawiki/png/icons/delete.png');
+
+    &:hover {
+        background-image: url('/static/aawiki/png/icons/delete-hover.png');
+    }
+}
 .icon-galaxy {
     background-image: url('/static/aawiki/png/icons/galaxy.png');
 
@@ -857,7 +885,8 @@ img {
         background-image: url('/static/aawiki/png/icons/target-hover.png');
     }
 }
-.icon-styles {
+.icon-transition,
+.icon-visibility {
     background-image: url('/static/aawiki/png/icons/styles.png');
 
     &:hover {

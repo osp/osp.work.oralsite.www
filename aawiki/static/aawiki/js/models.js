@@ -25,12 +25,6 @@ window.AA = window.AA || {};
         defaults: {
             id: "me"
         },
-        initialize: function() {
-            this.listenTo(AA.globalEvents, 'aa:changeUser', this.onChangeUser);
-        },
-        onChangeUser: function() {
-            this.reset().fetch()
-        },
         loggedIn: function() {
             return this.get("id") !== -1 && this.get("id") !== 'me'; // it’s `me` when the app first tries to find out who the user is: the backend returns the real id
         },
@@ -45,15 +39,16 @@ window.AA = window.AA || {};
             body: "Nouvelle annotation",
             style: 'width: 300px; height: 400px; top: 10px; left: 10px;'
         },
-        loadFront: function (src, name) {
+        loadFront: function (src, name, options) {
             name = name || '__content';
+            options || (options = {});
 
             var data = jsyaml.loadFront(src, name);
 
             data['klass'] = data['class'];
             delete data['class'];
 
-            this.set(data);
+            this.set(data, options);
 
             return this;
         },
@@ -112,6 +107,10 @@ window.AA = window.AA || {};
         }],
         initialize: function() {
             this.on('error', this.onError);
+            this.listenTo(AA.globalEvents, "aa:changeUser", this.onChangeUser);
+        },
+        onChangeUser: function() {
+            this.unset('permissions').fetch();
         },
         onError: function(model, response, options) {
             // Redirects to the current version if a wrong revision is passed
