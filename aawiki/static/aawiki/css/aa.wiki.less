@@ -565,6 +565,15 @@ blockquote {
     }
 }
 
+#canvas.anonymous > section {
+    /* When hovering over an annotation box, put in front.
+     * We can only do this for logged-out users, as logged-in users
+     * need to have manual control over the stacking of the boxes */
+    &:hover {
+      z-index: 9999999 !important;
+    }
+}
+
 body {
    .user-select(none);
 }
