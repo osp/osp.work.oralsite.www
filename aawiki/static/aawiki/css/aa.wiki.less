@@ -510,6 +510,7 @@ blockquote {
         }
     }
 
+    /** This is triggered by the ‘collapsed’ class: the box will have a look of being collapsed on initial load */
     &.collapsed:not(.editing) {
         height: auto !important;
 
@@ -523,6 +524,14 @@ blockquote {
         .wrapper {
             display: none;
         }
+
+       /*   FIXME this is a stop gap solution: the collapsed box will show the original box as well, as you hover over it 
+        *  It would be better to do a solution where you have to click, but that’s more involved an probably impossible in
+        * CSS alone. */
+        &:hover .wrapper {
+            display: inherit;
+        }
+
     }
 
 
