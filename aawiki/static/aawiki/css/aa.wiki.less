@@ -550,6 +550,12 @@ blockquote {
         }
     }
 
+    /** This is triggered by the ‘nosubdivision’ class: we won’t see lines between the different annotations **/
+    &.nosubdivision > .wrapper section[typeof="aa:annotation"] {
+        border-top: none;
+    }
+
+
     ul li:before {
         content: "– ";
     }
