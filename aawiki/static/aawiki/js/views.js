@@ -377,7 +377,7 @@ window.AA = window.AA || {};
                     } else if (driverMediaRef) {
                         // We go to lengths to specify id’s,
                         // because Popcorn.smart only supports id´s and not elements themselves.
-                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri);
+                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri, { defaults: { controls : true }});
                     } else {
                             
                         // And else we don’t know what to do
