@@ -438,6 +438,11 @@ blockquote {
         outline: 1px solid #ccc;
         padding: 5px;
 
+        iframe {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
         section[typeof="aa:annotation"] {
             border-top: 1px solid whitesmoke;
             margin-top: -1px;
@@ -510,6 +515,7 @@ blockquote {
         }
     }
 
+    /** This is triggered by the ‘collapsed’ class: the box will have a look of being collapsed on initial load */
     &.collapsed:not(.editing) {
         height: auto !important;
 
@@ -523,6 +529,14 @@ blockquote {
         .wrapper {
             display: none;
         }
+
+       /*   FIXME this is a stop gap solution: the collapsed box will show the original box as well, as you hover over it 
+        *  It would be better to do a solution where you have to click, but that’s more involved an probably impossible in
+        * CSS alone. */
+        &:hover .wrapper {
+            display: inherit;
+        }
+
     }
 
 
@@ -550,12 +564,27 @@ blockquote {
         }
     }
 
+    /** This is triggered by the ‘nosubdivision’ class: we won’t see lines between the different annotations **/
+    &.nosubdivision > .wrapper section[typeof="aa:annotation"] {
+        border-top: none;
+    }
+
+
     ul li:before {
         content: "– ";
     }
 
     ol {
         list-style: decimal inside;
+    }
+}
+
+#canvas.anonymous > section {
+    /* When hovering over an annotation box, put in front.
+     * We can only do this for logged-out users, as logged-in users
+     * need to have manual control over the stacking of the boxes */
+    &:hover {
+      z-index: 9999999 !important;
     }
 }
 
@@ -614,6 +643,10 @@ body {
     &.hidden {
       display: none;
     }
+}
+
+.mini-player {
+    background-size: 100% 100%;
 }
 
 .mini-player.paused {

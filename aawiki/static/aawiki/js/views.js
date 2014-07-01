@@ -214,7 +214,7 @@ window.AA = window.AA || {};
             this.listenTo(this.model, 'sync', this.render);
         },
         onChangeUser: function() {
-            this.model.reset().fetch()
+            this.model.reset().fetch();
         },
         login: function(e) {
             e.preventDefault();
@@ -377,7 +377,7 @@ window.AA = window.AA || {};
                     } else if (driverMediaRef) {
                         // We go to lengths to specify id’s,
                         // because Popcorn.smart only supports id´s and not elements themselves.
-                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri);
+                        this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri, { defaults: { controls : true }});
                     } else {
                             
                         // And else we don’t know what to do
@@ -532,6 +532,7 @@ window.AA = window.AA || {};
         renderPlayer: function() {
             var that = this;
             if (typeof this.hasPlay === "undefined") { return null; }
+            if (!this.driver) { return null; }
             
             if (this.hasPlay()) {
                 this.$el.find(".controls").removeClass("hidden");
@@ -910,38 +911,30 @@ window.AA = window.AA || {};
             .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
                 event.preventDefault();
 
-                // FIXME: call that.driver instead
-                var driver = AA.router.multiplexView.drivers[that.model.get('about')];
-                $(this).insertAtCaret('\n\n' + AA.utils.ss2tc(driver.currentTime()) + ' -->\n\n');
+                $(this).insertAtCaret('\n\n' + AA.utils.ss2tc(that.driver.currentTime()) + ' -->\n\n');
             })
             .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
                 event.preventDefault();
 
-                // FIXME: call that.driver instead
-                var driver = AA.router.multiplexView.drivers[that.model.get('about')];
-                if (driver.paused()) {
-                    driver.play();
+                if (that.driver.paused()) {
+                    that.driver.play();
                 } else {
-                    driver.pause();
+                    that.driver.pause();
                     //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
                 }
             })
             .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
                 event.preventDefault();
 
-                // FIXME: call that.driver instead
-                var driver = AA.router.multiplexView.drivers[that.model.get('about')];
-                var nextTime = Math.max(driver.currentTime() - 5, 0);
-                driver.currentTime(nextTime);
+                var nextTime = Math.max(that.driver.currentTime() - 5, 0);
+                that.driver.currentTime(nextTime);
                 //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
             })
             .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
                 event.preventDefault();
 
-                // FIXME: call that.driver instead
-                var driver = AA.router.multiplexView.drivers[that.model.get('about')];
-                var nextTime = Math.min(driver.currentTime() + 5, driver.duration());
-                driver.currentTime(nextTime);
+                var nextTime = Math.min(that.driver.currentTime() + 5, that.driver.duration());
+                that.driver.currentTime(nextTime);
                 //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
             });
         },
@@ -952,7 +945,7 @@ window.AA = window.AA || {};
              * (it is not very handy otherwise to click button of an overlaping
              * box with a lower z-index).
              *
-             * See <http://jsfiddle.net/Fzn5T/3/> for a proff-of-concept.
+             * See <http://jsfiddle.net/Fzn5T/3/> for a proof-of-concept.
              */
             var that = this;
             var model = this.model;
