@@ -532,6 +532,7 @@ window.AA = window.AA || {};
         renderPlayer: function() {
             var that = this;
             if (typeof this.hasPlay === "undefined") { return null; }
+            if (!this.driver) { return null; }
             
             if (this.hasPlay()) {
                 this.$el.find(".controls").removeClass("hidden");
