@@ -6,7 +6,8 @@ window.AA = window.AA || {};
     AA.Router = Backbone.Router.extend({
         currentSlug: '',
         routes: {
-            ":slug/(:rev/)": "page",
+            ":slug/": "stripTrailingSlash",
+            ":slug(/:rev)": "page",
             "": "index",
         },
         initialize: function() {
@@ -25,9 +26,10 @@ window.AA = window.AA || {};
         index: function() {
             AA.router.navigate('/Index/', {trigger: true});
         },
+        stripTrailingSlash: function(slug) {
+            AA.router.navigate('/' + slug, {trigger: true});
+        },
         page: function(slug, rev) {
-            console.log('change page');
-
             // Makes sure the page slug is indeed a Wiki name
             var wiki_name = AA.utils.wikify(slug);
             if (slug !== wiki_name) {

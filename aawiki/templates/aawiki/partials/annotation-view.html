@@ -10,22 +10,22 @@
 </div>
 
 <div class="menu-top top">
-    <div draggable="false" title="drag annotation" class="icon icon-drag"></div>
+    <div draggable="false" title="drag box" class="icon icon-drag"></div>
     <% if (loggedIn) { %>
-    <div draggable="false" title="edit annotation" class="icon icon-edit"></div>
-    <div draggable="false" title="delete annotation" class="icon icon-delete"></div>
-    <div draggable="false" title="export annotation to audacity markers" class="icon icon-export"></div>
-    <div draggable="false" title="Drag to connect" class="icon icon-target"></div>
+    <div draggable="false" title="edit box" class="icon icon-edit"></div>
+    <div draggable="false" title="delete box" class="icon icon-delete"></div>
+    <div draggable="false" title="export to audacity markers" class="icon icon-export"></div>
+    <div draggable="false" title="drag to connect" class="icon icon-target"></div>
     <% } %>
 </div>
 
-<% if (loggedIn) { %>
 <div class="menu-left left">
+    <div draggable="false" title="toggle visibility" class="icon icon-visibility"></div>
+    <% if (loggedIn) { %>
     <div draggable="false" title="toggle transition" class="icon icon-transition"></div>
-    <div draggable="false" title="toggle collapsing" class="icon icon-visibility"></div>
     <div draggable="false" title="set z-index" class="icon icon-layers"></div>
+    <% } %>
 </div>
-<% } %>
 
 <div class="wrapper <% if (isSlideshow) { %>slideshow<% } %> <% /* if (isMedia) { %>media<% } */ %>">
     <%= body %>

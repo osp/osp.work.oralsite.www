@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-06-22T23:30Z
+ * Date: 2014-06-27T15:36Z
  */
 
 (function(expose) {
@@ -2060,11 +2060,7 @@
         var path = parts[1];
         var hash = parts[2];
         
-        // FIXME The first test here is to avoid adding ../ if there is only a #fragment-identifier as it
-        // will lead away from the current page
-        // We should probably not be adding the ../ in the first place— can we change our wikilinks syntax to be
-        // /pages/slug instead of /pages/slug/ ? 
-        var uri =  (path ? '../' : '') + encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
+        var uri = encodeURIComponent( capitaliseFirstLetter( spaceToUnderscore( path ) ) );
         
         if (hash) {
           // do not escape =, so we can have #t=3.5

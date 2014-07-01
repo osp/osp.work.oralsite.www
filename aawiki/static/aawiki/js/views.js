@@ -287,8 +287,8 @@ window.AA = window.AA || {};
                 .find('#accordion').tabs() 
                 ;
 
-            //AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
-            //AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
+            AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
+            AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
 
             $('#extra-stylesheet').remove();
             var stylesheet = this.model.get('stylesheet');
@@ -1150,11 +1150,11 @@ window.AA = window.AA || {};
             
             this.cursorMenu.register ([
                 // Create Annotation Button
-                new AA.widgets.MenuButton ({title: 'new annotation', class: 'icon-new'})
+                new AA.widgets.MenuButton ({title: 'new box', class: 'icon-new'})
                     .on('click', this.addAnnotation.bind(this)),
 
                 // Create Organize annotations Button
-                new AA.widgets.MenuButton ({title: 'organize annotations', class: 'icon-pack'})
+                new AA.widgets.MenuButton ({title: 'organize boxess', class: 'icon-pack'})
                     .on('click', this.organizeAnnotations.bind(this)),
 
                 // Create Snapshot Button
@@ -1180,15 +1180,9 @@ window.AA = window.AA || {};
                     .on('click', this.editPermissions.bind(this)),
 
                 // Create Set About Value Button
-                new AA.widgets.MenuButton({title: 'Drag to connect', class: 'icon-target'})
+                new AA.widgets.MenuButton({title: 'drag to connect', class: 'icon-target'})
                     .draggable({ helper: "clone" })
                     .attr('href', document.location.origin + document.location.pathname),
-
-                // Delete Page Button
-                new AA.widgets.MenuButton({title: 'delete page', class: 'icon-delete'})
-                    .on('click', function() {
-                    
-                    })
             ]);
             
             this.listenTo(this.collection, 'add', this.renderOne);
