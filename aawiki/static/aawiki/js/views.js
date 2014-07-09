@@ -73,7 +73,7 @@ window.AA = window.AA || {};
             this.model.set('permissions', permissions);
             this.model.save(null, {
                 error: function() {
-                    console.log("there was an error");
+                    //console.log("there was an error");
                     this.$el.find('select, input').prop('disabled', false);
                 },
                 success: function() {
@@ -280,6 +280,7 @@ window.AA = window.AA || {};
             this.model.save();
         },
         render: function() {
+            //console.log(this);
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             
@@ -1072,14 +1073,17 @@ window.AA = window.AA || {};
         
         showMenu: function (e) {
             if (this.cursorMenu.visible()) {
-                this.cursorMenu.hide ();
+                this.cursorMenu.hide();
             } else {
                 var focused = $('#canvas > section.focused').length;
 
                 if (focused) {
                     $('#canvas > section').removeClass('focused');
                 } else {
-                    this.cursorMenu.show (e);
+                    if (AA.userModel.loggedIn()) {
+                        //console.log('logged in');
+                        this.cursorMenu.show(e);
+                    }
                 };
             }
         },
