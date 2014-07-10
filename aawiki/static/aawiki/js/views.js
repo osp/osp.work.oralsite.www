@@ -241,52 +241,45 @@ window.AA = window.AA || {};
         el: '#page-meta-container',
         template: _.template($('#page-view-template').html()),
         events: {
-            "click #toggleDrawer"               : "toggleDrawer",
-            "click #commit-list a"              : "wayback",
-            "change #permissions-visible"       : "updatePermissionsVisible",
+            //"click #commit-list a"              : "wayback",
+            //"change #permissions-visible"       : "updatePermissionsVisible",
             //"change #permissions-editable"      : "updatePermissionsEditable",
             //"change #permissions-administrated" : "updatePermissionsAdministrated",
         },
-        toggleDrawer: function(event) {
-            $('#sidebar, #canvas').toggleClass('hide');
-        },
-        wayback: function(event) {
-            event.preventDefault();
-            var href = $(event.currentTarget).attr('href');
-            AA.router.navigate(href.substring(6), {trigger: true});
-        },
+        //wayback: function(event) {
+            //event.preventDefault();
+            //var href = $(event.currentTarget).attr('href');
+            //AA.router.navigate(href.substring(6), {trigger: true});
+        //},
         setTitle: function() {
             document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
         },
-        publicUser: {
-            "current": false,
-            "id": -1,
-            "name": "AnonymousUser",
-            "type": "user",
-            "uri": "/api/v1/user/-1/"
-        },
-        updatePermissionsVisible: function() {
-            var permissions = this.model.get("permissions");
+        //publicUser: {
+            //"current": false,
+            //"id": -1,
+            //"name": "AnonymousUser",
+            //"type": "user",
+            //"uri": "/api/v1/user/-1/"
+        //},
+        //updatePermissionsVisible: function() {
+            //var permissions = this.model.get("permissions");
             
-            if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
-                // add public user
-                permissions.view_page.push(this.publicUser);
-            } else {
-                // remove public user
-                permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
-            }
+            //if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
+                //// add public user
+                //permissions.view_page.push(this.publicUser);
+            //} else {
+                //// remove public user
+                //permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
+            //}
             
-            this.model.set("permissions", permissions);
-            this.model.save();
-        },
+            //this.model.set("permissions", permissions);
+            //this.model.save();
+        //},
         render: function() {
-            //console.log(this);
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             
-            this.$el.html( this.template( context ) )
-                .find('#accordion').tabs() 
-                ;
+            this.$el.html( this.template( context ) );
 
             AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
             AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
@@ -310,17 +303,57 @@ window.AA = window.AA || {};
     });
 
 
-    AA.RevisionView = Backbone.View.extend({
-        el: '#revisions_browser_ctrl',
-        template: _.template($('#revisions-browser-template').html()),
+    AA.ToolView = Backbone.View.extend({
+        el: '#tools',
         events: {
-            'click #toggleRevisions': 'toggleRevisions',
+            "click .toggleDrawer": "toggleDrawer",
         },
-        toggleRevisions: function(event) {
-            event.preventDefault();
+        toggleDrawer: function(event) {
+            $('body').toggleClass('show-tool');
+        },
+        initialize: function() {
+            $('.tabs', this.$el).tabs();
+        }
+    });
 
-            $('#revisions_browser_ctrl').toggleClass('hidden');
+
+    AA.SidebarView = Backbone.View.extend({
+        el: '#sidebar',
+        events: {
+            "click .toggleDrawer": "toggleDrawer",
         },
+        toggleDrawer: function(event) {
+            $('body').toggleClass('hide-sidebar');
+        }
+    });
+
+
+    //AA.ToolView = Backbone.View.extend({
+        //el: '#tools',
+        //template: _.template($('#tools-view-template').html()),
+        //events: {
+            //"click .toggleDrawer"               : "toggleDrawer",
+        //},
+        //toggleDrawer: function(event) {
+            //$('body').toggleClass('show-tool');
+        //},
+        //render: function() {
+            //var context = this.model.toJSON();
+            
+            //this.$el.html( this.template( context ) )
+                //.find('.accordion').tabs() 
+                //;
+            //return this;
+        //},
+        //initialize: function() {
+            //this.listenTo(this.model, 'change', this.render);
+        //},
+    //});
+
+
+    AA.RevisionView = Backbone.View.extend({
+        el: '#commits',
+        template: _.template($('#revisions-browser-template').html()),
         render: function() {
             this.$el
             .empty()
