@@ -861,23 +861,19 @@ window.AA = window.AA || {};
                 $top.removeClass('bottom').addClass('top');
             };
         },
-        onFocus: function(model, collection) {
-            if (model !== this.model && this.$el.hasClass('focused')) {
+        onFocus: function(event, instance) {
+            if (instance === this.model) {
+                this.positionMenu();
+                this.$el.addClass('focused');
+                this.model.collection.focused = this;
+            } else {
                 this.$el.removeClass('focused');
             }
         },
-        focus: function(e) {
-            if (AA.router.annotationCollectionView.cursorMenu.visible()) {
-                AA.router.annotationCollectionView.cursorMenu.hide ();
-            };
-
-            this.positionMenu();
-
-            this.model.collection.trigger('focus', this.model, this.model.collection);
+        focus: function(event) {
+            this.model.collection.trigger('focus', event, this.model);
         
-            this.$el.addClass('focused');
-            
-            e.stopPropagation();
+            event.stopPropagation();
         },
         onPositionChange: function(model, value, options) { // FIXME this code should allow for animations but is not called right now
             var defaults = {
@@ -1080,7 +1076,7 @@ window.AA = window.AA || {};
         collection: new AA.AnnotationCollection(), 
         el: '#canvas',
         events: {
-            "click"            : "showMenu",
+            "click"            : "focus",
         },
         initialize: function() {
             this.cursorMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'cursor'});
@@ -1122,6 +1118,7 @@ window.AA = window.AA || {};
                     .attr('href', document.location.origin + document.location.pathname),
             ]);
             
+            this.listenTo(this.collection, 'focus', this.onFocus);
             this.listenTo(this.collection, 'add', this.renderOne);
             this.listenTo(AA.userModel, 'sync', this.render);
             this.render();
@@ -1155,20 +1152,23 @@ window.AA = window.AA || {};
             AA.globalEvents.trigger('aa:newDrivers');
             return this;
         },
-        showMenu: function (e) {
-            if (this.cursorMenu.visible()) {
-                this.cursorMenu.hide();
-            } else {
-                var focused = $('#canvas > section.focused').length;
-
-                if (focused) {
-                    $('#canvas > section').removeClass('focused');
+        focus: function(event) {
+            this.collection.trigger('focus', event, this.collection);
+        
+            event.stopPropagation();
+        },
+        onFocus: function(event, instance) {
+            if (instance === this.collection && 
+                ! this.cursorMenu.visible() &&
+                AA.userModel.loggedIn() &&
+                ! AA.router.pageModel.get('rev')) {
+                if (this.collection.focused) {
+                    this.collection.focused = undefined;
                 } else {
-                    if (AA.userModel.loggedIn()) {
-                        //console.log('logged in');
-                        this.cursorMenu.show(e);
-                    }
-                };
+                    this.cursorMenu.show(event);
+                }
+            } else {
+                this.cursorMenu.hide();
             }
         },
         commit: function(event) {
