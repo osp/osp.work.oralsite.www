@@ -5,6 +5,7 @@ Uses Git to versionize content.
 """
 
 import os
+import codecs
 from time import mktime
 from git import Git, Repo
 from git.errors import InvalidGitRepositoryError, NoSuchPathError, GitCommandError
@@ -64,7 +65,7 @@ class GitBackend(BaseBackend):
         """
 
         try:
-            fobj = open(os.path.join(self.repo_path, key), 'w')
+            fobj = codecs.open(os.path.join(self.repo_path, key), 'w', "utf-8" )
         except IOError:
             #parent directory seems to be missing
             self.initial(os.path.dirname(os.path.join(self.repo_path, key)))
