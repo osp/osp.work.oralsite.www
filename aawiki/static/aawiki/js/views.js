@@ -681,6 +681,7 @@ window.AA = window.AA || {};
              */
             var that = this;
             var model = this.model;
+            var isFocused = this.$el.hasClass('focused');
 
             var $tmp = $('<div>').attr('style', that.model.get('style'));
 
@@ -792,6 +793,10 @@ window.AA = window.AA || {};
                 this.updateAnnotationEvents();
             }
 
+            if (isFocused) {
+                this.$el.addClass('focused');
+            }
+
             return this;
         },
         edit: function() {
@@ -865,7 +870,6 @@ window.AA = window.AA || {};
             if (instance === this.model) {
                 this.positionMenu();
                 this.$el.addClass('focused');
-                this.model.collection.focused = this;
             } else {
                 this.$el.removeClass('focused');
             }
@@ -1162,13 +1166,17 @@ window.AA = window.AA || {};
                 ! this.cursorMenu.visible() &&
                 AA.userModel.loggedIn() &&
                 ! AA.router.pageModel.get('rev')) {
-                if (this.collection.focused) {
-                    this.collection.focused = undefined;
+                if (this.focused) {
+                    this.focused = undefined;
                 } else {
                     this.cursorMenu.show(event);
                 }
             } else {
                 this.cursorMenu.hide();
+            }
+
+            if (instance !== this.collection) {
+                this.focused = instance;
             }
         },
         commit: function(event) {
