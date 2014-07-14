@@ -14,7 +14,7 @@ import uuid
 import mimetypes
 import magic
 
-from django.utils.hashcompat import md5_constructor as md5
+from hashlib import md5
 from PIL import Image
 from urllib import quote
 
@@ -55,10 +55,10 @@ class Bundle(object):
         self.url = url  # TODO: normalize the URL?
         self.url = re.sub(r'http:/([\w]+)', r'http://\1', self.url) # http:/about --> http://about
         self.url = re.sub(r'https:/([\w]+)', r'https://\1', self.url) # https:/about --> https://about
-        
+
         self.to_go = to_go  # the remaining tasks
         self.target_ext = target_ext # the extension for the final file (as requested from the view)
-        
+
         self.mime = "application/octet-stream"  # A default mimetype
         self.consumed = []  # the tasks already performed
 
@@ -131,7 +131,7 @@ def cache(bundle):
     if not os.path.exists(full_path):
         r = requests.get(bundle.url, stream=True, verify=False) # We don’t check the host’s certificate
         if r.status_code == 200:
-            
+
             with open(full_path, 'wb') as f:
                 for chunk in r.iter_content(1024):
                     f.write(chunk)
@@ -180,19 +180,19 @@ def resize(bundle):
         raise TypeError
 
     image = Image.open(bundle.url2path())
-    
+
     filter = bundle.consume() # the name of the current filter is popped, something like resize:640
     # This is how we get the argument for now:
     try:
         width = int(filter.split(':')[1])
     except IndexError:
         raise TypeError("No argument found for resize width")
-    
+
     ratio = width / float(image.size[0])
     height = int( image.size[1] * ratio )
 
     image = image.resize((width, height), Image.NEAREST)
-    
+
     image.save(bundle.url2path())
     return bundle
 
@@ -224,12 +224,12 @@ def process_pipeline(url=None, pipeline=[], target_ext=None, synchronous=False):
     filters.extend([registry[p.split(':')[0]] for p in pipeline])    # This removes the arguments as in resize:640 -> resize
                                                                      # Could  be cleaner, but in that case should adapt the code in the resize filter to correspond
     filters.extend([serialize])
-    
+
     bundle = Bundle(url=url, to_go=pipeline, target_ext=target_ext)
-    
+
     for filter in filters:
         bundle = filter(bundle)
-    
+
     return bundle
-    
-    
+
+

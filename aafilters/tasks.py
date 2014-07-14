@@ -13,7 +13,7 @@ import magic
 
 from celery import chain, shared_task
 from django.core.cache import cache as memcache
-from django.utils.hashcompat import md5_constructor as md5
+from hashlib import md5
 from PIL import Image
 from urllib import quote
 
@@ -225,7 +225,7 @@ def process_pipeline(url=None, pipeline=[], target_ext=None, synchronous=False):
         filters.extend([serialize.subtask(link_error=cb)])
 
         result = chain(*filters).apply_async(link=cb, task_id=task_id)
-        
+
         if synchronous:
             result.wait()
         return task_id
