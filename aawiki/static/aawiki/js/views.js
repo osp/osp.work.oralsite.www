@@ -334,6 +334,9 @@ window.AA = window.AA || {};
     AA.RevisionView = Backbone.View.extend({
         el: '#commits',
         template: _.template($('#revisions-browser-template').html()),
+        events: {
+            "click .revert":     "revert",
+        },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
         },
@@ -353,6 +356,15 @@ window.AA = window.AA || {};
                 AA.router.navigate(href.substring(6), { trigger: true });
             });
         },
+        revert: function() {
+            window.alert('not implemented yet');
+            return;
+            var answer = window.confirm("You are about to revert an old version. Proceed?");
+
+            if (answer) {
+                console.log("not implemented yet");
+            }
+        }
     });
 
 
@@ -699,7 +711,8 @@ window.AA = window.AA || {};
             .html(this.templates.view({
                 body: markdown.toHTML(this.model.get("body"), "Aa"),
                 isSlideshow: this.isSlideshow(),
-                loggedIn: AA.userModel.loggedIn()
+                loggedIn: AA.userModel.loggedIn(),
+                isHead: AA.router.pageModel.get('rev') === null
             }))
             .draggable({
                 handle: '.icon-drag',
@@ -805,7 +818,10 @@ window.AA = window.AA || {};
 
             this.$el
             .addClass('editing')
-            .html(this.templates.edit({body: this.model.toFrontMatter()}))
+            .html(this.templates.edit({
+                body: this.model.toFrontMatter(),
+                isHead: AA.router.pageModel.get('rev') === null
+            }))
             .find('textarea')
             .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
                 event.preventDefault();
