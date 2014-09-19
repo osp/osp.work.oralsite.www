@@ -13,7 +13,7 @@
     <% if (isHead) { %>
     <div draggable="false" title="drag box" class="icon icon-drag"></div>
     <% } %>
-    <% if (loggedIn) { %>
+    <% if (canChange) { %>
     <div draggable="false" title="edit box" class="icon icon-edit"></div>
     <% if (isHead) { %>
     <div draggable="false" title="delete box" class="icon icon-delete"></div>
@@ -26,7 +26,7 @@
 <% if (isHead) { %>
 <div class="menu-left left">
     <div draggable="false" title="toggle visibility" class="icon icon-visibility"></div>
-    <% if (loggedIn) { %>
+    <% if (canChange) { %>
     <div draggable="false" title="toggle transition" class="icon icon-transition"></div>
     <div draggable="false" title="set z-index" class="icon icon-layers"></div>
     <% } %>
