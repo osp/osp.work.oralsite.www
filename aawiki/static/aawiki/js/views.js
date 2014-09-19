@@ -1147,7 +1147,7 @@ window.AA = window.AA || {};
                     .on('click', this.addAnnotation.bind(this)),
 
                 // Create Organize annotations Button
-                new AA.widgets.MenuButton ({title: 'organize boxess', class: 'icon-pack'})
+                new AA.widgets.MenuButton ({title: 'organize boxes', class: 'icon-pack'})
                     .on('click', this.organizeAnnotations.bind(this)),
 
                 // Create Snapshot Button
