@@ -716,7 +716,7 @@ window.AA = window.AA || {};
             .html(this.templates.view({
                 body: markdown.toHTML(this.model.get("body"), "Aa"),
                 isSlideshow: this.isSlideshow(),
-                loggedIn: AA.userModel.loggedIn(),
+                canChange: AA.userModel.canChange(),
                 isHead: AA.router.pageModel.get('rev') === null
             }))
             .draggable({
@@ -747,7 +747,7 @@ window.AA = window.AA || {};
                             top: ui.position.top + 'px',
                         }).attr('style');
 
-                    model.set({ style: style }, { silent: true }).save();
+                    model.set({ style: style }, { silent: true }).saveIfAuthorized();
                 }
             })
             .droppable({ 
@@ -793,7 +793,7 @@ window.AA = window.AA || {};
                             height: ui.size.height + 'px',
                         }).attr('style');
 
-                    model.set({ style: style }, { silent: true }).save();
+                    model.set({ style: style }, { silent: true }).saveIfAuthorized();
                 }
             });
             
@@ -967,8 +967,8 @@ window.AA = window.AA || {};
                 $tmp.addClass('collapsed');
             }
 
-            this.model.set("klass", $tmp.attr('class'));
-            this.model.save();
+            this.model.set("klass", $tmp.attr('class')).saveIfAuthorized();
+
             this.render();
 
             return false;
@@ -1118,10 +1118,6 @@ window.AA = window.AA || {};
                 // Create Snapshot Button
                 new AA.widgets.MenuButton ({title: 'take a snapshot', class: 'icon-star'})
                     .on('click', this.commit.bind(this)),
-
-                // Create Browse history Button
-                new AA.widgets.MenuButton ({title: 'browse history', class: 'icon-galaxy'})
-                    .on('click', function() { window.alert('Not implemented yet!'); }),
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})

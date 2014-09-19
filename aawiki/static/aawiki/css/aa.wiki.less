@@ -370,13 +370,24 @@ blockquote {
 /* The Error Box */
 
 .error {
-    width: 207px;
-    border: 1px solid black;
+    width: 300px;
     position: fixed;
-    top: 13px;
+    bottom: 13px;
     left: 13px;
     padding: 13px;
     display: none;
+    font-size: 13px;
+    background-color: lightgreen;
+
+    h1 {
+        font-size: inherit;
+        line-height: inherit;
+        font-weight: bold;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 /** The Annotation Box **/
@@ -831,10 +842,7 @@ body {
 video,
 audio,
 img {
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    /*max-height: 100%;*/
+    width: 100%;
 }
 
 

@@ -15,6 +15,17 @@ window.AA = window.AA || {};
     };
 
 
+    Backbone.Model.prototype.saveIfAuthorized = function() {
+        if (AA.userModel.canChange()) {
+            this.save();
+        } else if (AA.userModel.loggedIn()) {
+            AA.alertView.set('Insufficient permissions to save', 'Remember, your changes will not actually be saved when you leave the page');
+        }
+
+        return this;
+    };
+
+
     AA.SiteModel = Backbone.Model.extend({
         urlRoot: "/api/v1/site/",
     });
