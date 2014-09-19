@@ -14,6 +14,10 @@
 {% include "aawiki/partials/site-view.html" %}
 </script>
 
+<script type="text/template" id="tools-view-template">
+{% include "aawiki/partials/tools-view.html" %}
+</script>
+
 <script type="text/template" id="page-view-template">
 {% include "aawiki/partials/page-view.html" %}
 </script>
@@ -72,29 +76,36 @@
 {% else %}
 {% compress css %}
 <!-- This is the nifty django-compressor way to compile your less files in css -->
-<link rel="stylesheet/less" type="text/css" media="all" href="{{ STATIC_URL }}aawiki/css/aa.wiki.less" />
+<link type="text/less" rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.less" charset="utf-8">
 {% endcompress %}
 {% endif %}
 {% endblock %}
 
 
 {% block body %}
+<aside id="tools">
+    <i class="toggleDrawer fa fa-bars"></i>
+    <div class="tabs">
+        <ul>
+            <li><a href="#help">Help</a></li>
+            <li><a href="#commits">History</a></li>
+        </ul>
+        <div id="help">{% include "aawiki/partials/help.html" %}</div>
+        <div id="commits">bla</div>
+    </div>
+</aside>
+
 <header id="sidebar">
-    <div id="site-meta-container">
-    	
-    </div>
-    <div id="user-meta-container">
-        
-    </div>
-    <div id="page-meta-container">
-        
-    </div>
+    <i class="toggleDrawer fa fa-bars"></i>
+    <div id="site-meta-container"></div>
+    <div id="user-meta-container"></div>
+    <div id="page-meta-container"></div>
 </header>
-<div id="timeline">
-	
-</div>
-<article id="canvas">
-</article>
+
+<div id="timeline"></div>
+
+<article id="canvas"></article>
+
 <div class="error">
     <noscript>
         This page requires JavaScript. Apologies from OLGA.

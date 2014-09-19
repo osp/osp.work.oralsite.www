@@ -142,9 +142,37 @@ body {
     word-wrap: break-word;
 }
 
+#tools,
 #sidebar,
 #canvas {
     .box-sizing(border-box);
+}
+
+#tools {
+    position: fixed;
+    width: 290px;
+    top: 0;
+    left: -290px;
+    bottom: 0;
+    padding: 13px;
+    z-index: 9999999999999999;
+    .transition(left, 250ms, ease-out, 0s);
+
+    .show-tool & {
+        left: 0px;
+    }
+
+    .toggleDrawer {
+        cursor: default;
+        position: absolute;
+        left: 300px;
+        top: 10px;
+        z-index: 9999999999999;
+    }
+
+    .current {
+        outline: 1px solid black;
+    }
 }
 
 #sidebar {
@@ -157,19 +185,11 @@ body {
     z-index: 9999999999999999;
     .transition(right, 250ms, ease-out, 0s);
 
-    &.hide {
+    .hide-sidebar & {
         right: -290px;
     }
 
-    nav {
-        cursor: default;
-        position: fixed;
-        right: 20px;
-        top: 10px;
-        z-index: 9999999999999;
-    }
-
-    #toggleDrawer {
+    .toggleDrawer {
         cursor: default;
         position: absolute;
         right: 300px;
@@ -181,13 +201,17 @@ body {
 #canvas {
     position: fixed;
     right: 290px;
+    left: 0px;
     top: 20px;
-    left: 0;
     bottom: 0;
     overflow: auto;
-    .transition(right, 250ms, ease-out, 0s);
+    .transition(all, 250ms, ease-out, 0s);
 
-    &.hide {
+    .show-tool & {
+        left: 290px;
+    }
+
+    .hide-sidebar & {
         right: 0px;
     }
 

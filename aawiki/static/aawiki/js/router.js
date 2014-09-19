@@ -22,6 +22,9 @@ window.AA = window.AA || {};
             AA.userModel = new AA.UserModel({ id : 'me' });
             AA.userView = new AA.UserView({ model : AA.userModel });
             AA.userView.model.fetch();
+            
+            AA.toolView = new AA.ToolView();
+            AA.sidebarView = new AA.SidebarView();
         },
         index: function() {
             AA.router.navigate('/Index/', {trigger: true});
@@ -58,9 +61,9 @@ window.AA = window.AA || {};
             // collection is created as a property of the page view model.
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageModel.get('annotations')});
 
-            //this.revisionView && this.revisionView.empty();
+            this.revisionView && this.revisionView.empty();
             //if(AA.userModel.loggedIn()) {
-                //this.revisionView = new AA.RevisionView({ model: this.pageModel });
+                this.revisionView = new AA.RevisionView({ model: this.pageModel });
             //}
 
             this.timelinePlayerView && this.timelinePlayerView.remove();

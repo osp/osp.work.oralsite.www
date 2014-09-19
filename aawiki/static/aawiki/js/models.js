@@ -28,6 +28,33 @@ window.AA = window.AA || {};
         loggedIn: function() {
             return this.get("id") !== -1 && this.get("id") !== 'me'; // it’s `me` when the app first tries to find out who the user is: the backend returns the real id
         },
+        canAdminister: function() {
+            var perms = AA.router.pageModel.get('permissions');
+
+            if (! perms) {
+                return false;
+            }
+            
+            return _.contains(_.pluck(perms.administer_page, 'id'), this.get('id'));
+        },
+        canChange: function() {
+            var perms = AA.router.pageModel.get('permissions');
+
+            if (! perms) {
+                return false;
+            }
+            
+            return _.contains(_.pluck(perms.change_page, 'id'), this.get('id'));
+        },
+        canView: function() {
+            var perms = AA.router.pageModel.get('permissions');
+
+            if (! perms) {
+                return false;
+            }
+            
+            return _.contains(_.pluck(perms.view_page, 'id'), this.get('id'));
+        }
     });
     
     

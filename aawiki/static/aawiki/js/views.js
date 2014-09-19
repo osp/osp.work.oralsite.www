@@ -12,27 +12,64 @@ window.AA = window.AA || {};
 
     AA.PopUpView = Backbone.View.extend({
         tagName: 'div',
-        attributes: {class: 'popup-wrapper'},
+        attributes: { class: 'popup-wrapper' },
         events: {
             'click input[value="cancel"]': 'remove', 
             "submit"                     : 'submit',
             "keypress input"             : "submitOnEnter",
         },
-        //template: _.template($('#popup-view-template').html()),
+        initialize: function() {
+            this.render();
+        },
         submitOnEnter: function(event) {
             // cf http://japhr.blogspot.be/2011/11/submitting-backbonejs-forms-with-enter.html
             if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
                 this.submit(event);
             }
         },
-        initialize: function() {
-            this.render();
-        },
     });
 
 
     AA.EditPermissionsView = AA.PopUpView.extend({
         template: _.template($('#edit-permissions-view-template').html()),
+        render: function() {
+            var permissions = this.model.get('permissions');
+
+            var ids = _.pluck(permissions.view_page, 'id');
+            var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            visitorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.change_page, 'id');
+            var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
+            editorCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            ids = _.pluck(permissions.administer_page, 'id');
+            var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
+            adminCollection.each(function(user) {
+                if (_.indexOf(ids, user.get("id"))) { 
+                    user.set('selected', true); 
+                }   
+            });
+
+            this.$el.html(this.template({
+                users: AA.router.userCollection,
+                can_view_ids: _.pluck(permissions.view_page, 'id'),
+                can_change_ids: _.pluck(permissions.change_page, 'id'),
+                can_administer_ids: _.pluck(permissions.administer_page, 'id')
+            }));
+
+            $('body').append(this.$el);
+
+            return this;
+        },
         submit: function (event){
             var getPermissionEntries = function($elt) {
                 var ids = _.map($elt.val(), function(val) { return parseInt(val); });
@@ -73,56 +110,24 @@ window.AA = window.AA || {};
             this.model.set('permissions', permissions);
             this.model.save(null, {
                 error: function() {
-                    console.log("there was an error");
                     this.$el.find('select, input').prop('disabled', false);
                 },
                 success: function() {
                     that.remove();
                 }
             });
-
-        },
-        render: function() {
-            var permissions = this.model.get('permissions');
-
-            var ids = _.pluck(permissions.view_page, 'id');
-            var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
-            visitorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
-            ids = _.pluck(permissions.change_page, 'id');
-            var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
-            editorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
-            ids = _.pluck(permissions.administer_page, 'id');
-            var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
-            adminCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
-            });
-
-            this.$el.html(this.template({
-                users: AA.router.userCollection,
-                can_view_ids: _.pluck(permissions.view_page, 'id'),
-                can_change_ids: _.pluck(permissions.change_page, 'id'),
-                can_administer_ids: _.pluck(permissions.administer_page, 'id')
-            }));
-
-            $('body').append(this.$el);
         },
     });
 
 
     AA.EditIntroductionView = AA.PopUpView.extend({
         template: _.template($('#edit-introduction-view-template').html()),
+        render: function() {
+            this.$el.html(this.template({ introduction: this.model.toFrontMatter() }));
+            $('body').append(this.$el);
+
+            return this;
+        },
         submit: function (event){
             event.preventDefault();
 
@@ -132,15 +137,18 @@ window.AA = window.AA || {};
 
             this.remove();
         },
-        render: function() {
-            this.$el.html(this.template({introduction: this.model.toFrontMatter()}));
-            $('body').append(this.$el);
-        },
     });
 
     
     AA.LoginView = AA.PopUpView.extend({
         template: _.template($('#login-view-template').html()),
+        render: function() {
+            this.$el.html( this.template( {} ) );
+
+            $('body').append( this.$el );
+
+            return this;
+        },
         submit: function (event){
             event.preventDefault();
 
@@ -165,11 +173,6 @@ window.AA = window.AA || {};
                 },
             });
         },
-        render: function() {
-            this.$el.html( this.template( {} ) );
-
-            $('body').append( this.$el );
-        }
     });
 
 
@@ -241,51 +244,19 @@ window.AA = window.AA || {};
         el: '#page-meta-container',
         template: _.template($('#page-view-template').html()),
         events: {
-            "click #toggleDrawer"               : "toggleDrawer",
-            "click #commit-list a"              : "wayback",
-            "change #permissions-visible"       : "updatePermissionsVisible",
+            //"click #commit-list a"              : "wayback",
+            //"change #permissions-visible"       : "updatePermissionsVisible",
             //"change #permissions-editable"      : "updatePermissionsEditable",
             //"change #permissions-administrated" : "updatePermissionsAdministrated",
         },
-        toggleDrawer: function(event) {
-            $('#sidebar, #canvas').toggleClass('hide');
-        },
-        wayback: function(event) {
-            event.preventDefault();
-            var href = $(event.currentTarget).attr('href');
-            AA.router.navigate(href.substring(6), {trigger: true});
-        },
-        setTitle: function() {
-            document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
-        },
-        publicUser: {
-            "current": false,
-            "id": -1,
-            "name": "AnonymousUser",
-            "type": "user",
-            "uri": "/api/v1/user/-1/"
-        },
-        updatePermissionsVisible: function() {
-            var permissions = this.model.get("permissions");
-            
-            if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
-                // add public user
-                permissions.view_page.push(this.publicUser);
-            } else {
-                // remove public user
-                permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
-            }
-            
-            this.model.set("permissions", permissions);
-            this.model.save();
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
         },
         render: function() {
             var context = this.model.toJSON();
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             
-            this.$el.html( this.template( context ) )
-                .find('#accordion').tabs() 
-                ;
+            this.$el.html( this.template( context ) );
 
             AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
             AA.router.annotationCollectionView.$el.attr('class', this.model.get('klass'));
@@ -303,22 +274,71 @@ window.AA = window.AA || {};
             this.setTitle();
             return this;
         },
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
+        //wayback: function(event) {
+            //event.preventDefault();
+            //var href = $(event.currentTarget).attr('href');
+            //AA.router.navigate(href.substring(6), {trigger: true});
+        //},
+        setTitle: function() {
+            document.title = AA.siteView.model.get('name') + ' | ' + this.model.get('name');
         },
+        //publicUser: {
+            //"current": false,
+            //"id": -1,
+            //"name": "AnonymousUser",
+            //"type": "user",
+            //"uri": "/api/v1/user/-1/"
+        //},
+        //updatePermissionsVisible: function() {
+            //var permissions = this.model.get("permissions");
+            
+            //if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
+                //// add public user
+                //permissions.view_page.push(this.publicUser);
+            //} else {
+                //// remove public user
+                //permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
+            //}
+            
+            //this.model.set("permissions", permissions);
+            //this.model.save();
+        //},
+    });
+
+
+    AA.ToolView = Backbone.View.extend({
+        el: '#tools',
+        events: {
+            "click .toggleDrawer": "toggleDrawer",
+        },
+        toggleDrawer: function(event) {
+            $('body').toggleClass('show-tool');
+        },
+        initialize: function() {
+            $('.tabs', this.$el).tabs();
+        }
+    });
+
+
+    AA.SidebarView = Backbone.View.extend({
+        el: '#sidebar',
+        events: {
+            "click .toggleDrawer": "toggleDrawer",
+        },
+        toggleDrawer: function(event) {
+            $('body').toggleClass('hide-sidebar');
+        }
     });
 
 
     AA.RevisionView = Backbone.View.extend({
-        el: '#revisions_browser_ctrl',
+        el: '#commits',
         template: _.template($('#revisions-browser-template').html()),
         events: {
-            'click #toggleRevisions': 'toggleRevisions',
+            "click .revert":     "revert",
         },
-        toggleRevisions: function(event) {
-            event.preventDefault();
-
-            $('#revisions_browser_ctrl').toggleClass('hidden');
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
         },
         render: function() {
             this.$el
@@ -333,12 +353,18 @@ window.AA = window.AA || {};
             .find('a').on('click', function(event) {
                 event.preventDefault();
                 var href = $(event.currentTarget).attr('href');
-                AA.router.navigate(href.substring(6), {trigger: true});
+                AA.router.navigate(href.substring(6), { trigger: true });
             });
         },
-        initialize: function() {
-            this.listenTo(this.model, 'change', this.render);
-        },
+        revert: function() {
+            window.alert('not implemented yet');
+            return;
+            var answer = window.confirm("You are about to revert an old version. Proceed?");
+
+            if (answer) {
+                console.log("not implemented yet");
+            }
+        }
     });
 
 
@@ -560,29 +586,23 @@ window.AA = window.AA || {};
     };
 
 
-    AA.AbstractPlayerEvents = {
-        "click .play":     "playPause",
-        "click .next":     "next",
-        "click .previous": "previous",
-        "input #seek-bar": "seek", // continuously emit; bind to `change #seek-bar` to only update when mouse is released
-    };
-
-
     AA.TimelinePlayerView = Backbone.View.extend({
         el: '#timeline',
-        events: AA.AbstractPlayerEvents,
-        templates: {
-            player: _.template($('#timeline-player-template').html()),
+        template: _.template($('#timeline-player-template').html()),
+        events: {
+            "click .play":     "playPause",
+            "click .next":     "next",
+            "click .previous": "previous",
+            "input #seek-bar": "seek", // continuously emit; bind to `change #seek-bar` to only update when mouse is released
         },
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
             this.listenTo(AA.globalEvents, "aa:newDrivers", this.render, this);
             this.listenTo(AA.globalEvents, "aa:updateAnnotationEvents", this.render, this);
+
             this.driver = AA.router.multiplexView.registerDriver(document.location.origin + document.location.pathname);
+
             this.render();
-        },
-        hasPlay: function() {
-            return this.driver.getTrackEvents().length > 0;
         },
         render: function() {
             // Once this view has first rendered, subsequent updates target specific dom elements.
@@ -592,9 +612,12 @@ window.AA = window.AA || {};
             var that = this;
             // do we already have the controls?
             if (this.$el.find('.controls').length === 0) {
-                this.$el.html(this.templates.player({}));
+                this.$el.html(this.template({}));
             }
             return this.renderPlayer();
+        },
+        hasPlay: function() {
+            return this.driver.getTrackEvents().length > 0;
         },
     }).extend(AA.AbstractPlayer);
 
@@ -659,6 +682,189 @@ window.AA = window.AA || {};
 
             this.render();
         },
+        render: function() {
+            /*
+             * It is necessary that #canvas > section elements have a z-index
+             * set to auto to allow for the .menu elements to be painted on top
+             * (it is not very handy otherwise to click button of an overlaping
+             * box with a lower z-index).
+             *
+             * See <http://jsfiddle.net/Fzn5T/3/> for a proof-of-concept.
+             */
+            var that = this;
+            var model = this.model;
+            var isFocused = this.$el.hasClass('focused');
+
+            var $tmp = $('<div>').attr('style', that.model.get('style'));
+
+            this.$el
+            .attr({
+                'id': 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 ), // id="annotation-0004"
+                'title': this.model.get('title'),
+                'class': this.model.get('klass'),
+                'about': this.model.get('about')
+            })
+            .css({
+                left: $tmp.css('left'),
+                top: $tmp.css('top')
+            })
+            .html(this.templates.view({
+                body: markdown.toHTML(this.model.get("body"), "Aa"),
+                isSlideshow: this.isSlideshow(),
+                loggedIn: AA.userModel.loggedIn(),
+                isHead: AA.router.pageModel.get('rev') === null
+            }))
+            .draggable({
+                handle: '.icon-drag',
+                containment: "parent",
+                distance: 10,
+                scroll: true,
+                scrollSensitivity: 100,
+                addClasses: false,
+                drag: function (event, ui) {
+                    if (event.ctrlKey) {
+                        $("#canvas").addClass("grid");
+                        ui.position.left = Math.floor(ui.position.left / 20) * 20;
+                        ui.position.top = Math.floor(ui.position.top / 20) * 20;
+                    } else {
+                        $("#canvas").removeClass("grid");
+                    }
+                },
+                stop: function(event, ui) { 
+                    that.positionMenu();
+
+                    $("#canvas").removeClass("grid");
+
+                    var style = $('<div>')
+                        .attr('style', that.model.get('style'))
+                        .css({
+                            left: ui.position.left + 'px',
+                            top: ui.position.top + 'px',
+                        }).attr('style');
+
+                    model.set({ style: style }, { silent: true }).save();
+                }
+            })
+            .droppable({ 
+                accept: ".icon-target",
+                addClasses: false,
+                greedy: true,
+                hoverClass: "drop-hover",
+                over: function( event, ui ) {
+                    event.stopImmediatePropagation();
+                },
+                drop: function( event, ui ) {
+                    var about = ui.draggable.attr('href');
+                    var answer = window.confirm("You are about to connect the annotation to " + about + ". Proceed?");
+
+                    if (answer) {
+                        that.model.set({ about: about }).save();
+                        that.render();
+                    };
+                }
+            })
+            .renderResources();
+
+            $('.wrapper', this.$el)
+            .attr('style', this.model.get('style'))
+            .resizable({
+                resize: function (event, ui) {
+                    if (event.ctrlKey) {
+                        $("html").addClass("grid");
+
+                        ui.element.width((Math.floor(ui.size.width / 20) * 20) - (ui.position.left % 20));
+                        ui.element.height((Math.floor(ui.size.height / 20) * 20) - (ui.position.top % 20));
+                    } else {
+                        $("html").removeClass("grid");
+                    }
+                },
+                stop: function(event, ui) {
+                    $("html").removeClass("grid");
+
+                    var style = $('<div>')
+                        .attr('style', that.model.get('style'))
+                        .css({
+                            width: ui.size.width + 'px',
+                            height: ui.size.height + 'px',
+                        }).attr('style');
+
+                    model.set({ style: style }, { silent: true }).save();
+                }
+            });
+            
+            $('.icon-target', this.$el)
+                .attr('href', document.location.origin + document.location.pathname + '#' + this.model.get('id'))
+                .draggable({ helper: "clone" })
+            ;
+
+            if (this.isMedia()) {
+                // the resources need to be rendered first, this is 
+                this.$el.addClass("media");
+            }
+            
+            if(this.driver) {
+                this.updateAnnotationEvents();
+            }
+
+            if (isFocused) {
+                this.$el.addClass('focused');
+            }
+
+            return this;
+        },
+        edit: function() {
+            var that = this;
+            this.$el.attr('title', this.model.get('title'));
+
+            this.$el
+            .addClass('editing')
+            .html(this.templates.edit({
+                body: this.model.toFrontMatter(),
+                isHead: AA.router.pageModel.get('rev') === null
+            }))
+            .find('textarea')
+            .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
+                event.preventDefault();
+
+                $(this).insertAtCaret('\n\n' + AA.utils.ss2tc(that.driver.currentTime()) + ' -->\n\n');
+            })
+            .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
+                event.preventDefault();
+
+                if (that.driver.paused()) {
+                    that.driver.play();
+                } else {
+                    that.driver.pause();
+                    //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+                }
+            })
+            .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
+                event.preventDefault();
+
+                var nextTime = Math.max(that.driver.currentTime() - 5, 0);
+                that.driver.currentTime(nextTime);
+                //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+            })
+            .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
+                event.preventDefault();
+
+                var nextTime = Math.min(that.driver.currentTime() + 5, that.driver.duration());
+                that.driver.currentTime(nextTime);
+                //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
+            });
+        },
+        save: function() {
+            this.model
+                .loadFront($('textarea', this.$el).val(), 'body', { silent: true })
+                .save();
+
+            // we explicitly call render here. We cannot rely on the change
+            // event in case: we want to switch back to the view mode even if
+            // the user hasn't done any changes.
+            // The option {silent: true} was passed above to avoid calling
+            // render twice
+            this.render();
+        },
         positionMenu: function() {
             var position = this.$el.position();
             var $left = this.$el.find('.menu-left');
@@ -676,23 +882,18 @@ window.AA = window.AA || {};
                 $top.removeClass('bottom').addClass('top');
             };
         },
-        onFocus: function(model, collection) {
-            if (model !== this.model && this.$el.hasClass('focused')) {
+        onFocus: function(event, instance) {
+            if (instance === this.model) {
+                this.positionMenu();
+                this.$el.addClass('focused');
+            } else {
                 this.$el.removeClass('focused');
             }
         },
-        focus: function(e) {
-            if (AA.router.annotationCollectionView.cursorMenu.visible()) {
-                AA.router.annotationCollectionView.cursorMenu.hide ();
-            };
-
-            this.positionMenu();
-
-            this.model.collection.trigger('focus', this.model, this.model.collection);
+        focus: function(event) {
+            this.model.collection.trigger('focus', event, this.model);
         
-            this.$el.addClass('focused');
-            
-            e.stopPropagation();
+            event.stopPropagation();
         },
         onPositionChange: function(model, value, options) { // FIXME this code should allow for animations but is not called right now
             var defaults = {
@@ -888,256 +1089,15 @@ window.AA = window.AA || {};
                 miniPlayerDriver.pause();
             }
         },
-        save: function() {
-            this.model
-                .loadFront($('textarea', this.$el).val(), 'body', {silent: true})
-                .save();
-
-            // we explicitly call render here. We cannot rely on the change
-            // event in case: we want to switch back to the view mode even if
-            // the user hasn't done any changes.
-            // The option {silent: true} was passed above to avoid calling
-            // render twice
-            this.render();
-        },
-        edit: function() {
-            var that = this;
-            this.$el.attr('title', this.model.get('title'));
-
-            this.$el
-            .addClass('editing')
-            .html(this.templates.edit({body: this.model.toFrontMatter()}))
-            .find('textarea')
-            .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
-                event.preventDefault();
-
-                $(this).insertAtCaret('\n\n' + AA.utils.ss2tc(that.driver.currentTime()) + ' -->\n\n');
-            })
-            .bind('keydown', "Ctrl+Shift+up", function toggle(event) {
-                event.preventDefault();
-
-                if (that.driver.paused()) {
-                    that.driver.play();
-                } else {
-                    that.driver.pause();
-                    //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
-                }
-            })
-            .bind('keydown', "Ctrl+Shift+left", function rewind(event) {
-                event.preventDefault();
-
-                var nextTime = Math.max(that.driver.currentTime() - 5, 0);
-                that.driver.currentTime(nextTime);
-                //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
-            })
-            .bind('keydown', "Ctrl+Shift+right", function fastForward(event) {
-                event.preventDefault();
-
-                var nextTime = Math.min(that.driver.currentTime() + 5, that.driver.duration());
-                that.driver.currentTime(nextTime);
-                //AA.router.navigate('t=' + mediaElt.currentTime + 's', {trigger: false, replace: true})
-            });
-        },
-        render: function() {
-            /*
-             * It is necessary that #canvas > section elements have a z-index
-             * set to auto to allow for the .menu elements to be painted on top
-             * (it is not very handy otherwise to click button of an overlaping
-             * box with a lower z-index).
-             *
-             * See <http://jsfiddle.net/Fzn5T/3/> for a proof-of-concept.
-             */
-            var that = this;
-            var model = this.model;
-
-            var $tmp = $('<div>').attr('style', that.model.get('style'));
-
-            this.$el
-            .attr({
-                'id': 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 ), // id="annotation-0004"
-                'title': this.model.get('title'),
-                'class': this.model.get('klass'),
-                'about': this.model.get('about')
-            })
-            .css({
-                left: $tmp.css('left'),
-                top: $tmp.css('top')
-            })
-            .html(this.templates.view({
-                body: markdown.toHTML(this.model.get("body"), "Aa"),
-                isSlideshow: this.isSlideshow(),
-                loggedIn: AA.userModel.loggedIn()
-            }))
-            .draggable({
-                handle: '.icon-drag',
-                containment: "parent",
-                distance: 10,
-                scroll: true,
-                scrollSensitivity: 100,
-                addClasses: false,
-                drag: function (event, ui) {
-                    if (event.ctrlKey) {
-                        $("#canvas").addClass("grid");
-                        ui.position.left = Math.floor(ui.position.left / 20) * 20;
-                        ui.position.top = Math.floor(ui.position.top / 20) * 20;
-                    } else {
-                        $("#canvas").removeClass("grid");
-                    }
-                },
-                stop: function(event, ui) { 
-                    that.positionMenu();
-
-                    $("#canvas").removeClass("grid");
-
-                    var style = $('<div>')
-                        .attr('style', that.model.get('style'))
-                        .css({
-                            left: ui.position.left + 'px',
-                            top: ui.position.top + 'px',
-                        }).attr('style');
-
-                    model.set({ style: style }, { silent: true }).save();
-                }
-            })
-            .droppable({ 
-                accept: ".icon-target",
-                addClasses: false,
-                greedy: true,
-                hoverClass: "drop-hover",
-                over: function( event, ui ) {
-                    event.stopImmediatePropagation();
-                },
-                drop: function( event, ui ) {
-                    var about = ui.draggable.attr('href');
-                    var answer = window.confirm("You are about to connect the annotation to " + about + ". Proceed?");
-
-                    if (answer) {
-                        that.model.set({ about: about }).save();
-                        that.render();
-                    };
-                }
-            })
-            .renderResources();
-
-            $('.wrapper', this.$el)
-            .attr('style', this.model.get('style'))
-            .resizable({
-                resize: function (event, ui) {
-                    if (event.ctrlKey) {
-                        $("html").addClass("grid");
-
-                        ui.element.width((Math.floor(ui.size.width / 20) * 20) - (ui.position.left % 20));
-                        ui.element.height((Math.floor(ui.size.height / 20) * 20) - (ui.position.top % 20));
-                    } else {
-                        $("html").removeClass("grid");
-                    }
-                },
-                stop: function(event, ui) {
-                    $("html").removeClass("grid");
-
-                    var style = $('<div>')
-                        .attr('style', that.model.get('style'))
-                        .css({
-                            width: ui.size.width + 'px',
-                            height: ui.size.height + 'px',
-                        }).attr('style');
-
-                    model.set({ style: style }, { silent: true }).save();
-                }
-            });
-            
-            $('.icon-target', this.$el)
-                .attr('href', document.location.origin + document.location.pathname + '#' + this.model.get('id'))
-                .draggable({ helper: "clone" })
-            ;
-
-            if (this.isMedia()) {
-                // the resources need to be rendered first, this is 
-                this.$el.addClass("media");
-            }
-            
-            if(this.driver) {
-                this.updateAnnotationEvents();
-            }
-
-            return this;
-        }
     }).extend(AA.AbstractPlayer);
 
 
     AA.AnnotationCollectionView = Backbone.View.extend({
-        events: {
-            "click"            : "showMenu",
-        },
-        
-        showMenu: function (e) {
-            if (this.cursorMenu.visible()) {
-                this.cursorMenu.hide ();
-            } else {
-                var focused = $('#canvas > section.focused').length;
-
-                if (focused) {
-                    $('#canvas > section').removeClass('focused');
-                } else {
-                    this.cursorMenu.show (e);
-                };
-            }
-        },
-        
         collection: new AA.AnnotationCollection(), 
         el: '#canvas',
-
-        commit: function(event) {
-            this.cursorMenu.hide();
-
-            var msg = prompt("Commit message", "My modifications");
-
-            if (msg) {
-                AA.router.pageModel.commit(msg);
-            }
+        events: {
+            "click"            : "focus",
         },
-        
-        addAnnotation: function(event) {
-            var offsetBtn = $(event.currentTarget).position();
-            var offsetCanvas = this.$el.position();
-            var top = offsetBtn.top - offsetCanvas.top;
-            var left = offsetBtn.left - offsetCanvas.left;
-            this.collection.create({style: 'top: ' + top + 'px; left: ' + left + 'px'});
-            this.cursorMenu.hide();
-        },
-        
-        organizeAnnotations: function (event) {
-            var proceed = window.confirm("This will rearrange your layout… Proceed?");
-
-            if (proceed) {
-                // sort the annotations by z-index;
-                var sorted = this.collection.sortBy(function(model) { 
-                    return model.zIndex();
-                });
-
-                _.each(sorted, function(model, index) {
-                    var $tmp = $('<div>')
-                        .attr('style', model.get('style'))
-                        .css({
-                            top: 20 + (index * 20) + 'px',
-                            left: 20 + (index * 20) + 'px'
-                        });
-
-                    model.set({style: $tmp.attr('style')}, {animate: false}).save();
-                });
-            }
-
-            this.cursorMenu.hide();
-        },
-        
-        editPermissions: function (event) {
-            if (this.cursorMenu.visible()) {
-                this.cursorMenu.hide();
-            };
-
-            new AA.EditPermissionsView({ model: AA.router.pageModel });
-        },
-        
         initialize: function() {
             this.cursorMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'cursor'});
             
@@ -1178,11 +1138,11 @@ window.AA = window.AA || {};
                     .attr('href', document.location.origin + document.location.pathname),
             ]);
             
+            this.listenTo(this.collection, 'focus', this.onFocus);
             this.listenTo(this.collection, 'add', this.renderOne);
             this.listenTo(AA.userModel, 'sync', this.render);
             this.render();
         },
-
         renderOne: function(model, collection) {
             var $el = this.$el;
             var annotationView = new AA.AnnotationView({model: model});
@@ -1196,7 +1156,6 @@ window.AA = window.AA || {};
 
             return this;
         },
-        
         render: function() {
             var $el = this.$el;
             $el.empty();
@@ -1212,7 +1171,77 @@ window.AA = window.AA || {};
             
             AA.globalEvents.trigger('aa:newDrivers');
             return this;
-        }
+        },
+        focus: function(event) {
+            this.collection.trigger('focus', event, this.collection);
+        
+            event.stopPropagation();
+        },
+        onFocus: function(event, instance) {
+            if (instance === this.collection && 
+                ! this.cursorMenu.visible() &&
+                AA.userModel.loggedIn() &&
+                ! AA.router.pageModel.get('rev')) {
+                if (this.focused) {
+                    this.focused = undefined;
+                } else {
+                    this.cursorMenu.show(event);
+                }
+            } else {
+                this.cursorMenu.hide();
+            }
+
+            if (instance !== this.collection) {
+                this.focused = instance;
+            }
+        },
+        commit: function(event) {
+            this.cursorMenu.hide();
+
+            var msg = prompt("Commit message", "My modifications");
+
+            if (msg) {
+                AA.router.pageModel.commit(msg);
+            }
+        },
+        addAnnotation: function(event) {
+            var offsetBtn = $(event.currentTarget).position();
+            var offsetCanvas = this.$el.position();
+            var top = offsetBtn.top - offsetCanvas.top;
+            var left = offsetBtn.left - offsetCanvas.left;
+            this.collection.create({style: 'top: ' + top + 'px; left: ' + left + 'px'});
+            this.cursorMenu.hide();
+        },
+        organizeAnnotations: function (event) {
+            var proceed = window.confirm("This will rearrange your layout… Proceed?");
+
+            if (proceed) {
+                // sort the annotations by z-index;
+                var sorted = this.collection.sortBy(function(model) { 
+                    return model.zIndex();
+                });
+
+                _.each(sorted, function(model, index) {
+                    var $tmp = $('<div>')
+                        .attr('style', model.get('style'))
+                        .css({
+                            top: 20 + (index * 20) + 'px',
+                            left: 20 + (index * 20) + 'px'
+                        });
+
+                    model.set({style: $tmp.attr('style')}, {animate: false}).save();
+                });
+            }
+
+            this.cursorMenu.hide();
+        },
+        editPermissions: function (event) {
+            if (this.cursorMenu.visible()) {
+                this.cursorMenu.hide();
+            };
+
+            new AA.EditPermissionsView({ model: AA.router.pageModel });
+        },
     });
 })();  // end of the namespace AA
 
