@@ -164,10 +164,15 @@ def thumb(bundle):
     if bundle.mime not in accepted_mimetypes:
         raise TypeError
 
-    image_file = Image.open(bundle.url2path())
+    image = Image.open(bundle.url2path())
     bundle.consume()
-    image_file = image_file.resize((100, 100), Image.NEAREST)
-    image_file.save(bundle.url2path())
+    
+    width = 100
+    ratio = width / float(image.size[0])
+    height = int( image.size[1] * ratio )
+    
+    image = image.resize((width, height), Image.ANTIALIAS)
+    image.save(bundle.url2path())
     return bundle
 
 def resize(bundle):
@@ -191,7 +196,7 @@ def resize(bundle):
     ratio = width / float(image.size[0])
     height = int( image.size[1] * ratio )
 
-    image = image.resize((width, height), Image.NEAREST)
+    image = image.resize((width, height), Image.ANTIALIAS)
 
     image.save(bundle.url2path())
     return bundle
