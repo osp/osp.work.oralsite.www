@@ -1,3 +1,15 @@
+"""
+Attention: this file is not used for the moment
+
+Where we to want to install the queue,
+one would have to uncomment the lines pertaining to django-celery
+in requirements.txt
+oralsite/settings.py (installed apps)
+oralsite/urls.py
+"""
+
+
+
 from __future__ import absolute_import
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`

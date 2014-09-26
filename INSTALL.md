@@ -35,20 +35,6 @@ based OS, you can install them by running
     sudo apt-get update
     sudo apt-get install python-dev libjpeg-dev libpng-dev
 
-
-# Install a message broker
-
-This is required to run the resource filters. The filters task is to cache and
-transform Http resources, while keeping a link to the original resource. It may
-be used for embedding a video, or turning a colored image into Black
-and White directly from the wiki. We advise to use Rabbitmq. To install it, see
-<http://www.rabbitmq.com/install-debian.html#apt>.
-
-Once installed, start the message broker.
-
-    sudo /etc/init.d/rabbitmq start
-
-
 # Clone the repository
 
 If you read this, you have most likely already done this.
@@ -94,13 +80,9 @@ be found at <https://docs.djangoproject.com/en/1.5/topics/settings/>
 
     mkdir -p media/cache
 
-# Run the task queue
-
-    celery -A oralsite worker -l info
-
 # Run the projet
 
-Open a new terminal to run the server and the task queue side-by-side.
+Run the server.
 
     python manage runserver
 

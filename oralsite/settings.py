@@ -96,7 +96,7 @@ INSTALLED_APPS = (
     'south',
     'tastypie',
     'guardian',
-    'djcelery',
+#    'djcelery',
     'compressor',
     'aawiki',
     'aafilters',
