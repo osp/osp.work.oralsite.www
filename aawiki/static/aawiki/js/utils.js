@@ -31,6 +31,39 @@ window.AA = window.AA || {};
     AA.utils.ss2tc = markdown.Markdown.dialects.Aa.utils.ss2tc;
     AA.utils.lpad = markdown.Markdown.dialects.Aa.utils.lpad;
 
+    AA.utils.fromAudacity = function(src) {
+        var lines = $.trim(src).split('\n');
+        var ret = [];
+       
+        for (var i=0, l=lines.length; i < l; i ++) {
+            var fields = lines[i].split('\t');
+            var begin = parseFloat(fields.shift().replace(',', '.'));
+            var end = parseFloat(fields.shift().replace(',', '.'));
+            begin = AA.utils.ss2tc(begin);
+            end = AA.utils.ss2tc(end);
+            var txt = fields.join('\t');
+            txt = txt.replace(/\\n/g, '\n');
+            ret.push(begin + " --> " + end + "\n\n" + txt);
+        }
+
+        return ret.join('\n\n');
+    }
+
+    AA.utils.fromSRT = function(src) {
+        var parsed = parser.fromSrt(src);
+        var ret = [];
+       
+        for (var i=0, l=parsed.length; i < l; i ++) {
+            var cur = parsed[i];
+            var begin = cur.startTime;
+            var end = cur.endTime;
+            var txt = cur.text;
+            ret.push(begin + " --> " + end + "\n\n" + txt);
+        }
+
+        return ret.join('\n\n');
+    }
+
     AA.utils.wikify = function(target) {
       // Links like 'sherry Turkle' will get wikified.
       // Links like 'sherry.jpeg' will not get wikified.

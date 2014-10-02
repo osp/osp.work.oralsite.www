@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2010 Ash Berlin
  * Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
  * Version: 0.6.0-beta1
- * Date: 2014-06-27T15:36Z
+ * Date: 2014-10-01T15:10Z
  */
 
 (function(expose) {
@@ -362,6 +362,7 @@
     // include the root element in the rendered output?
     options.root = options.root || false;
 
+    jsonml = JSON.parse(JSON.stringify(jsonml)); // Clone to prevent mutation of original reference.
     var content = [];
 
     if ( options.root ) {
@@ -426,11 +427,15 @@
   };
 
   function escapeHTML( text ) {
-    return text.replace( /&/g, "&amp;" )
-               .replace( /</g, "&lt;" )
-               .replace( />/g, "&gt;" )
-               .replace( /"/g, "&quot;" )
-               .replace( /'/g, "&#39;" );
+    if (text && text.length > 0) {
+      return text.replace( /&/g, "&amp;" )
+                 .replace( /</g, "&lt;" )
+                 .replace( />/g, "&gt;" )
+                 .replace( /"/g, "&quot;" )
+                 .replace( /'/g, "&#39;" );
+    } else {
+      return "";
+    }
   }
 
   function render_tree( jsonml ) {
@@ -458,8 +463,12 @@
       delete attributes.src;
     }
 
-    for ( var a in attributes )
-      tag_attrs += " " + a + '="' + escapeHTML( attributes[ a ] ) + '"';
+    for ( var a in attributes ) {
+      var escaped = escapeHTML( attributes[ a ]);
+      if (escaped && escaped.length) {
+        tag_attrs += " " + a + '="' + escaped + '"';
+      }
+    }
 
     // be careful about adding whitespace here for inline elements
     if ( tag === "img" || tag === "br" || tag === "hr" )
@@ -679,7 +688,7 @@
       inline_until_char = DialectHelpers.inline_until_char;
 
   // A robust regexp for matching URLs. Thanks: https://gist.github.com/dperini/729294
-  var urlRegexp = /(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/i.source;
+  var urlRegexp = /(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/i.source;
 
   /**
    * Gruber dialect
@@ -1124,7 +1133,7 @@
       },
 
       referenceDefn: function referenceDefn( block, next) {
-        var re = /^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*)\3|\((.*?)\)))?\n?/;
+        var re = /^\s*\[([^\[\]]+)\]:\s*(\S+)(?:\s+(?:(['"])(.*)\3|\((.*?)\)))?\n?/;
         // interesting matches are [ , ref_id, url, , title, title ]
 
         if ( !block.match(re) )
@@ -1278,6 +1287,9 @@
         if ( !res[1] ) {
           return [ res[0] + 1, text.charAt(0) ].concat(res[2]);
         }
+
+        // empty link
+        if ( res[0] === 1 ) { return [ 2, "[]" ]; }
 
         var consumed = 1 + res[ 0 ],
             children = res[ 1 ],
@@ -2333,7 +2345,7 @@
       output += leaf[1]["data-begin"] + "\t" + leaf[1]["data-end"] + "\t";
 
       for (var j = 0, m = leaf[2].length; j < m; j ++) {
-        leaf[2][j] = leaf[2][j].replace('\n', '\\n');
+        leaf[2][j] = leaf[2][j].replace(/\n/g, "\\n");
       }
 
       output += leaf[2].join('\\n\\n');
