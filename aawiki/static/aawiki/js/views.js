@@ -425,7 +425,7 @@ window.AA = window.AA || {};
             if (answer) {
                 var clone = this.model.clone();
                 var current = new AA.PageModel();
-                current.set({id : "Fluxus"});
+                current.set({id : AA.router.currentSlug});
                 current.fetch({success: function(model, response, options) {
                     current.get('annotations').each(function(model, index) {
                         model.destroy({wait: true});
@@ -442,7 +442,7 @@ window.AA = window.AA || {};
                     clone.set('permissions', current.get('permissions'));
                     clone.unset("annotations");
                     clone.save(null, {success: function(model, response) {
-                        AA.router.navigate("Fluxus", { trigger: true });
+                        AA.router.navigate(AA.router.currentSlug, { trigger: true });
                     }});
                 }});
             }
