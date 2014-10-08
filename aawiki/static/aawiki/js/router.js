@@ -61,7 +61,7 @@ window.AA = window.AA || {};
             // collection is created as a property of the page view model.
             this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageModel.get('annotations')});
 
-            this.revisionView && this.revisionView.empty();
+            this.revisionView && this.revisionView.empty() && this.revisionView.undelegateEvents();
             //if(AA.userModel.loggedIn()) {
                 this.revisionView = new AA.RevisionView({ model: this.pageModel });
             //}

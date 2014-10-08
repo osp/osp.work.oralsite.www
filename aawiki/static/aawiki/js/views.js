@@ -420,12 +420,31 @@ window.AA = window.AA || {};
             });
         },
         revert: function() {
-            window.alert('not implemented yet');
-            return;
             var answer = window.confirm("You are about to revert an old version. Proceed?");
 
             if (answer) {
-                console.log("not implemented yet");
+                var clone = this.model.clone();
+                var current = new AA.PageModel();
+                current.set({id : "Fluxus"});
+                current.fetch({success: function(model, response, options) {
+                    current.get('annotations').each(function(model, index) {
+                        model.destroy({wait: true});
+                    });
+                    clone.unset('rev');
+                    clone.unset('revisions');
+                    clone.get('annotations').each(function(model, index) {
+                        model.unset('id');
+                        model.unset('resource_uri');
+                    });
+                    clone.get('annotations').each(function(model, index) {
+                        model.save(null, {wait: true});
+                    });
+                    clone.set('permissions', current.get('permissions'));
+                    clone.unset("annotations");
+                    clone.save(null, {success: function(model, response) {
+                        AA.router.navigate("Fluxus", { trigger: true });
+                    }});
+                }});
             }
         }
     });
