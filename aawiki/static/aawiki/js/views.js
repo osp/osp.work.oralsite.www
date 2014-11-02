@@ -15,8 +15,8 @@ window.AA = window.AA || {};
         attributes: { class: 'popup-wrapper' },
         events: {
             'click input[value="cancel"]': 'remove', 
-            "submit"                     : 'submit',
-            "keypress input"             : "submitOnEnter",
+            'submit #dialog-form': 'submit',
+            'keypress #dialog-form input[value="submit"]': "submitOnEnter"
         },
         initialize: function() {
             this.render();
@@ -26,6 +26,64 @@ window.AA = window.AA || {};
             if ( event.keyCode === 13 ) { // 13 is the code for ENTER KEY
                 this.submit(event);
             }
+        },
+    });
+
+
+    AA.ImportExportView = AA.PopUpView.extend({
+        template: _.template($('#import-export-view-template').html()),
+        events: function(){
+            return _.extend({}, AA.PopUpView.prototype.events, {
+                'submit #import-form' : 'importData',
+                'click input[value="close"]': 'remove', 
+            });
+        },
+        render: function() {
+            var audacity = markdown.Markdown.dialects.AaTiny.toAudacity(this.model.get('body'));
+            var audacityData = window.btoa(audacity);
+
+            var srt = markdown.Markdown.dialects.AaTiny.toSRT(this.model.get('body'));
+            var srtData = window.btoa(srt);
+
+            var name = 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 );
+
+            this.$el.html(this.template({
+                audacityData: audacityData,
+                srtData: srtData,
+                name: name,
+            }));
+
+            $('body').append(this.$el);
+
+            return this;
+        },
+        importData: function (event){
+            event.preventDefault();
+
+            var that = this;
+
+            var f = $('#file').get(0).files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                var t = $('input[name="type"]:checked').val();
+                var ret;
+
+                if (t === "audacity") {
+                    ret = AA.utils.fromAudacity(reader.result);
+                } else if (t === "srt") {
+                    ret = AA.utils.fromSRT(reader.result);
+                }
+
+                that.model.set('body', ret).save();
+            };
+
+            reader.readAsText(f);
+        },
+        submit: function (event){
+            event.preventDefault();
+
+            this.remove();
         },
     });
 
@@ -362,12 +420,31 @@ window.AA = window.AA || {};
             });
         },
         revert: function() {
-            window.alert('not implemented yet');
-            return;
             var answer = window.confirm("You are about to revert an old version. Proceed?");
 
             if (answer) {
-                console.log("not implemented yet");
+                var clone = this.model.clone();
+                var current = new AA.PageModel();
+                current.set({id : AA.router.currentSlug});
+                current.fetch({success: function(model, response, options) {
+                    current.get('annotations').each(function(model, index) {
+                        model.destroy({wait: true});
+                    });
+                    clone.unset('rev');
+                    clone.unset('revisions');
+                    clone.get('annotations').each(function(model, index) {
+                        model.unset('id');
+                        model.unset('resource_uri');
+                    });
+                    clone.get('annotations').each(function(model, index) {
+                        model.save(null, {wait: true});
+                    });
+                    clone.set('permissions', current.get('permissions'));
+                    clone.unset("annotations");
+                    clone.save(null, {success: function(model, response) {
+                        AA.router.navigate(AA.router.currentSlug, { trigger: true });
+                    }});
+                }});
             }
         }
     });
@@ -925,9 +1002,7 @@ window.AA = window.AA || {};
             return false;
         },
         exportAnnotationToAudacityMarkers: function(event) {
-            var audacity = markdown.Markdown.dialects.AaTiny.toAudacity(this.model.get('body'));
-            var encoded = window.btoa(audacity);
-            window.open("data:application/octet-stream;charset=utf-8;base64," + encoded);
+            new AA.ImportExportView({model: this.model});
 
             return false;
         },

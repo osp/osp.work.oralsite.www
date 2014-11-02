@@ -61,6 +61,10 @@
 <script type="text/template" id="edit-permissions-view-template">
 {% include "aawiki/partials/edit-permissions-view.html" %}
 </script>
+
+<script type="text/template" id="import-export-view-template">
+{% include "aawiki/partials/import-export-view.html" %}
+</script>
 {% endblock %}
 
 
@@ -146,6 +150,8 @@ compatible build. See <https://github.com/lodash/lodash/wiki/build-differences>
 <script src="{{ STATIC_URL }}components/popcorn-js/popcorn-complete.js"></script>
 <script src="{{ STATIC_URL }}components/moment/moment.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/plugins/aa.popcorn.js"></script>
+
+<script src="{{ STATIC_URL }}components/subtitles-parser/subtitles.parser.min.js"></script>
 
 <script src="{{ STATIC_URL }}components/jquery.contextual/aa.jquery.contextual.js"></script>
 <script src="{{ STATIC_URL }}components/jQuery-caret-utilities/jquery.caret.js"></script>
