@@ -544,10 +544,6 @@ blockquote {
         .wrapper {
             .opacity(0.5);
         }
-
-        .anonymous & {
-            display: none;
-        }
     }
 
     /** This is triggered by the ‘collapsed’ class: the box will have a look of being collapsed on initial load */
@@ -620,6 +616,10 @@ blockquote {
      * need to have manual control over the stacking of the boxes */
     &:hover {
       z-index: 9999999 !important;
+    }
+    
+    &.hidden {
+        display: none;
     }
 }
 
