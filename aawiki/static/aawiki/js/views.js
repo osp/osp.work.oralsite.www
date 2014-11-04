@@ -471,6 +471,7 @@ window.AA = window.AA || {};
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
                     // If the about refers to a part of the page, we try to create
                     // a separate abstract player for that part
+
                     var hash = '#' + uri.split('#').slice(-1);
                     if ($(hash).length === 0) {
                         return null;
@@ -480,8 +481,10 @@ window.AA = window.AA || {};
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
-                    var driverMediaEl  = document.querySelector('[src="' + uri + '"]');
-                    var driverMediaRef = document.querySelector('[data-uri="' + uri + '"]');
+                    
+                    // the uri, or the uri with an added hash for media-query (#t=3)
+                    var driverMediaEl  = document.querySelector('[src="' + uri + '"], [src^="' + uri + '#"]');
+                    var driverMediaRef = document.querySelector('[data-uri="' + uri + '"], [data-uri^="' + uri + '#"]');
                     if (driverMediaEl &&
                            ( driverMediaEl.tagName.toLowerCase() === "video" ||
                              driverMediaEl.tagName.toLowerCase() === "audio" )
@@ -494,6 +497,7 @@ window.AA = window.AA || {};
                     } else {
                             
                         // And else we don’t know what to do
+                        console.log('driver not found ' + uri);
                         return null;
                     }
                 }
@@ -524,6 +528,11 @@ window.AA = window.AA || {};
                 return this.drivers[uri];
             }
         },
+        getDriver: function(uri) {
+            // strip media-query like #t=3:
+            uri = uri.match(/[^\#]+/)[0];
+            return this.drivers[uri];
+        },
         findChildren: function(uri) {
             return $('section[about="' + uri+ '"]');
         },
@@ -550,7 +559,7 @@ window.AA = window.AA || {};
             var activeChildDriverUris = this.findChildrenMedia(uri);
             
             for (var i=0; i<activeChildDriverUris.length; i++) {
-                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && !driver.paused()) {
                     driver.pause();
                 }
@@ -560,7 +569,7 @@ window.AA = window.AA || {};
             var activeChildDriverUris = this.findChildrenMedia(uri);
             
             for (var i=0; i<activeChildDriverUris.length; i++) {
-                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && driver.paused()) {
                     driver.play();
                 }
@@ -799,7 +808,7 @@ window.AA = window.AA || {};
                 body: markdown.toHTML(this.model.get("body"), "Aa"),
                 isSlideshow: this.isSlideshow(),
                 canChange: AA.userModel.canChange(),
-                isHead: AA.router.pageModel.get('rev') === null
+                isHead: AA.router.pageView.model.get('rev') === null
             }))
             .draggable({
                 handle: '.icon-drag',
@@ -907,7 +916,7 @@ window.AA = window.AA || {};
             .addClass('editing')
             .html(this.templates.edit({
                 body: this.model.toFrontMatter(),
-                isHead: AA.router.pageModel.get('rev') === null
+                isHead: AA.router.pageView.model.get('rev') === null
             }))
             .find('textarea')
             .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
@@ -1098,7 +1107,10 @@ window.AA = window.AA || {};
             }).get();
             var allUris = hostedUris.concat(mediaUris);
             for (var i=0; i<allUris.length; i++) {
-                AA.router.multiplexView.registerDriver(allUris[i]);
+                var uri = allUris[i];
+                // strip media-query like #t=3:
+                uri = uri.match(/[^\#]+/)[0];
+                AA.router.multiplexView.registerDriver(uri);
             }
         },
         deleteAnnotationEvents: function() {
@@ -1167,7 +1179,7 @@ window.AA = window.AA || {};
             return true;
         },
         playPauseMiniPlayer: function(e) {
-            var miniPlayerDriver = AA.router.multiplexView.drivers[$(e.target).attr("rel")];
+            var miniPlayerDriver = AA.router.multiplexView.getDriver($(e.target).attr("rel"));
             if (miniPlayerDriver.paused()) {
                 miniPlayerDriver.play();
             } else {
@@ -1206,7 +1218,7 @@ window.AA = window.AA || {};
                             AA.router.annotationCollectionView.cursorMenu.hide ();
                         };
 
-                        new AA.EditIntroductionView({model: AA.router.pageModel });
+                        new AA.EditIntroductionView({model: AA.router.pageView.model });
                     }),
 
                 // Create Manage permissions Button
@@ -1262,7 +1274,7 @@ window.AA = window.AA || {};
             if (instance === this.collection && 
                 ! this.cursorMenu.visible() &&
                 AA.userModel.loggedIn() &&
-                ! AA.router.pageModel.get('rev')) {
+                ! AA.router.pageView.model.get('rev')) {
                 if (this.focused) {
                     this.focused = undefined;
                 } else {
@@ -1282,7 +1294,7 @@ window.AA = window.AA || {};
             var msg = prompt("Commit message", "My modifications");
 
             if (msg) {
-                AA.router.pageModel.commit(msg);
+                AA.router.pageView.model.commit(msg);
             }
         },
         addAnnotation: function(event) {
@@ -1321,7 +1333,7 @@ window.AA = window.AA || {};
                 this.cursorMenu.hide();
             };
 
-            new AA.EditPermissionsView({ model: AA.router.pageModel });
+            new AA.EditPermissionsView({ model: AA.router.pageView.model });
         },
     });
 })();  // end of the namespace AA

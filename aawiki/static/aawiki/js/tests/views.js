@@ -7,7 +7,7 @@ var mockPageHash = {
         "page" : "/api/v1/page/Tests/",
         "resource_uri" : "/api/v1/annotation/2/",
     }, {
-        "body" : "#A video\n\n\n00:00:01,000 --> 00:01:05,000\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv ]]\n\n",
+        "body" : "#A video\n\n\n00:00:01,000 --> 00:01:05,000\n\n[[ embed::" + document.location.origin + "/static/components/popcorn-js/test/trailer.ogv#t=3 ]]\n\n",
         "id" : 9,
         "page" : "/api/v1/page/Tests/",
         "resource_uri" : "/api/v1/annotation/9/",
@@ -251,17 +251,17 @@ describe("The views", function() {
         });
 
         it("the drivers are instances of Popcorn.js", function() {
-            expect(AA.router.multiplexView.drivers[document.location.origin + "/static/components/popcorn-js/test/trailer.ogv"]).toBeDefined();
-            expect(AA.router.multiplexView.drivers[document.location.origin + "/static/components/popcorn-js/test/trailer.ogv"] instanceof Popcorn).toBe(true);
+            expect(AA.router.multiplexView.getDriver(document.location.origin + "/static/components/popcorn-js/test/trailer.ogv")).toBeDefined();
+            expect(AA.router.multiplexView.getDriver(document.location.origin + "/static/components/popcorn-js/test/trailer.ogv") instanceof Popcorn).toBe(true);
         });
 
         it("Popcorn.js and the original element agree", function() {
-            expect(AA.router.multiplexView.drivers[document.location.origin + "/static/components/popcorn-js/test/trailer.ogv"].paused()).toBe(true);
-            expect(AA.router.multiplexView.drivers[document.location.origin + "/static/components/popcorn-js/test/trailer.ogv"].media.paused).toBe(true);
+            expect(AA.router.multiplexView.getDriver(document.location.origin + "/static/components/popcorn-js/test/trailer.ogv").paused()).toBe(true);
+            expect(AA.router.multiplexView.getDriver(document.location.origin + "/static/components/popcorn-js/test/trailer.ogv").media.paused).toBe(true);
         });
 
         it("the video has 3 registered events", function() {
-            expect(AA.router.multiplexView.drivers[document.location.origin + "/static/components/popcorn-js/test/trailer.ogv"].getTrackEvents().length).toBe(3);
+            expect(AA.router.multiplexView.getDriver(document.location.origin + "/static/components/popcorn-js/test/trailer.ogv").getTrackEvents().length).toBe(3);
         });
 
     });

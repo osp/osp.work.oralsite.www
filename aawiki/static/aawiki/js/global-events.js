@@ -24,7 +24,8 @@ window.AA = window.AA || {};
         }).get();
         var allUris = hostedUris.concat(mediaUris);
         for (var i=0; i<allUris.length; i++) {
-            var driver = AA.router.multiplexView.drivers[allUris[i]];
+            var uri = allUris[i];
+            var driver = AA.router.multiplexView.getDriver(uri);
             if (typeof driver !== "undefined" && driver.paused()) {
                 driver.play();
             }
