@@ -794,7 +794,7 @@ window.AA = window.AA || {};
                 body: markdown.toHTML(this.model.get("body"), "Aa"),
                 isSlideshow: this.isSlideshow(),
                 canChange: AA.userModel.canChange(),
-                isHead: AA.router.pageModel.get('rev') === null
+                isHead: AA.router.pageView.model.get('rev') === null
             }))
             .draggable({
                 handle: '.icon-drag',
@@ -902,7 +902,7 @@ window.AA = window.AA || {};
             .addClass('editing')
             .html(this.templates.edit({
                 body: this.model.toFrontMatter(),
-                isHead: AA.router.pageModel.get('rev') === null
+                isHead: AA.router.pageView.model.get('rev') === null
             }))
             .find('textarea')
             .bind('keydown', "Ctrl+Shift+down", function timestamp(event) {
@@ -1201,7 +1201,7 @@ window.AA = window.AA || {};
                             AA.router.annotationCollectionView.cursorMenu.hide ();
                         };
 
-                        new AA.EditIntroductionView({model: AA.router.pageModel });
+                        new AA.EditIntroductionView({model: AA.router.pageView.model });
                     }),
 
                 // Create Manage permissions Button
@@ -1257,7 +1257,7 @@ window.AA = window.AA || {};
             if (instance === this.collection && 
                 ! this.cursorMenu.visible() &&
                 AA.userModel.loggedIn() &&
-                ! AA.router.pageModel.get('rev')) {
+                ! AA.router.pageView.model.get('rev')) {
                 if (this.focused) {
                     this.focused = undefined;
                 } else {
@@ -1277,7 +1277,7 @@ window.AA = window.AA || {};
             var msg = prompt("Commit message", "My modifications");
 
             if (msg) {
-                AA.router.pageModel.commit(msg);
+                AA.router.pageView.model.commit(msg);
             }
         },
         addAnnotation: function(event) {
@@ -1316,7 +1316,7 @@ window.AA = window.AA || {};
                 this.cursorMenu.hide();
             };
 
-            new AA.EditPermissionsView({ model: AA.router.pageModel });
+            new AA.EditPermissionsView({ model: AA.router.pageView.model });
         },
     });
 })();  // end of the namespace AA

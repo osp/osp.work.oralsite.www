@@ -59,11 +59,11 @@ window.AA = window.AA || {};
             this.annotationCollectionView && this.annotationCollectionView.empty();
             // Since we are using backbone-associations.js, An annotation
             // collection is created as a property of the page view model.
-            this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageModel.get('annotations')});
+            this.annotationCollectionView = new AA.AnnotationCollectionView({collection : this.pageView.model.get('annotations')});
 
             this.revisionView && this.revisionView.empty() && this.revisionView.undelegateEvents();
             //if(AA.userModel.loggedIn()) {
-                this.revisionView = new AA.RevisionView({ model: this.pageModel });
+                this.revisionView = new AA.RevisionView({ model: this.pageView.model });
             //}
 
             this.timelinePlayerView && this.timelinePlayerView.remove();
