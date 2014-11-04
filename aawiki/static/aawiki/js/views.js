@@ -399,6 +399,9 @@ window.AA = window.AA || {};
         template: _.template($('#revisions-browser-template').html()),
         events: {
             "click .revert":     "revert",
+            "click .revision_list a":     "navigate",
+            "click #revisions_browser_next a":     "navigate",
+            "click #revisions_browser_prev a":     "navigate",
         },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
@@ -412,14 +415,16 @@ window.AA = window.AA || {};
                 rev: this.model.current_rev(),
                 revisions: this.model.get('revisions'),
                 slug: AA.router.currentSlug
-            }))
-            .find('a').on('click', function(event) {
-                event.preventDefault();
-                var href = $(event.currentTarget).attr('href');
-                AA.router.navigate(href.substring(6), { trigger: true });
-            });
+            }));
         },
-        revert: function() {
+        navigate: function(event) {
+            event.preventDefault();
+            var href = $(event.currentTarget).attr('href');
+            AA.router.navigate(href.substring(6), { trigger: true });
+        },
+        revert: function(event) {
+            event.preventDefault();
+
             var answer = window.confirm("You are about to revert an old version. Proceed?");
 
             if (answer) {

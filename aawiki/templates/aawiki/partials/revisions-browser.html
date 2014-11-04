@@ -1,25 +1,24 @@
 <% if (rev) { %>
-<p>This is an old revision of this page, last edited by <%= rev.name %> at <%= moment.unix(rev.date).calendar() %>. It may differ significantly from the current revision. (<em class="revert">revert</em>)</p>
-    <!--(diff) ← Previous revision | Latest revision (diff) | Newer revision → (diff)-->
-    <div id="revisions_browser_cur">
-        <a href="/pages/<%= slug %>">back to editing mode</a>
-        <p><span class="revert" data-rev="<%= rev.id %>">revert</span></p>
-    </div>
+<p>This is an old revision of this page, last edited by <%= rev.name %> at <%= moment.unix(rev.date).calendar() %>. It may differ significantly from the current revision. You can <a href="#" class="revert">revert it</a> or
+<a href="/pages/<%= slug %>">switch back to editing mode</a>.
+</>
 <% } %>
 
 <% if (revisions.length) { %>
-    <div id="revisions_browser_prev">
+    <p id="revisions_browser">
         <% if (prev) { %>
-        <a href="/pages/<%= slug %>/<%= prev.id %>">prev</a>
+        <span id="revisions_browser_prev">
+            <a href="/pages/<%= slug %>/<%= prev.id %>">previous revision</a>
+        </span>
         <% }; %>
-    </div>
-    <div id="revisions_browser_next">
         <% if (next) { %>
-        <a href="/pages/<%= slug %>/<%= next.id %>">next</a>
+        <span id="revisions_browser_next">
+            <a href="/pages/<%= slug %>/<%= next.id %>">next revision</a>
+        </span>
         <% }; %>
-    </div>
+    </p>
 
-    <ul>
+    <ul class="revision_list">
         <% _.each(revisions, function(revision) { %>
         <li<% if (rev && revision.id === rev.id) { %> class="current"<% }; %>>
         <p><a href="/pages/<%= slug %>/<%= revision.id %>"><%= moment.unix(revision.date).calendar() %>, by <%= revision.name %></a></p>
