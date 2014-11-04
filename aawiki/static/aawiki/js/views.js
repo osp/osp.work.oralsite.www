@@ -466,6 +466,7 @@ window.AA = window.AA || {};
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
                     // If the about refers to a part of the page, we try to create
                     // a separate abstract player for that part
+
                     var hash = '#' + uri.split('#').slice(-1);
                     if ($(hash).length === 0) {
                         return null;
@@ -475,8 +476,10 @@ window.AA = window.AA || {};
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
-                    var driverMediaEl  = document.querySelector('[src="' + uri + '"]');
-                    var driverMediaRef = document.querySelector('[data-uri="' + uri + '"]');
+                    
+                    // the uri, or the uri with an added hash for media-query (#t=3)
+                    var driverMediaEl  = document.querySelector('[src="' + uri + '"], [src^="' + uri + '#"]');
+                    var driverMediaRef = document.querySelector('[data-uri="' + uri + '"], [data-uri^="' + uri + '#"]');
                     if (driverMediaEl &&
                            ( driverMediaEl.tagName.toLowerCase() === "video" ||
                              driverMediaEl.tagName.toLowerCase() === "audio" )
@@ -489,6 +492,7 @@ window.AA = window.AA || {};
                     } else {
                             
                         // And else we don’t know what to do
+                        console.log('driver not found ' + uri);
                         return null;
                     }
                 }
@@ -519,6 +523,11 @@ window.AA = window.AA || {};
                 return this.drivers[uri];
             }
         },
+        getDriver: function(uri) {
+            // strip media-query like #t=3:
+            uri = uri.match(/[^\#]+/)[0];
+            return this.drivers[uri];
+        },
         findChildren: function(uri) {
             return $('section[about="' + uri+ '"]');
         },
@@ -545,7 +554,7 @@ window.AA = window.AA || {};
             var activeChildDriverUris = this.findChildrenMedia(uri);
             
             for (var i=0; i<activeChildDriverUris.length; i++) {
-                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && !driver.paused()) {
                     driver.pause();
                 }
@@ -555,7 +564,7 @@ window.AA = window.AA || {};
             var activeChildDriverUris = this.findChildrenMedia(uri);
             
             for (var i=0; i<activeChildDriverUris.length; i++) {
-                var driver = AA.router.multiplexView.drivers[activeChildDriverUris[i]];
+                var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && driver.paused()) {
                     driver.play();
                 }
@@ -1093,7 +1102,10 @@ window.AA = window.AA || {};
             }).get();
             var allUris = hostedUris.concat(mediaUris);
             for (var i=0; i<allUris.length; i++) {
-                AA.router.multiplexView.registerDriver(allUris[i]);
+                var uri = allUris[i];
+                // strip media-query like #t=3:
+                uri = uri.match(/[^\#]+/)[0];
+                AA.router.multiplexView.registerDriver(uri);
             }
         },
         deleteAnnotationEvents: function() {
@@ -1162,7 +1174,7 @@ window.AA = window.AA || {};
             return true;
         },
         playPauseMiniPlayer: function(e) {
-            var miniPlayerDriver = AA.router.multiplexView.drivers[$(e.target).attr("rel")];
+            var miniPlayerDriver = AA.router.multiplexView.getDriver($(e.target).attr("rel"));
             if (miniPlayerDriver.paused()) {
                 miniPlayerDriver.play();
             } else {
