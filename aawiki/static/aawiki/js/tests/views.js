@@ -26,7 +26,7 @@ var mockPageHash = {
         "resource_uri" : "/api/v1/annotation/69/",
         "style" : "left: 333px; top: 868px; width: 300; height: 400",
     }, {
-        "about" : document.location.origin + '/tests/#annotation-0024',
+        "about" : document.location.origin + '/tests/#annotation-24',
         "body" : "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n\n8<\n\nThird slide\n",
         "id" : 24,
         "page" : "/api/v1/page/Tests/",
@@ -209,7 +209,7 @@ describe("The views", function() {
         it("the about attributes are correct", function() {
             expect($("article > section:nth-child(1)")).toHaveAttr("about", document.location.protocol + '//' + document.location.host + "/static/components/popcorn-js/test/trailer.ogv");
             expect($("article > section:nth-child(2)")).toHaveAttr("about", document.location.origin + document.location.pathname);
-            expect($("article > section:nth-child(5)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-0024');
+            expect($("article > section:nth-child(5)")).toHaveAttr("about", document.location.origin + document.location.pathname + '#annotation-24');
         });
 
         it("features play buttons for the self-driven annotation, i.e. the slideshow", function() {

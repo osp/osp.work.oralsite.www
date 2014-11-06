@@ -795,7 +795,7 @@ window.AA = window.AA || {};
 
             this.$el
             .attr({
-                'id': 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 ), // id="annotation-0004"
+                'id': 'annotation-' + this.model.get('id'),  // id="annotation-4"
                 'title': this.model.get('title'),
                 'class': this.model.get('klass'),
                 'about': this.model.get('about')
