@@ -889,7 +889,7 @@ window.AA = window.AA || {};
             });
             
             $('.icon-target', this.$el)
-                .attr('href', document.location.origin + document.location.pathname + '#' + this.model.get('id'))
+                .attr('href', document.location.origin + document.location.pathname + '#annotation-' + this.model.get('id'))
                 .draggable({ helper: "clone" })
             ;
 
