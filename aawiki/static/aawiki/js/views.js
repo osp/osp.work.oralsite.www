@@ -1300,8 +1300,8 @@ window.AA = window.AA || {};
         addAnnotation: function(event) {
             var offsetBtn = $(event.currentTarget).position();
             var offsetCanvas = this.$el.position();
-            var top = offsetBtn.top - offsetCanvas.top;
-            var left = offsetBtn.left - offsetCanvas.left;
+            var top = offsetBtn.top - offsetCanvas.top + this.$el.scrollTop();
+            var left = offsetBtn.left - offsetCanvas.left + this.$el.scrollLeft();
             this.collection.create({style: 'top: ' + top + 'px; left: ' + left + 'px'});
             this.cursorMenu.hide();
         },
