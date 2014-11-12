@@ -21,7 +21,7 @@
             var mimes = {
                 img: ["image/jpeg", "image/png", "image/gif"],
                 html5video: ["video/ogg", "video/webm", "video/mp4"],
-                html5audio: ["audio/ogg", "audio/mp3"],
+                html5audio: ["audio/ogg", "audio/mpeg"],
                 iframe: ["text/html"]
             };
             for (var templName in mimes) {
