@@ -425,7 +425,7 @@ window.AA = window.AA || {};
         revert: function(event) {
             event.preventDefault();
 
-            var answer = window.confirm("You are about to revert an old version. It will erase the working version permanently. If any doubt, make sur you take a snapshoot of the working version before committing. Proceed anyway?");
+            var answer = window.confirm("You are about to revert to an old version. It will erase the working version permanently. Make sure you take a snapshot of the working version before reverting. Proceed?");
 
             if (answer) {
                 var clone = this.model.clone();
