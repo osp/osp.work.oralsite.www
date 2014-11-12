@@ -261,14 +261,9 @@ window.AA = window.AA || {};
             var id = this.model.get('id');
 
             if (typeof id === "undefined" || id === -1) {
-                // FIXME This is just an ugly hack to deal with the fact that the
-                // attribute get removed I don’t know where
-                setTimeout(function() {
-                    $('#canvas').addClass('anonymous');
-                }, 2000);
-                $('#canvas').addClass('anonymous');
+                $('body').addClass('anonymous');
             } else {
-                $('#canvas').removeClass('anonymous');
+                $('body').removeClass('anonymous');
             }
 
             this.$el.html( this.template( this.model.toJSON() ) );

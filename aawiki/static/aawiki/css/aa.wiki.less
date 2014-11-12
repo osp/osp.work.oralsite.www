@@ -622,7 +622,12 @@ blockquote {
     }
 }
 
-#canvas.anonymous > section {
+/* Not effective yet */
+.anonymous #tools {
+    display: none;
+}
+
+.anonymous #canvas > section {
     /* When hovering over an annotation box, put in front.
      * We can only do this for logged-out users, as logged-in users
      * need to have manual control over the stacking of the boxes */
