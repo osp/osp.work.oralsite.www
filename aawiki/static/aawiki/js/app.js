@@ -3,9 +3,6 @@ $(function() {
     // and annotation boxes into drivers.
     Popcorn.player( "baseplayer" );
 
-    // listen for annotations ( knows how to handle new annotations added at runtime )
-    AA.listeningAnnotations();
-
     // loads the views that change from page to page
     AA.router = new AA.Router();
     
