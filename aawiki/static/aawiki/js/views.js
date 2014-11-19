@@ -756,7 +756,8 @@ window.AA = window.AA || {};
             "click .previous"           : "previous",            
             "click .mini-player"        : "playPauseMiniPlayer",
             'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
-            'click span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
+            'click a[target="multiplex"]': "crossDriverLink",
+            'click a[target="multiplex"],span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
@@ -1107,6 +1108,17 @@ window.AA = window.AA || {};
         },
         jumpToAnnotation: function(e) {
             this.driver.currentTime(e.target.getAttribute("content"));
+        },
+        crossDriverLink: function(e) {
+            e.preventDefault();
+            var href = e.target.getAttribute("href"); // "http://repo.sarma.be/soiree%20parole/Alessandro%20Bosetti%20in%202spaces.ogv#t=100"
+            // if no link found:
+            if (!href) { return; }
+            var times = href.match(/#t=([0-9]+)/);    // ["#t=100", "100"]
+            // if no fragments found:
+            if ( times.length<2 ) { return; }
+            console.log(" AA.router.multiplexView.getDriver('" + href + "').currentTime(" + times[1] + ")");
+            AA.router.multiplexView.getDriver(href).currentTime(times[1]);
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
