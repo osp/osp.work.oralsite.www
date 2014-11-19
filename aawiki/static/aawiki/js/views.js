@@ -461,6 +461,7 @@ window.AA = window.AA || {};
                 if (uri === document.location.origin + document.location.pathname) {
                     // If the about is the current page, attach to the general timeline
                     this.drivers[uri] = Popcorn.baseplayer( "#timeline" );
+                    this.drivers[uri].media.src = uri; // just to have some reference from the popcorn object to the driver
                 } 
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
@@ -472,7 +473,7 @@ window.AA = window.AA || {};
                         return null;
                     }
                     this.drivers[uri] = Popcorn.baseplayer( hash );
-
+                    this.drivers[uri].media.src = uri; // just to have some reference from the popcorn object to the driver
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
