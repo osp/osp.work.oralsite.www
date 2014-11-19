@@ -1110,15 +1110,19 @@ window.AA = window.AA || {};
             this.driver.currentTime(e.target.getAttribute("content"));
         },
         crossDriverLink: function(e) {
+            var position, href, times, driver;
             e.preventDefault();
-            var href = e.target.getAttribute("href"); // "http://repo.sarma.be/soiree%20parole/Alessandro%20Bosetti%20in%202spaces.ogv#t=100"
+            href = e.target.getAttribute("href"); // "http://repo.sarma.be/soiree%20parole/Alessandro%20Bosetti%20in%202spaces.ogv#t=100"
             // if no link found:
             if (!href) { return; }
-            var times = href.match(/#t=([0-9]+)/);    // ["#t=100", "100"]
-            // if no fragments found:
-            if ( times.length<2 ) { return; }
-            console.log(" AA.router.multiplexView.getDriver('" + href + "').currentTime(" + times[1] + ")");
-            AA.router.multiplexView.getDriver(href).currentTime(times[1]);
+            times = href.match(/#t=([0-9]+)/);    // ["#t=100", "100"]
+            // if no fragment found, we go to the beginning (the author used multiplex for a reason!)
+            if ( !times || times.length<2 ) { position = 0; } else { position = times[1]; }
+            // console.log("CrossDriverLink!");
+            // console.log("AA.router.multiplexView.getDriver('" + href + "').currentTime(" + position + ")");
+            driver = AA.router.multiplexView.getDriver(href);
+            driver.currentTime(position);
+            if (driver.paused()) { driver.play(); }
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
