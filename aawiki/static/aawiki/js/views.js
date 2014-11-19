@@ -600,7 +600,6 @@ window.AA = window.AA || {};
             var nextEvent = this.nextEvent();
             if (nextEvent) {
                 this.driver.currentTime(nextEvent.start);
-                this.render();
             }
         },
         previousEvent: function() {
@@ -614,7 +613,6 @@ window.AA = window.AA || {};
             var previousEvent = this.previousEvent();
             if (previousEvent) {
                 this.driver.currentTime(previousEvent.start);
-                this.render();
             }
         },
         duration: function() {
