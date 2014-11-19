@@ -172,8 +172,6 @@ describe("The views", function() {
 
     describe("The Annotation view", function() {
 
-        AA.listeningAnnotations();
-
         Popcorn.player("baseplayer");
 
         AA.router.multiplexView = new AA.MultiplexView();
