@@ -40,10 +40,10 @@ window.AA = window.AA || {};
         },
         render: function() {
             var audacity = markdown.Markdown.dialects.AaTiny.toAudacity(this.model.get('body'));
-            var audacityData = window.btoa(audacity);
+            var audacityData = base64EncArr(strToUTF8Arr(audacity));
 
             var srt = markdown.Markdown.dialects.AaTiny.toSRT(this.model.get('body'));
-            var srtData = window.btoa(srt);
+            var srtData = base64EncArr(strToUTF8Arr(srt));
 
             var name = 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 );
 
