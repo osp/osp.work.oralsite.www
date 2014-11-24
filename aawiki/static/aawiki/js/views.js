@@ -459,6 +459,7 @@ window.AA = window.AA || {};
                 if (uri === document.location.origin + document.location.pathname) {
                     // If the about is the current page, attach to the general timeline
                     this.drivers[uri] = Popcorn.baseplayer( "#timeline" );
+                    this.drivers[uri].media.src = uri; // just to have some reference from the popcorn object to the driver
                 } 
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
@@ -470,7 +471,7 @@ window.AA = window.AA || {};
                         return null;
                     }
                     this.drivers[uri] = Popcorn.baseplayer( hash );
-
+                    this.drivers[uri].media.src = uri; // just to have some reference from the popcorn object to the driver
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
@@ -597,7 +598,6 @@ window.AA = window.AA || {};
             var nextEvent = this.nextEvent();
             if (nextEvent) {
                 this.driver.currentTime(nextEvent.start);
-                this.render();
             }
         },
         previousEvent: function() {
@@ -611,7 +611,6 @@ window.AA = window.AA || {};
             var previousEvent = this.previousEvent();
             if (previousEvent) {
                 this.driver.currentTime(previousEvent.start);
-                this.render();
             }
         },
         duration: function() {
@@ -755,7 +754,8 @@ window.AA = window.AA || {};
             "click .previous"           : "previous",            
             "click .mini-player"        : "playPauseMiniPlayer",
             'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
-            'click span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
+            'click a[target="multiplex"]': "crossDriverLink",
+            'click a[target="multiplex"],span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
             // references to timed annotations
@@ -1116,6 +1116,21 @@ window.AA = window.AA || {};
         },
         jumpToAnnotation: function(e) {
             this.driver.currentTime(e.target.getAttribute("content"));
+        },
+        crossDriverLink: function(e) {
+            var position, href, times, driver;
+            e.preventDefault();
+            href = e.target.getAttribute("href"); // "http://repo.sarma.be/soiree%20parole/Alessandro%20Bosetti%20in%202spaces.ogv#t=100"
+            // if no link found:
+            if (!href) { return; }
+            times = href.match(/#t=([0-9]+)/);    // ["#t=100", "100"]
+            // if no fragment found, we go to the beginning (the author used multiplex for a reason!)
+            if ( !times || times.length<2 ) { position = 0; } else { position = times[1]; }
+            // console.log("CrossDriverLink!");
+            // console.log("AA.router.multiplexView.getDriver('" + href + "').currentTime(" + position + ")");
+            driver = AA.router.multiplexView.getDriver(href);
+            driver.currentTime(position);
+            if (driver.paused()) { driver.play(); }
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
