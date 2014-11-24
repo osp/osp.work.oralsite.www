@@ -45,12 +45,10 @@ window.AA = window.AA || {};
             var srt = markdown.Markdown.dialects.AaTiny.toSRT(this.model.get('body'));
             var srtData = base64EncArr(strToUTF8Arr(srt));
 
-            var name = 'annotation-' + AA.utils.lpad( this.model.get('id'), 4 );
-
             this.$el.html(this.template({
                 audacityData: audacityData,
                 srtData: srtData,
-                name: name,
+                name: this.model.get('uuid'),
             }));
 
             $('body').append(this.$el);
@@ -792,7 +790,7 @@ window.AA = window.AA || {};
 
             this.$el
             .attr({
-                'id': 'annotation-' + this.model.get('id'),  // id="annotation-4"
+                'id': this.model.get('uuid'),  // id="annotation-4"
                 'title': this.model.get('title'),
                 'class': this.model.get('klass'),
                 'about': this.model.get('about')
@@ -886,7 +884,7 @@ window.AA = window.AA || {};
             });
             
             $('.icon-target', this.$el)
-                .attr('href', document.location.origin + document.location.pathname + '#annotation-' + this.model.get('id'))
+                .attr('href', document.location.origin + document.location.pathname + '#' + this.model.get('uuid'))
                 .draggable({ helper: "clone" })
             ;
 
@@ -947,16 +945,26 @@ window.AA = window.AA || {};
             });
         },
         save: function() {
+            var that = this;
+
             this.model
                 .loadFront($('textarea', this.$el).val(), 'body', { silent: true })
-                .save();
-
-            // we explicitly call render here. We cannot rely on the change
-            // event in case: we want to switch back to the view mode even if
-            // the user hasn't done any changes.
-            // The option {silent: true} was passed above to avoid calling
-            // render twice
-            this.render();
+                .save(null, {
+                    success: function(model, result, xhr) {
+                        // we explicitly call render here. We cannot rely on the change
+                        // event in case: we want to switch back to the view mode even if
+                        // the user hasn't done any changes.
+                        // The option {silent: true} was passed above to avoid calling
+                        // render twice
+                        that.render();
+                    },
+                    error: function(model, xhr, options) {
+                        var error = xhr.responseJSON.error_message;
+                        if (error === "UNIQUE constraint failed: aawiki_annotation.page_id, aawiki_annotation.uuid") {
+                            window.alert('the annotation uuid must be unique within the page. Please fix it.');
+                        }
+                    }
+                })
         },
         positionMenu: function() {
             var position = this.$el.position();
@@ -1111,7 +1119,7 @@ window.AA = window.AA || {};
         },
         setAsSlideshow: function() {
             if (window.confirm('Set as slideshow?')) {
-                this.model.set("about", document.location.origin + document.location.pathname + '#' + 'annotation-' + AA.utils.lpad( this.model.attributes.id, 4) );
+                this.model.set("about", document.location.origin + document.location.pathname + '#' + this.model.get('uuid') );
             }
             this.model.save();
             this.renderPlayer();

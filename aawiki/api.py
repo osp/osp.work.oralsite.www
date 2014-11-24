@@ -6,6 +6,8 @@ from django.contrib.sites.models import Site
 
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_slug
+from django.core.exceptions import ValidationError
 
 from guardian.shortcuts import assign_perm, remove_perm
 
@@ -14,6 +16,7 @@ from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.http import HttpUnauthorized, HttpForbidden, HttpNotFound
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
+from tastypie.validation import Validation
 
 from tastypie.utils import trailing_slash
 
@@ -125,6 +128,22 @@ def me(request):
     return user_view(request, pk=user.id)
 
 
+class AnnotationValidation(Validation):
+    def is_valid(self, bundle, request=None):
+        if not bundle.data:
+            return {'__all__': 'Not quite what I had in mind.'}
+
+        errors = {}
+
+        if 'uuid' in bundle.data.keys():
+            try:
+                validate_slug(bundle.data['uuid'])
+            except ValidationError:
+                errors['uuid'] = ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
+
+        return errors
+
+
 class AnnotationResource(ModelResource):
     page = fields.ForeignKey('aawiki.api.PageResource', 'page')
 
@@ -135,6 +154,7 @@ class AnnotationResource(ModelResource):
             "page": ALL_WITH_RELATIONS
         }
         authorization = PerAnnotationAuthorization()
+        validation = AnnotationValidation()
         always_return_data = True
 
 
@@ -197,11 +217,11 @@ class PageResource(ModelResource):
         for user_id, permission in old - new:
             user = User.objects.get(pk=user_id)
             remove_perm(permission, user, bundle.obj)
-        
+
         for user_id, permission in new - old:
             user = User.objects.get(pk=user_id)
             assign_perm(permission, user, bundle.obj)
-        
+
         # if there is the "message" field in the HTTP header it means we want
         # to commit
         msg = bundle.request.META.get('HTTP_MESSAGE')

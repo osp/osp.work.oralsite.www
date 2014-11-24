@@ -35,11 +35,15 @@ class Page(RCSModel):
 class Annotation(RCSModel):
     """Represent an annotation"""
     page = models.ForeignKey(Page)
+    uuid = models.SlugField()
     about = models.URLField(blank=True)
     body = models.TextField(blank=True)
     style = models.TextField(blank=True)
     klass = models.TextField(blank=True)
     title = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = (("page", "uuid"),)
 
     def __unicode__(self):
         return self.body[0:100]

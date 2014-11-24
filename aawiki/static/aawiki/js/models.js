@@ -71,11 +71,15 @@ window.AA = window.AA || {};
     
     AA.AnnotationModel = Backbone.AssociatedModel.extend({
         urlRoot: "/api/v1/annotation/",
-        defaults: {
-            title: "Untitled",
-            about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
-            body: "Nouvelle annotation",
-            style: 'width: 300px; height: 400px; top: 10px; left: 10px;'
+        defaults: function() {
+            // This is dynamically generated so the UUID is unique
+            return {
+                uuid: 'annotation-' + Math.floor((1 + Math.random()) * 0x10000).toString(16),
+                title: "Untitled",
+                about: document.location.origin + document.location.pathname, // if the driver is not specified, this annotation is about the current page
+                body: "Nouvelle annotation",
+                style: 'width: 300px; height: 400px; top: 10px; left: 10px;'
+            }
         },
         loadFront: function (src, name, options) {
             name = name || '__content';
