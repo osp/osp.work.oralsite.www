@@ -1009,9 +1009,12 @@ window.AA = window.AA || {};
             var $el = $(event.currentTarget);
             var $wrapper = $el.closest(".wrapper");
             $el.addClass("active");
-            $wrapper.animate({
-                scrollTop: $el.position().top + $wrapper.scrollTop()
-            }, 600);
+
+            if (! this.$el.hasClass('active-only')) {
+                $wrapper.animate({
+                    scrollTop: $el.position().top + $wrapper.scrollTop()
+                }, 600);
+            }
 
             playChildren($el); // play any audio/videos that are in this annotation
         },
