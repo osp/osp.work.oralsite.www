@@ -581,12 +581,10 @@ blockquote {
         }
 
         & section[typeof="aa:annotation"] {
-            visibility: hidden;
-            height: 0px;
-            padding: 0px;
+            display: none;
 
             &.active {
-                visibility: visible;
+                display: block;
                 background-color: inherit;
             }
         }
