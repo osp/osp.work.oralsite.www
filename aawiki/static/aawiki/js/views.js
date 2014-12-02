@@ -964,7 +964,7 @@ window.AA = window.AA || {};
                             window.alert('the annotation uuid must be unique within the page. Please fix it.');
                         }
                     }
-                })
+                });
         },
         positionMenu: function() {
             var position = this.$el.position();
