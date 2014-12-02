@@ -72,11 +72,6 @@ window.AA = window.AA || {};
             this.userCollection && this.userCollection.remove();
             this.userCollection = new AA.UserCollection();
             
-            if (window.chrome) {
-                var hash = location.hash;
-                location.hash = '';
-                location.hash = hash;
-            }
         }
     });
 })();  // end of the namespace AA
