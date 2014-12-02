@@ -5286,7 +5286,7 @@
         error: null
       },
       playerReady = false,
-      playerUID = Popcorn.guid(),
+      playerUID = Popcorn.guid("player_"),
       player,
       playerPaused = true,
       playerReadyCallbacks = [],

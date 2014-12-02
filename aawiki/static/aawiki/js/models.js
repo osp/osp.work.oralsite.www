@@ -95,7 +95,7 @@ window.AA = window.AA || {};
             return this;
         },
         toFrontMatter: function() {
-            var data = this.toJSON({noalias: true});
+            var data = _.clone(this.attributes);
             var body = data['body'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
 
             data['class'] = data.klass;
@@ -151,6 +151,17 @@ window.AA = window.AA || {};
             this.on('error', this.onError);
             this.listenTo(AA.globalEvents, "aa:changeUser", this.onChangeUser);
         },
+        toJSON: function(options) {
+            options || (options = {});
+
+            var attrs = _.clone(this.attributes);
+
+            if (options.message) {
+                attrs.message = options.message;
+            }
+
+            return attrs
+        },
         onChangeUser: function() {
             this.unset('permissions').fetch();
         },
@@ -184,7 +195,7 @@ window.AA = window.AA || {};
             }
         },
         toFrontMatter: function() {
-            var data = this.toJSON();
+            var data = _.clone(this.attributes);
             var introduction = data['introduction'].replace(/^(\r\n\n|\n|\r)+|(\r\n|\n|\r)+$/g, '');
 
             data['class'] = data.klass;
@@ -219,14 +230,9 @@ window.AA = window.AA || {};
             return this;
         },
         commit: function(msg) {
-            // for now just saves the full model
-            // This could be interesting:
-            // http://stackoverflow.com/questions/20668911/backbone-js-saving-a-model-with-header-params
-            this.save(null, {
-                headers: {
-                    Message: msg
-                }
-            });
+            // saves the full model and pass the message option which will
+            // trigger the commit on the backend
+            this.save(null, {message: msg})
         },
         prev_rev: function() {
             var current = this.get('rev');  
