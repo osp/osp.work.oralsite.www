@@ -239,7 +239,7 @@ window.AA = window.AA || {};
             this.listenTo(this.model, 'change', this.render);
         },
         render: function() {
-            this.$el.html( this.template( this.model.toJSON() ) );
+            this.$el.html( this.template( _.clone(this.model.attributes) ) );
 
             return this;
         },
@@ -264,7 +264,7 @@ window.AA = window.AA || {};
                 $('body').removeClass('anonymous');
             }
 
-            this.$el.html( this.template( this.model.toJSON() ) );
+            this.$el.html( this.template( _.clone(this.model.attributes) ) );
 
             return this;
         },
@@ -309,7 +309,7 @@ window.AA = window.AA || {};
             this.listenTo(this.model, 'change', this.render);
         },
         render: function() {
-            var context = this.model.toJSON();
+            var context = _.clone(this.model.attributes)
             context.introduction = markdown.toHTML(context.introduction, "Aa");
             
             this.$el.html( this.template( context ) );

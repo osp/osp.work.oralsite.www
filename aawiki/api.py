@@ -222,13 +222,15 @@ class PageResource(ModelResource):
             user = User.objects.get(pk=user_id)
             assign_perm(permission, user, bundle.obj)
 
-        # if there is the "message" field in the HTTP header it means we want
+        # if there is the "message" key it means we want
         # to commit
-        msg = bundle.request.META.get('HTTP_MESSAGE')
-        if msg:
+        if 'message' in bundle.data:
             try:
                 # TODO: don't store the permissions?
                 data = bundle.data.copy()
+
+                msg = data['message']
+                del data['message']
 
                 for key in ('permissions', 'rev'):
                     if key in data:
