@@ -755,6 +755,8 @@ window.AA = window.AA || {};
             "click .mini-player"        : "playPauseMiniPlayer",
             'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
             'click a[target="multiplex"]': "crossDriverLink",
+            'drag'                      : "drag",
+            "dragstop"                  : "dragstop",
             'click a[target="multiplex"],span[property="aa:begin"],span[property="aa:end"],video,audio,.mini-player,.controls' : function(e) { e.stopPropagation(); }
         },
         initialize: function() {
@@ -772,6 +774,30 @@ window.AA = window.AA || {};
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);
 
             this.render();
+        },
+        drag: function (event, ui) {
+            if (event.ctrlKey) {
+                $("#canvas").addClass("grid");
+                ui.position.left = Math.floor(ui.position.left / 20) * 20;
+                ui.position.top = Math.floor(ui.position.top / 20) * 20;
+            } else {
+                $("#canvas").removeClass("grid");
+            }
+        },
+        dragstop: function(event, ui) {
+            console.log("dragstop!");
+            this.positionMenu();
+
+            $("#canvas").removeClass("grid");
+
+            var style = $('<div>')
+                .attr('style', this.model.get('style'))
+                .css({
+                    left: ui.position.left + 'px',
+                    top: ui.position.top + 'px',
+                }).attr('style');
+
+            this.model.set({ style: style }, { silent: true }).saveIfAuthorized();
         },
         render: function() {
             /*
@@ -812,29 +838,6 @@ window.AA = window.AA || {};
                 scroll: true,
                 scrollSensitivity: 100,
                 addClasses: false,
-                drag: function (event, ui) {
-                    if (event.ctrlKey) {
-                        $("#canvas").addClass("grid");
-                        ui.position.left = Math.floor(ui.position.left / 20) * 20;
-                        ui.position.top = Math.floor(ui.position.top / 20) * 20;
-                    } else {
-                        $("#canvas").removeClass("grid");
-                    }
-                },
-                stop: function(event, ui) { 
-                    that.positionMenu();
-
-                    $("#canvas").removeClass("grid");
-
-                    var style = $('<div>')
-                        .attr('style', that.model.get('style'))
-                        .css({
-                            left: ui.position.left + 'px',
-                            top: ui.position.top + 'px',
-                        }).attr('style');
-
-                    model.set({ style: style }, { silent: true }).saveIfAuthorized();
-                }
             })
             .droppable({ 
                 accept: ".icon-target",

@@ -14,7 +14,8 @@ $(function() {
     Backbone.history.start({pushState: true, root: "/pages/"});
 });
 
-if (window.chrome) {
+if (window.chrome) { // cf http://davidwalsh.name/detecting-google-chrome-javascript
+    
     /* Work around the problem that chrome only goes to a # link if it is there in the initial HTML
      We make it look again after the annotations have loaded
 
