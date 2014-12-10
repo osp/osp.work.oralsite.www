@@ -894,9 +894,13 @@ window.AA = window.AA || {};
             ;
 
             if (this.isMedia()) {
-                // the resources need to be rendered first, this is
                 this.$el.addClass("media");
             }
+
+            if (this.isSlideshow()) {
+                this.$el.addClass("slideshow");
+            }
+
 
             if(this.driver) {
                 this.updateAnnotationEvents();
