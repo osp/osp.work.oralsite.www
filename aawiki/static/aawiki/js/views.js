@@ -14,7 +14,7 @@ window.AA = window.AA || {};
         tagName: 'div',
         attributes: { class: 'popup-wrapper' },
         events: {
-            'click input[value="cancel"]': 'remove', 
+            'click input[value="cancel"]': 'remove',
             'submit #dialog-form': 'submit',
             'keypress #dialog-form input[value="submit"]': "submitOnEnter"
         },
@@ -35,7 +35,7 @@ window.AA = window.AA || {};
         events: function(){
             return _.extend({}, AA.PopUpView.prototype.events, {
                 'submit #import-form' : 'importData',
-                'click input[value="close"]': 'remove', 
+                'click input[value="close"]': 'remove',
             });
         },
         render: function() {
@@ -94,25 +94,25 @@ window.AA = window.AA || {};
             var ids = _.pluck(permissions.view_page, 'id');
             var visitorCollection = new Backbone.Collection(AA.router.userCollection.models);
             visitorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
+                if (_.indexOf(ids, user.get("id"))) {
+                    user.set('selected', true);
+                }
             });
 
             ids = _.pluck(permissions.change_page, 'id');
             var editorCollection = new Backbone.Collection(AA.router.userCollection.models);
             editorCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
+                if (_.indexOf(ids, user.get("id"))) {
+                    user.set('selected', true);
+                }
             });
 
             ids = _.pluck(permissions.administer_page, 'id');
             var adminCollection = new Backbone.Collection(AA.router.userCollection.models);
             adminCollection.each(function(user) {
-                if (_.indexOf(ids, user.get("id"))) { 
-                    user.set('selected', true); 
-                }   
+                if (_.indexOf(ids, user.get("id"))) {
+                    user.set('selected', true);
+                }
             });
 
             this.$el.html(this.template({
@@ -129,12 +129,12 @@ window.AA = window.AA || {};
         submit: function (event){
             var getPermissionEntries = function($elt) {
                 var ids = _.map($elt.val(), function(val) { return parseInt(val); });
-                
-                var users = AA.router.userCollection.filter(function(model) { 
-                    return _.contains(ids, model.get('id')); 
+
+                var users = AA.router.userCollection.filter(function(model) {
+                    return _.contains(ids, model.get('id'));
                 });
 
-                return _.map(users, function(user) { 
+                return _.map(users, function(user) {
                     var name = user.get('first_name');
                     name = name ? name : user.get('username');
                     var id = user.get('id');
@@ -195,7 +195,7 @@ window.AA = window.AA || {};
         },
     });
 
-    
+
     AA.LoginView = AA.PopUpView.extend({
         template: _.template($('#login-view-template').html()),
         render: function() {
@@ -222,7 +222,7 @@ window.AA = window.AA || {};
                 data: data,
                 dataType: 'json',
                 processData: false,
-                success: function(data) { 
+                success: function(data) {
                     AA.globalEvents.trigger('aa:changeUser');
 
                     that.remove();
@@ -245,7 +245,7 @@ window.AA = window.AA || {};
         },
     });
 
-    
+
     AA.UserView = Backbone.View.extend({
         el: '#user-meta-container',
         template: _.template($('#user-view-template').html()),
@@ -288,7 +288,7 @@ window.AA = window.AA || {};
                 type: 'GET',
                 contentType: 'application/json',
                 processData: false,
-                success: function(data) { 
+                success: function(data) {
                     AA.globalEvents.trigger('aa:changeUser');
                 },
             });
@@ -311,7 +311,7 @@ window.AA = window.AA || {};
         render: function() {
             var context = _.clone(this.model.attributes)
             context.introduction = markdown.toHTML(context.introduction, "Aa");
-            
+
             this.$el.html( this.template( context ) );
 
             AA.router.annotationCollectionView.$el.attr('style', this.model.get('style'));
@@ -347,7 +347,7 @@ window.AA = window.AA || {};
         //},
         //updatePermissionsVisible: function() {
             //var permissions = this.model.get("permissions");
-            
+
             //if ($("#permissions-visible").find("input[type=radio]:checked").val() === "public") {
                 //// add public user
                 //permissions.view_page.push(this.publicUser);
@@ -355,7 +355,7 @@ window.AA = window.AA || {};
                 //// remove public user
                 //permissions.view_page = _.reject(permissions.view_page, function(p) { return p.id === -1; });
             //}
-            
+
             //this.model.set("permissions", permissions);
             //this.model.save();
         //},
@@ -455,12 +455,12 @@ window.AA = window.AA || {};
         registerDriver : function(uri) {
             var that = this;
             if (typeof(this.drivers[uri]) === 'undefined') {
-                
+
                 if (uri === document.location.origin + document.location.pathname) {
                     // If the about is the current page, attach to the general timeline
                     this.drivers[uri] = Popcorn.baseplayer( "#timeline" );
                     this.drivers[uri].media.src = uri; // just to have some reference from the popcorn object to the driver
-                } 
+                }
                 else if (uri.indexOf(document.location.origin + document.location.pathname) !== -1 && uri.indexOf('#') !== -1 ) {
                     // example uri: http://localhost:8000/pages/tests/#annotation-0024
                     // If the about refers to a part of the page, we try to create
@@ -475,7 +475,7 @@ window.AA = window.AA || {};
                 } else {
                     // we assume that the driver is a media element we can manipulate
                     // such as <video class="player" controls="" preload="" src="http://localhost:8000/static/components/popcorn-js/test/trailer.ogv"></video>
-                    
+
                     // the uri, or the uri with an added hash for media-query (#t=3)
                     var driverMediaEl  = document.querySelector('[src="' + uri + '"], [src^="' + uri + '#"]');
                     var driverMediaRef = document.querySelector('[data-uri="' + uri + '"], [data-uri^="' + uri + '#"]');
@@ -489,7 +489,7 @@ window.AA = window.AA || {};
                         // because Popcorn.smart only supports id´s and not elements themselves.
                         this.drivers[uri] = Popcorn.smart('#' + driverMediaRef.getAttribute('id'), uri, { defaults: { controls : true }});
                     } else {
-                            
+
                         // And else we don’t know what to do
                         console.log('driver not found ' + uri);
                         return null;
@@ -533,11 +533,11 @@ window.AA = window.AA || {};
         findChildrenMedia: function(uri) {
             var that = this;
             var $childrenSections = this.findChildren(uri);
-            
+
             var uris = [];
 
             var $activeAnnotations = $childrenSections.find('section[typeof="aa:annotation"].active');
-            
+
             $activeAnnotations.each(function(i, el) {
                 $(el).find(".embed.hosted").each(function(i, el) {
                     uris.push( $(el).attr("data-uri") );
@@ -546,12 +546,12 @@ window.AA = window.AA || {};
                     uris.push( $(el).attr("src") );
                 });
             });
-            
+
             return uris;
         },
         pauseChildren: function(uri) {
             var activeChildDriverUris = this.findChildrenMedia(uri);
-            
+
             for (var i=0; i<activeChildDriverUris.length; i++) {
                 var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && !driver.paused()) {
@@ -561,7 +561,7 @@ window.AA = window.AA || {};
         },
         playChildren: function(uri) {
             var activeChildDriverUris = this.findChildrenMedia(uri);
-            
+
             for (var i=0; i<activeChildDriverUris.length; i++) {
                 var driver = AA.router.multiplexView.getDriver(activeChildDriverUris[i]);
                 if (typeof driver !== "undefined" && driver.paused()) {
@@ -647,7 +647,7 @@ window.AA = window.AA || {};
             var that = this;
             if (typeof this.hasPlay === "undefined") { return null; }
             if (!this.driver) { return null; }
-            
+
             if (this.hasPlay()) {
                 this.$el.find(".controls").removeClass("hidden");
 
@@ -659,7 +659,7 @@ window.AA = window.AA || {};
                 if (this.driver.paused() === playButtonShowsPause()) {
                     this.$el.find('.play').toggleClass("fa-play fa-pause");
                 }
-                
+
                 // update time based values:
                 this.$el.find('.current_time').text(AA.utils.ss2tc(this.driver.currentTime()));
                 this.$el.find('.duration').text(AA.utils.ss2tc(this.duration()));
@@ -753,7 +753,7 @@ window.AA = window.AA || {};
             "mousedown .icon-layers"    : "changeZIndex",
             "click .controls .play"     : "playPause",
             "click .next"               : "next",
-            "click .previous"           : "previous",            
+            "click .previous"           : "previous",
             "click .mini-player"        : "playPauseMiniPlayer",
             'click span[property="aa:begin"],span[property="aa:end"]' : "jumpToAnnotation",
             'click a[target="multiplex"]': "crossDriverLink",
@@ -841,7 +841,7 @@ window.AA = window.AA || {};
                 scrollSensitivity: 100,
                 addClasses: false,
             })
-            .droppable({ 
+            .droppable({
                 accept: ".icon-target",
                 addClasses: false,
                 greedy: true,
@@ -887,17 +887,17 @@ window.AA = window.AA || {};
                     model.set({ style: style }, { silent: true }).saveIfAuthorized();
                 }
             });
-            
+
             $('.icon-target', this.$el)
                 .attr('href', document.location.origin + document.location.pathname + '#' + this.model.get('uuid'))
                 .draggable({ helper: "clone" })
             ;
 
             if (this.isMedia()) {
-                // the resources need to be rendered first, this is 
+                // the resources need to be rendered first, this is
                 this.$el.addClass("media");
             }
-            
+
             if(this.driver) {
                 this.updateAnnotationEvents();
             }
@@ -1037,17 +1037,17 @@ window.AA = window.AA || {};
         },
         focus: function(event) {
             this.model.collection.trigger('focus', event, this.model);
-        
+
             event.stopPropagation();
         },
         onPositionChange: function(model, value, options) { // FIXME this code should allow for animations but is not called right now
             var defaults = {
                 animate: false
             };
-           
+
             var options = $.extend({}, defaults, options);
             var that = this;
-            
+
             if (options.animate === true) {
                 this.$el.animate({
                     left: model.changed.left,
@@ -1153,7 +1153,7 @@ window.AA = window.AA || {};
              * This annotation has an `about` value. It represents what is annotated,
              * also called the ‘driver’ because this time based resource can trigger
              * time-based behaviour in the annotations.
-             * 
+             *
              * With this time-based resource we initialise the driver,
              * if it has not yet been initialised, and we call the function to register
              * the annotations as events.
@@ -1179,7 +1179,7 @@ window.AA = window.AA || {};
         },
         deleteAnnotationEvents: function() {
             /**
-             * Delete all references to annotations at this annotation’s driver. 
+             * Delete all references to annotations at this annotation’s driver.
              */
             for (var i=0; i<this.driverEventIDs.length; i++) {
                 var eventID = this.driverEventIDs[i];
@@ -1191,9 +1191,9 @@ window.AA = window.AA || {};
             /**
              * Scan the contents of the annotation view: parse out all annotations,
              * and register them with the driver.
-             * 
+             *
              * This is rerun every time the content changes (with the old events
-             * emptied out beforehand) 
+             * emptied out beforehand)
              */
             if (!this.driver) {
                 return false;
@@ -1235,7 +1235,7 @@ window.AA = window.AA || {};
 
             var annotations = this.$el.find("[typeof='aa:annotation']");
             if (annotations.length !== 1) { return false; }
-            
+
             var media = annotations.find("audio[src], video[src]");
             if (media.length !== 1) {
                 return false;
@@ -1254,14 +1254,14 @@ window.AA = window.AA || {};
 
 
     AA.AnnotationCollectionView = Backbone.View.extend({
-        collection: new AA.AnnotationCollection(), 
+        collection: new AA.AnnotationCollection(),
         el: '#canvas',
         events: {
             "click"            : "focus",
         },
         initialize: function() {
             this.cursorMenu = new AA.widgets.Menu ({iconSize: 40, iconSpacing: 5, position: 'cursor'});
-            
+
             this.cursorMenu.register ([
                 // Create Annotation Button
                 new AA.widgets.MenuButton ({title: 'new box', class: 'icon-new'})
@@ -1277,7 +1277,7 @@ window.AA = window.AA || {};
 
                 // Create Edit introduction Button
                 new AA.widgets.MenuButton ({title: 'edit introduction', class: 'icon-edit'})
-                    .on('click', function() { 
+                    .on('click', function() {
                         if (AA.router.annotationCollectionView.cursorMenu.visible()) {
                             AA.router.annotationCollectionView.cursorMenu.hide ();
                         };
@@ -1294,7 +1294,7 @@ window.AA = window.AA || {};
                     .draggable({ helper: "clone" })
                     .attr('href', document.location.origin + document.location.pathname),
             ]);
-            
+
             this.listenTo(this.collection, 'focus', this.onFocus);
             this.listenTo(this.collection, 'add', this.renderOne);
             this.listenTo(AA.userModel, 'sync', this.render);
@@ -1325,17 +1325,17 @@ window.AA = window.AA || {};
                 // annotation needs to be appended first in order for the program
                 // to find the drivers
             });
-            
+
             AA.globalEvents.trigger('aa:newDrivers');
             return this;
         },
         focus: function(event) {
             this.collection.trigger('focus', event, this.collection);
-        
+
             event.stopPropagation();
         },
         onFocus: function(event, instance) {
-            if (instance === this.collection && 
+            if (instance === this.collection &&
                 ! this.cursorMenu.visible() &&
                 AA.userModel.loggedIn() &&
                 ! AA.router.pageView.model.get('rev')) {
@@ -1374,7 +1374,7 @@ window.AA = window.AA || {};
 
             if (proceed) {
                 // sort the annotations by z-index;
-                var sorted = this.collection.sortBy(function(model) { 
+                var sorted = this.collection.sortBy(function(model) {
                     return model.zIndex();
                 });
 
