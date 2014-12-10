@@ -666,6 +666,7 @@ window.AA = window.AA || {};
                 this.$el.find('.next').toggleClass("disabled", !this.nextEvent());
                 this.$el.find('.previous').toggleClass("disabled", !this.previousEvent());
                 this.$el.find('#seek-bar').val( 100 / this.duration()  * this.driver.currentTime() );
+                this.$el.find('#faux-seek-bar-interior').css("width", 100 / this.duration()  * this.driver.currentTime() + "px" );
             } else {
                 this.$el.find(".controls").addClass("hidden");
             }
@@ -682,6 +683,7 @@ window.AA = window.AA || {};
             "click .next":     "next",
             "click .previous": "previous",
             "input #seek-bar": "seek", // continuously emit; bind to `change #seek-bar` to only update when mouse is released
+                                       // at the moment the seek bar is disabled
         },
         initialize: function() {
             this.listenTo(AA.globalEvents, "aa:timeUpdate", this.renderPlayerConditionally, this);

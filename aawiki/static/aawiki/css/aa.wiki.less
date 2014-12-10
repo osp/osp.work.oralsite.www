@@ -972,3 +972,24 @@ img {
 }
 
 
+/* Because scrubbing with the seek bar is not working to satisfaction yet, it is better not to display the seekbar—
+ we provide a progress bar that provides visual feedback on where we are in the timeline */
+
+#seek-bar {
+    display: none;
+}
+
+#faux-seek-bar {
+    display: inline-block;
+    position: relative;
+    height: 9px;
+    border: 1px solid #ccc;
+    width: 100px;
+}
+
+#faux-seek-bar-interior {
+    background-color: blue;
+    width: 50px;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+}
