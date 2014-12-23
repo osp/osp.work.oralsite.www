@@ -29,6 +29,7 @@ var mockPageHash = {
         "about" : document.location.origin + '/tests/#annotation-24',
         "body" : "#Relative time\n\nThis is an example of a slideshow.\n\n8<\n\nFirst slide\n\n8<\n\nSecond slide\n\n8<\n\nThird slide\n",
         "id" : 24,
+        "uuid" : "annotation-24",
         "page" : "/api/v1/page/Tests/",
         "resource_uri" : "/api/v1/annotation/24/",
         "style" : "left: 333px; top: 18px; width: 300; height: 400",

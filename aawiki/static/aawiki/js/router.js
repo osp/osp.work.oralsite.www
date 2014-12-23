@@ -71,6 +71,7 @@ window.AA = window.AA || {};
 
             this.userCollection && this.userCollection.remove();
             this.userCollection = new AA.UserCollection();
+            
         }
     });
 })();  // end of the namespace AA
