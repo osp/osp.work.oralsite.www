@@ -2,12 +2,20 @@ from django.contrib import admin
 from aawiki.models import Annotation, Page
 from guardian.admin import GuardedModelAdmin
 
+
+class AnnotationInline(admin.StackedInline):
+    extra = 0
+    model = Annotation
+
+
 class AnnotationAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['title', 'body']
 
 
 class PageAdmin(GuardedModelAdmin):
-    pass
+    inlines = [
+        AnnotationInline,
+    ]
 
 
 admin.site.register(Annotation, AnnotationAdmin)
