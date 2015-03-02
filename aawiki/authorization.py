@@ -27,7 +27,7 @@ def get_user(bundle):
 def get_serialized_perms(object, current_user_id=None, perms_to_serialize=[u'view_page', u'change_page', u'administer_page']):
     """
     Get the specified user-permission pairs for the given object.
-    
+
     If passed a current_user_id, an extra field ‘current’ is added to each user-permission pair,
     that designates whether the user with the permission corresponds to the current user.
     """
@@ -69,7 +69,7 @@ class PerUserAuthorization(Authorization):
             return object_list
         else:
             raise Unauthorized("Sorry, no user list")
-    
+
     def read_detail(self, object_list, bundle):
         """
         A user can request info on herself
@@ -78,25 +78,25 @@ class PerUserAuthorization(Authorization):
             return True
         else:
             return False
-    
+
     def create_list(self, object_list, bundle):
         # Currently not used in Tastypie
         raise NotImplementedError()
-    
+
     def create_detail(self, object_list, bundle):
         # TODO
         raise NotImplementedError()
-    
+
     def update_list(self, object_list, bundle):
         raise NotImplementedError()
-    
+
     def update_detail(self, object_list, bundle):
         # TODO
         raise NotImplementedError()
-    
+
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
-    
+
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
 
@@ -111,30 +111,30 @@ class PerPageAuthorization(Authorization):
     def read_list(self, object_list, bundle):
         pages = get_objects_for_user(get_user(bundle), 'aawiki.view_page')
         return pages
-    
+
     def read_detail(self, object_list, bundle):
         return get_user(bundle).has_perm('view_page', bundle.obj) or anonymous_user.has_perm('view_page', bundle.obj)
-    
+
     def create_list(self, object_list, bundle):
         # Currently not used in Tastypie
         raise NotImplementedError()
-    
+
     def create_detail(self, object_list, bundle):
         return get_user(bundle).has_perm('aawiki.add_page')
-    
+
     def update_list(self, object_list, bundle):
         pages = get_objects_for_user(get_user(bundle), 'aawiki.change_page')
         return pages
-    
+
     def update_detail(self, object_list, bundle):
-        return get_user(bundle).has_perm('change_page', bundle.obj)
-    
+        return get_user(bundle).has_perm('aawiki.change_page')
+
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
-    
+
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
-    
+
 class PerAnnotationAuthorization(Authorization):
     """
     To see if a user can see, edit and create annotations, we depend
@@ -147,14 +147,14 @@ class PerAnnotationAuthorization(Authorization):
             permitted_ids.append(p.id)
         permitted_ids = list(set(permitted_ids))
         return object_list.filter(page__id__in=permitted_ids)
-    
+
     def read_detail(self, object_list, bundle):
         return get_user(bundle).has_perm('view_page', bundle.obj.page) or anonymous_user.has_perm('view_page', bundle.obj.page)
-    
+
     def create_list(self, object_list, bundle):
         # Currently not used in Tastypie
         raise NotImplementedError()
-    
+
     def create_detail(self, object_list, bundle):
         """
         Here we can not rely on bundle.obj, because the object has not been
@@ -164,16 +164,16 @@ class PerAnnotationAuthorization(Authorization):
         url_match = resolve(page_url)
         page = Page.objects.get(slug = url_match.kwargs['slug'])
         return get_user(bundle).has_perm('change_page', page) # change page, not add page, because adding an annotation means changing a page
-    
+
     def update_list(self, object_list, bundle):
         permitted_pages = [i.id for i in get_objects_for_user(get_user(bundle), 'aawiki.change_page')]
         return object_list.filter(page__id__in=permitted_pages)
-    
+
     def update_detail(self, object_list, bundle):
         return get_user(bundle).has_perm('change_page', bundle.obj.page)
-    
+
     def delete_list(self, object_list, bundle):
         raise Unauthorized("Sorry, no deletes.")
-    
+
     def delete_detail(self, object_list, bundle):
         return get_user(bundle).has_perm('change_page', bundle.obj.page)

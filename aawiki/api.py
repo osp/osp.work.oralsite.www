@@ -225,17 +225,18 @@ class PageResource(ModelResource):
         # if there is the "message" key it means we want
         # to commit
         if 'message' in bundle.data:
+            # TODO: don't store the permissions?
+            data = bundle.data.copy()
+
+            msg = data['message']
+            del data['message']
+
+            for key in ('permissions', 'rev'):
+                if key in data:
+                    del data[key]
+
             try:
-                # TODO: don't store the permissions?
-                data = bundle.data.copy()
-
-                msg = data['message']
-                del data['message']
-
-                for key in ('permissions', 'rev'):
-                    if key in data:
-                        del data[key]
-
+                #import ipdb; ipdb.set_trace()
                 backend.commit('aawiki/Page/%s.json' % kwargs['slug'], self.serialize(None, data, 'application/json'), message=msg)
             except:
                 # Main case: the content hasn't changed between two calls, and
@@ -250,17 +251,23 @@ class PageResource(ModelResource):
 
         cf http://stackoverflow.com/questions/10070173/tastypie-obj-create-how-to-use-newly-created-object
         """
+        # 1. Create the page. If the user is Anonymous or does not have Django
+        # permissions to create a page, it will throw a 401 "Insufficient
+        # permissions to save" error.
+        # FIXME: shouldn't throw a 404 error instead?
         bundle = super(PageResource, self).obj_create(bundle, **kwargs)
-        user = get_user(bundle)
 
+        # 2. This code is only performed if it passed the previous line without
+        # 401 error (sends an immediate HttpResponse in caseof failure)
+        user = get_user(bundle)
         anonymous_user = User.objects.get(pk=-1)
 
-        assign_perm('aawiki.view_page', user, bundle.obj)
+        assign_perm('view_page', user, bundle.obj)
         if user.id != -1:
             # if the current user is not the anonymous user
-            assign_perm('aawiki.view_page', anonymous_user, bundle.obj)
+            assign_perm('view_page', anonymous_user, bundle.obj)
         assign_perm('aawiki.change_page', user, bundle.obj)
-        assign_perm('aawiki.administer_page', user, bundle.obj)
+        assign_perm('administer_page', user, bundle.obj)
 
         return bundle
 
