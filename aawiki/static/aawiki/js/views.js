@@ -1346,7 +1346,7 @@ window.AA = window.AA || {};
             if (instance === this.collection &&
                 ! this.cursorMenu.visible() &&
                 AA.userModel.loggedIn() &&
-                (AA.userModel.canChange() || AA.userModel.canAdminister) &&
+                (AA.userModel.canChange() || AA.userModel.canAdminister()) &&
                 ! AA.router.pageView.model.get('rev')) {
                 if (this.focused) {
                     this.focused = undefined;
