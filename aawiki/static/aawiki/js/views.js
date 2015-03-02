@@ -1297,6 +1297,10 @@ window.AA = window.AA || {};
                 new AA.widgets.MenuButton({title: 'drag to connect', class: 'icon-target'})
                     .draggable({ helper: "clone" })
                     .attr('href', document.location.origin + document.location.pathname),
+
+                // Create Set About Value Button
+                new AA.widgets.MenuButton({title: 'view the page source', class: 'icon-target'})
+                    .on('click', this.viewSource.bind(this)),
             ]);
 
             this.listenTo(this.collection, 'focus', this.onFocus);
@@ -1402,6 +1406,22 @@ window.AA = window.AA || {};
             };
 
             new AA.EditPermissionsView({ model: AA.router.pageView.model });
+        },
+        viewSource: function (event) {
+            //var src = Backbone.sync('read', AA.router.pageModel, {});
+            //var src = AA.router.pageModel.sync('read', AA.router.pageModel, {});
+            //var model = AA.router.pageModel;
+            //var foo = model.trigger('sync', model, {wait: true});
+
+            //console.log(foo);
+            $.ajax({
+                url: AA.router.pageModel.url(),
+                dataType: 'text',
+                async: false,
+                success: function (data){
+                    console.log(data);
+                }
+            });
         },
     });
 })();  // end of the namespace AA

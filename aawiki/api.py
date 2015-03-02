@@ -225,17 +225,18 @@ class PageResource(ModelResource):
         # if there is the "message" key it means we want
         # to commit
         if 'message' in bundle.data:
+            # TODO: don't store the permissions?
+            data = bundle.data.copy()
+
+            msg = data['message']
+            del data['message']
+
+            for key in ('permissions', 'rev'):
+                if key in data:
+                    del data[key]
+
             try:
-                # TODO: don't store the permissions?
-                data = bundle.data.copy()
-
-                msg = data['message']
-                del data['message']
-
-                for key in ('permissions', 'rev'):
-                    if key in data:
-                        del data[key]
-
+                #import ipdb; ipdb.set_trace()
                 backend.commit('aawiki/Page/%s.json' % kwargs['slug'], self.serialize(None, data, 'application/json'), message=msg)
             except:
                 # Main case: the content hasn't changed between two calls, and
