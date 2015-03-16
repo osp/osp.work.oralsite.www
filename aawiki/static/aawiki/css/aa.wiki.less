@@ -181,9 +181,7 @@ body {
     top: 0;
     right: 0;
     bottom: 0;
-    padding: 13px;
-    z-index: 9999999999999999;
-    overflow-y: auto;
+    z-index: 999999;
     .transition(right, 250ms, ease-out, 0s);
 
     .hide-sidebar & {
@@ -195,8 +193,17 @@ body {
         position: absolute;
         right: 300px;
         top: 10px;
-        z-index: 9999999999999;
     }
+}
+
+.sidebar__wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 13px;
+    overflow: auto;
 }
 
 #canvas {
