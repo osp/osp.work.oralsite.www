@@ -142,6 +142,10 @@ LOGGING = {
 COMPRESS_PRECOMPILERS = (
    ('text/less', 'lessc {infile} {outfile}'),
 )
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter'
+]
 INTERNAL_IPS = ('127.0.0.1',) # This is so the {% if debug %} works,
                               # cf http://stackoverflow.com/questions/11020663/
 
