@@ -18,7 +18,6 @@ def deploy():
         with prefix('source %s' % path_activate):
             run('pip install -r requirements.txt')
             run('python manage.py collectstatic --noinput')
-            run('python manage.py compress --force')
 
     run('touch %s' % path_wsgi)
 
