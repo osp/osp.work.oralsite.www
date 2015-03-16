@@ -140,7 +140,7 @@ LOGGING = {
 
 # Django Compressor setup
 COMPRESS_PRECOMPILERS = (
-   ('text/less', 'lessc {infile} {outfile}'),
+   ('text/less', 'lessc {infile} > {outfile}'),
 )
 COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
