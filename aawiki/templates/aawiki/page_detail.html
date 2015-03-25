@@ -1,7 +1,7 @@
 {% extends "aawiki/base.html" %}
 
 
-{% load compress markup %}
+{% load compress %}
 
 
 {% block extrahead %}
@@ -94,7 +94,7 @@
             <li><a href="#help">Help</a></li>
             <li><a href="#commits">History</a></li>
         </ul>
-        <div id="help">{% filter markdown:"extra" %}{% include "aawiki/partials/help.html" %}{% endfilter %}</div>
+        <div id="help">{% include "aawiki/partials/help.html" %}</div>
         <div id="commits">bla</div>
     </div>
 </aside>
