@@ -16,3 +16,6 @@ python-magic>=0.4,<0.5
 # Or maybe Dulwich, it does not have the libgit2 requirement
 # TODO: check if we can update the version of GitPython, as it seems pretty old
 GitPython==0.1.7
+
+# Temporary, for generating the help menu
+markdown>=2.1

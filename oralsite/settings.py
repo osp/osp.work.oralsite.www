@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'compressor',
     'aawiki',
     'aafilters',
+    'django.contrib.markup'
 )
 
 AUTHENTICATION_BACKENDS = (
