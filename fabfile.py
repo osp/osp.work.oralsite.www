@@ -7,13 +7,13 @@ env.hosts = ['sarma@sarma.be']
 env.path = '/srv/sarma_data01/www/apps/be.oralsite'
 
 
-def deploy():
+def deploy(branch='master'):
     """deploys to previously setup environment"""
     path_activate = '/srv/sarma_data01/www/venvs/be.oralsite/bin/activate'
     path_wsgi = '/srv/sarma_data01/www/apps/be.oralsite/oralsite/wsgi.py'
 
     with cd(env.path):
-        run('git pull origin master')
+        run('git pull origin %s' % branch)
 
         with prefix('source %s' % path_activate):
             run('pip install -r requirements.txt')

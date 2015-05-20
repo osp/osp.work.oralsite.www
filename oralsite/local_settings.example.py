@@ -39,7 +39,7 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERY_ALWAYS_EAGER = False
 
 
-# aawiki versioning
+# olga versioning
 RCS_BACKEND = 'gitcore' # uses git-python
 # Conflicts with the project git repository
 # Makes sure to set the GIT_REPO_PATH value to a path outside of the project repository!

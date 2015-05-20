@@ -93,12 +93,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'south',
+    #'south',
     'tastypie',
     'guardian',
 #    'djcelery',
     'compressor',
-    'aawiki',
+    'olga',
     'aafilters',
 )
 
