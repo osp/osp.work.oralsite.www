@@ -55,7 +55,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -97,7 +96,6 @@ INSTALLED_APPS = (
     'tastypie',
     'guardian',
 #    'djcelery',
-    'compressor',
     'olga',
     'aafilters',
 )
@@ -138,16 +136,10 @@ LOGGING = {
     }
 }
 
-# Django Compressor setup
-COMPRESS_PRECOMPILERS = (
-   ('text/less', 'lessc {infile} {outfile}'),
-)
-COMPRESS_CSS_FILTERS = [
-    'compressor.filters.css_default.CssAbsoluteFilter',
-    'compressor.filters.cssmin.CSSMinFilter'
-]
 INTERNAL_IPS = ('127.0.0.1',) # This is so the {% if debug %} works,
                               # cf http://stackoverflow.com/questions/11020663/
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 try:
     LOCAL_SETTINGS
